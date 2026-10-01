@@ -1,0 +1,20 @@
+<scheme name="SynthWave '84" version="142" parent_scheme="Darcula">
+  <colors>
+    <option name="CARET_COLOR" value="36F9F6" />
+    <option name="CARET_ROW_COLOR" value="2C253C" />
+    <option name="SELECTION_BACKGROUND" value="49365F" />
+    <option name="SELECTION_FOREGROUND" value="F5F1FF" />
+    <option name="LINE_NUMBERS_COLOR" value="B4A9C9" />
+    <option name="GUTTER_BACKGROUND" value="262335" />
+  </colors>
+  <attributes>
+    <option name="TEXT"><value><option name="FOREGROUND" value="F5F1FF" /><option name="BACKGROUND" value="262335" /></value></option>
+    <option name="DEFAULT_KEYWORD"><value><option name="FOREGROUND" value="FF7EDB" /></value></option>
+    <option name="DEFAULT_NUMBER"><value><option name="FOREGROUND" value="F97E72" /></value></option>
+    <option name="DEFAULT_STRING"><value><option name="FOREGROUND" value="FF8B39" /></value></option>
+    <option name="DEFAULT_LINE_COMMENT"><value><option name="FOREGROUND" value="B4A9C9" /></value></option>
+    <option name="DEFAULT_BLOCK_COMMENT"><value><option name="FOREGROUND" value="B4A9C9" /></value></option>
+    <option name="DEFAULT_FUNCTION_DECLARATION"><value><option name="FOREGROUND" value="36F9F6" /></value></option>
+    <option name="DEFAULT_CONSTANT"><value><option name="FOREGROUND" value="72F1B8" /></value></option>
+  </attributes>
+</scheme>

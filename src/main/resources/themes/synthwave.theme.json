@@ -1,0 +1,34 @@
+{
+  "name": "SynthWave '84",
+  "author": "Jakub Chrzanowski / Robb Owen",
+  "dark": true,
+  "parentTheme": "Islands Dark",
+  "editorScheme": "/themes/synthwave.xml",
+  "colors": {
+    "Editor": "#262335",
+    "Chrome": "#241B2F",
+    "Frame": "#171520",
+    "Foreground": "#F5F1FF",
+    "Muted": "#B4A9C9",
+    "Border": "#514361",
+    "Selection": "#49365F",
+    "Focus": "#36F9F6",
+    "Accent": "#FF7EDB"
+  },
+  "ui": {
+    "Islands": 1,
+    "Island.borderColor": "Chrome",
+    "MainWindow.background": "Frame",
+    "MainToolbar.background": "Frame",
+    "Panel.background": "Chrome",
+    "Panel.foreground": "Foreground",
+    "Label.foreground": "Foreground",
+    "Component.borderColor": "Border",
+    "Component.focusColor": "Focus",
+    "ToolWindow.background": "Chrome",
+    "Tree.background": "Chrome",
+    "Tree.foreground": "Foreground",
+    "Tree.selectionBackground": "Selection",
+    "Tree.selectionForeground": "Foreground"
+  }
+}

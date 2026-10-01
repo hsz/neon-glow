@@ -22,3 +22,12 @@ intellijPlatform {
         }
     }
 }
+
+tasks {
+    processResources {
+        from("LICENSE.upstream") {
+            into("META-INF")
+            rename { "LICENSE.synthwave84" }
+        }
+    }
+}
