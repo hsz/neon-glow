@@ -1,6 +1,7 @@
 package info.chrzanowski.idesynthwave.render
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
@@ -77,5 +78,38 @@ class GaussianBlurTest {
     @Test
     fun `empty raster is a no-op`() {
         GaussianBlur.separable(FloatArray(0), 0, 0, 1f, FloatArray(0))
+    }
+
+    @Test
+    fun `kernel rejects non-positive or NaN sigma`() {
+        for (sigma in floatArrayOf(0f, -1f, Float.NaN)) {
+            assertThrows(IllegalArgumentException::class.java) { GaussianBlur.kernel(sigma) }
+        }
+    }
+
+    @Test
+    fun `blur rejects undersized raster buffers`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            GaussianBlur.separable(FloatArray(1), 2, 2, 1f, FloatArray(4))
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            GaussianBlur.separable(FloatArray(4), 2, 2, 1f, FloatArray(1))
+        }
+    }
+
+    @Test
+    fun `single row and column use zero padding`() {
+        val kernel = GaussianBlur.kernel(1f)
+        val mid = kernel.size / 2
+        val row = FloatArray(kernel.size).also { it[mid] = 1f }
+        val column = row.copyOf()
+
+        GaussianBlur.separable(row, row.size, 1, 1f, FloatArray(row.size))
+        GaussianBlur.separable(column, 1, column.size, 1f, FloatArray(column.size))
+
+        for (i in kernel.indices) {
+            assertEquals(kernel[i] * kernel[mid], row[i], 1e-7f)
+            assertEquals(row[i], column[i], 1e-7f)
+        }
     }
 }
