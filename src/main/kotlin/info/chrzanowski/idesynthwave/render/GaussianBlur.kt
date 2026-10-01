@@ -7,7 +7,7 @@ import kotlin.math.exp
  * Separable Gaussian blur on a single-channel `FloatArray` raster (row-major, `w * h` samples).
  *
  * Samples outside the raster count as zero, so callers must pad their content by [radius] on every side if no
- * energy is to be lost at the borders.
+ * energy is to be lost at the borders; [GlowMaskRenderer] does exactly that.
  */
 object GaussianBlur {
 
