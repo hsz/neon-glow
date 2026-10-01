@@ -6,7 +6,7 @@ Choose **SynthWave '84** under **Settings | Appearance & Behavior | Appearance**
 
 ## Development
 
-Use JDK 21 or newer.
+Use JDK 21 or newer. Gradle compiles the plugin with a Java 21 toolchain.
 
 ```shell
 ./gradlew test
