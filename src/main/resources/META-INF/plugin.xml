@@ -1,0 +1,7 @@
+<idea-plugin>
+    <id>info.chrzanowski.idesynthwave</id>
+    <name>IDE Synthwave</name>
+    <vendor url="https://chrzanowski.info">Jakub Chrzanowski</vendor>
+    <description>A SynthWave-inspired theme for JetBrains IDEs.</description>
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>
