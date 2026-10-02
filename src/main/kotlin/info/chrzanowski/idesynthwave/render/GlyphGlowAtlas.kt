@@ -1,6 +1,8 @@
 package info.chrzanowski.idesynthwave.render
 
+import java.awt.Font
 import java.awt.Shape
+import java.awt.geom.AffineTransform
 
 /**
  * Everything a glow mask depends on. Two glyphs with equal keys look identical on screen, so they share one mask.
@@ -9,6 +11,9 @@ import java.awt.Shape
  * @param argb tint colour (alpha byte ignored)
  * @param sysScale device pixels per user-space unit
  * @param radiusPx user-space glow radius
+ * @param synthwaveStyle whether to use layered colour and shadow rules
+ * @param brightness variable shadow alpha baked into layered masks; same-colour masks use blit opacity instead
+ * @param textStyleRule resolved upstream/adaptive rule; different halo palettes must not share masks
  */
 data class GlyphKey(
     val glyphCode: Int,
@@ -18,16 +23,24 @@ data class GlyphKey(
     val argb: Int,
     val sysScale: Float,
     val radiusPx: Float,
+    val font: Font? = null,
+    val glyphTransform: AffineTransform? = null,
+    val synthwaveStyle: Boolean = false,
+    val brightness: Float = 1f,
+    val textStyleRule: SynthwaveTextStyle.Rule? = null,
 )
 
 /**
  * Access-ordered LRU cache of [GlowMask]s keyed by [GlyphKey]. Edits and scrolling never invalidate entries; only
- * [clear] (theme / settings change) or eviction at [capacity] drops them. Not thread-safe: paint runs on the EDT.
+ * [clear] (theme / settings change) or eviction at [capacity] / [maxBytes] drops them. Not thread-safe: paint runs on
+ * the EDT. Masks larger than the byte budget are returned without being retained.
  */
 class GlyphGlowAtlas(
     val capacity: Int = DEFAULT_CAPACITY,
+    val maxBytes: Long = DEFAULT_MAX_BYTES,
     private val renderer: (GlyphKey, Shape, Float) -> GlowMask = { key, outline, intensity ->
-        GlowMaskRenderer.render(
+        if (key.synthwaveStyle) SynthwaveTextStyle.render(key, outline, intensity)
+        else GlowMaskRenderer.render(
             outline, GlowMaskRenderer.sigmaFor(key.radiusPx, key.sysScale), key.argb, key.sysScale, intensity,
         )
     },
@@ -35,6 +48,7 @@ class GlyphGlowAtlas(
 
     init {
         require(capacity > 0) { "capacity must be positive, got $capacity" }
+        require(maxBytes > 0) { "maxBytes must be positive, got $maxBytes" }
     }
 
     private val entries = object : LinkedHashMap<GlyphKey, GlowMask>(capacity * 4 / 3 + 1, 0.75f, true) {
@@ -86,6 +100,12 @@ class GlyphGlowAtlas(
         val mask = renderer(key, outline, intensity)
         entries.put(key, mask)?.let { bytes -= it.bytes }
         bytes += mask.bytes
+        val iterator = entries.entries.iterator()
+        while (bytes > maxBytes && iterator.hasNext()) {
+            bytes -= iterator.next().value.bytes
+            iterator.remove()
+            evictions++
+        }
         return mask
     }
 
@@ -100,5 +120,6 @@ class GlyphGlowAtlas(
 
     companion object {
         const val DEFAULT_CAPACITY: Int = 1500
+        const val DEFAULT_MAX_BYTES: Long = 32L * 1024 * 1024
     }
 }

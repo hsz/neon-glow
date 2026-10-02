@@ -2,6 +2,8 @@ package info.chrzanowski.idesynthwave.render
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -107,5 +109,23 @@ class GlyphGlowAtlasTest {
         assertEquals(6 + 2 * pad, mask.width)
         assertEquals(8 + 2 * pad, mask.height)
         assertTrue(real.bytes > 0)
+    }
+
+    @Test
+    fun `wide layered masks remain within the byte budget including oversized entries`() {
+        val bounded = GlyphGlowAtlas(capacity = 100, maxBytes = 160) { _, _, _ ->
+            GlowMask(BufferedImage(4, 5, BufferedImage.TYPE_INT_ARGB_PRE), -1, -2)
+        }
+        for (glyph in 0 until 10) bounded.get(key(glyph = glyph)) { outline }
+        assertEquals(2, bounded.size)
+        assertEquals(160L, bounded.bytes)
+        assertEquals(8L, bounded.evictions)
+        assertNull(bounded.find(key(glyph = 0)))
+        assertNotNull(bounded.find(key(glyph = 9)))
+        val oversized = GlyphGlowAtlas(maxBytes = 1)
+        val mask = oversized.get(key()) { outline }
+        assertTrue(mask.bytes > 1)
+        assertEquals(0, oversized.size)
+        assertEquals(0L, oversized.bytes)
     }
 }
