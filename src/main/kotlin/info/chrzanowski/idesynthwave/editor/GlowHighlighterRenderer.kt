@@ -11,9 +11,13 @@ import com.intellij.ui.scale.JBUIScale
 import info.chrzanowski.idesynthwave.render.GaussianBlur
 import info.chrzanowski.idesynthwave.render.GlowMaskRenderer
 import info.chrzanowski.idesynthwave.render.GlowStats
+import info.chrzanowski.idesynthwave.render.GlowWorkBudget
 import info.chrzanowski.idesynthwave.render.GlyphGlowAtlas
 import info.chrzanowski.idesynthwave.render.GlyphKey
+import info.chrzanowski.idesynthwave.render.SynthwaveTextStyle
 import info.chrzanowski.idesynthwave.settings.GlowSettings
+import info.chrzanowski.idesynthwave.ui.GlowGraphics2D
+import java.awt.AlphaComposite
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -52,6 +56,7 @@ class GlowHighlighterRenderer(
     private val blit = AffineTransform()
     private var graphicsContext: FontRenderContext? = null
     private var editorContext: FontRenderContext? = null
+    private var workBudget = GlowWorkBudget()
 
     /** Glyphs blitted by the last [paint] (tests, statistics). */
     var lastGlyphCount: Int = 0
@@ -66,15 +71,27 @@ class GlowHighlighterRenderer(
     override fun paint(editor: Editor, highlighter: RangeHighlighter, g: Graphics) {
         lastGlyphCount = 0
         lastFallbackSegments = 0
+        workBudget = GlowWorkBudget()
         val state = settings.state
-        if (!state.enabled || PowerSaveMode.isEnabled()) return
-        if (!stats.enabled) {
-            paintGlow(editor, state, g)
-            return
+        if (!state.enabled || !state.editorText || state.editorGlowStrength <= 0f || state.brightness <= 0f || PowerSaveMode.isEnabled()) return
+        if (!state.regularText && !state.synthwaveStyle) return
+        if (g is Graphics2D && GlowGraphics2D.isGlowing(g)) return
+        val source = g as? Graphics2D ?: return
+        val alpha = source.composite as? AlphaComposite ?: return
+        if (alpha.rule != AlphaComposite.SRC_OVER || alpha.alpha == 0f) return
+        val halo = source.create() as Graphics2D
+        try {
+            halo.composite = alpha.derive(alpha.alpha * state.editorGlowStrength)
+            if (!stats.enabled) {
+                paintGlow(editor, state, halo)
+                return
+            }
+            val start = System.nanoTime()
+            paintGlow(editor, state, halo)
+            stats.recordPaint((System.nanoTime() - start) / 1_000, lastGlyphCount, lastFallbackSegments, atlas)
+        } finally {
+            halo.dispose()
         }
-        val start = System.nanoTime()
-        paintGlow(editor, state, g)
-        stats.recordPaint((System.nanoTime() - start) / 1_000, lastGlyphCount, lastFallbackSegments, atlas)
     }
 
     private fun paintGlow(editor: Editor, state: GlowSettings.State, g: Graphics) {
@@ -87,7 +104,7 @@ class GlowHighlighterRenderer(
 
         val radius = state.radiusPx
         val sysScale = JBUIScale.sysScale(g2).takeIf { it > 0f } ?: 1f
-        val padUser = repaintInflation(radius)
+        val padUser = repaintInflation(radius, state.synthwaveStyle)
         clip.grow(padUser, padUser)
 
         val lineCount = document.lineCount
@@ -108,6 +125,7 @@ class GlowHighlighterRenderer(
         val foldingModel = editor.foldingModel
 
         val oldInterpolation = g2.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
+        val alpha = g2.composite as AlphaComposite
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
         try {
             val iterator = editorEx.highlighter.createIterator(startOffset)
@@ -119,11 +137,16 @@ class GlowHighlighterRenderer(
                     val argb = (attributes?.foregroundColor?.rgb ?: defaultForeground) or ALPHA_MASK
                     val style = attributes?.fontType ?: Font.PLAIN
                     val font = scheme.getFont(EditorFontType.forJavaStyle(style))
-                    paintSegments(editor, text, tokenStart, tokenEnd, font, style, argb, frc, sysScale, radius, g2)
+                    val layered = state.synthwaveStyle && SynthwaveTextStyle.rule(argb, scheme.defaultBackground.rgb) != null
+                    if (layered || state.regularText) {
+                        g2.composite = alpha.derive(alpha.alpha * if (layered) 1f else state.brightness)
+                        paintSegments(editor, text, tokenStart, tokenEnd, font, style, argb, frc, sysScale, radius, g2)
+                    }
                 }
                 iterator.advance()
             }
         } finally {
+            g2.composite = alpha
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, oldInterpolation ?: RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
         }
     }
@@ -168,6 +191,9 @@ class GlowHighlighterRenderer(
         val codes = layout.codes
         val fonts = layout.fonts
         val blank = layout.blank
+        val state = settings.state
+        val rule = if (state.synthwaveStyle) SynthwaveTextStyle.rule(argb, editor.colorsScheme.defaultBackground.rgb) else null
+        val layered = rule != null
         val inverseScale = 1.0 / sysScale
         var keyFont: Font? = null
         var family = ""
@@ -178,8 +204,16 @@ class GlowHighlighterRenderer(
                 keyFont = glyphFont
                 family = glyphFont.family
             }
-            val key = GlyphKey(codes[i], family, glyphFont.style, glyphFont.size2D, argb, sysScale, radius)
-            val mask = atlas.find(key) ?: atlas.render(key, layout.outline(i))
+            val key = GlyphKey(codes[i], family, glyphFont.style, glyphFont.size2D, argb, sysScale, radius,
+                synthwaveStyle = layered, brightness = if (layered) state.brightness else 1f, textStyleRule = rule)
+            var mask = atlas.find(key)
+            if (mask == null) {
+                if (!workBudget.allowGlyph(state.performanceMode)) continue
+                val outline = layout.outline(i)
+                val maxRadius = if (layered) SynthwaveTextStyle.maxRadius(radius) else radius
+                if (!GlowWorkBudget.safeRaster(outline.bounds2D, sysScale, maxRadius)) continue
+                mask = atlas.render(key, outline)
+            }
             val deviceX = (xs[i] * sysScale).roundToInt() + mask.offsetX
             val deviceY = (ys[i] * sysScale).roundToInt() + mask.offsetY
             blit.setTransform(inverseScale, 0.0, 0.0, inverseScale, deviceX * inverseScale, deviceY * inverseScale)
@@ -194,8 +228,11 @@ class GlowHighlighterRenderer(
         /**
          * User-space pixels a halo may spill beyond its glyph for a given glow radius: the raster padding `3σ`
          * converted back to user space (`σ = radius · scale / 2`, so `3σ / scale = 1.5 · radius`), rounded up.
-         * Clips are inflated and edited lines repainted by this amount.
+         * SynthWave-style text uses the widest shadow layer. Clips are inflated and edited lines repainted by
+         * this amount.
          */
-        fun repaintInflation(radiusPx: Float): Int = GaussianBlur.radius(GlowMaskRenderer.sigmaFor(radiusPx, 1f)) + 1
+        fun repaintInflation(radiusPx: Float, synthwaveStyle: Boolean = false): Int =
+            GaussianBlur.radius(GlowMaskRenderer.sigmaFor(
+                if (synthwaveStyle) SynthwaveTextStyle.maxRadius(radiusPx) else radiusPx, 1f)) + 1
     }
 }

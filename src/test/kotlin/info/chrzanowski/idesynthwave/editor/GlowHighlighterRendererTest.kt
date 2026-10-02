@@ -3,12 +3,24 @@ package info.chrzanowski.idesynthwave.editor
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.HighlighterColors
+import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.ui.Graphics2DDelegate
 import info.chrzanowski.idesynthwave.GlowManager
 import info.chrzanowski.idesynthwave.settings.GlowSettings
+import java.awt.AlphaComposite
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.Image
 import java.awt.Rectangle
+import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
+import java.awt.image.ImageObserver
 import kotlin.math.abs
 
 class GlowHighlighterRendererTest : BasePlatformTestCase() {
@@ -91,6 +103,27 @@ class GlowHighlighterRendererTest : BasePlatformTestCase() {
         assertEquals(painted, paintedBounds(again))
     }
 
+    fun `test fallback editor strength affects opacity and zero performs no work`() = withEditor("glow") { editor, glow ->
+        val full = paint(editor, glow)
+        val count = manager.atlas.size
+        settings.state.editorGlowStrength = 0.25f
+        val dim = paint(editor, glow)
+        assertEquals(count, manager.atlas.size)
+        var changed = false
+        for (y in 0 until full.height) for (x in 0 until full.width) {
+            val a = full.getRGB(x, y) ushr 24
+            val b = dim.getRGB(x, y) ushr 24
+            assertTrue(b <= a)
+            if (a != b) changed = true
+        }
+        assertTrue(changed)
+        manager.atlas.clear()
+        settings.state.editorGlowStrength = 0f
+        assertNull(paintedBounds(paint(editor, glow)))
+        assertEquals(0, glow.renderer.lastGlyphCount)
+        assertEquals(0L, manager.atlas.misses)
+    }
+
     fun `test glow is painted in the token foreground colour`() = withEditor("colour") { editor, glow ->
         val image = paint(editor, glow)
         var best = 0
@@ -130,6 +163,68 @@ class GlowHighlighterRendererTest : BasePlatformTestCase() {
         assertEquals(0L, manager.atlas.misses)
     }
 
+    fun `test editor target controls the fallback independently of UI text and icons`() = withEditor("editor") { editor, glow ->
+        settings.state.editorText = false
+        assertNull(paintedBounds(paint(editor, glow)))
+        assertEquals(0, glow.renderer.lastGlyphCount)
+        WriteCommandAction.runWriteCommandAction(project) { editor.document.insertString(0, "x") }
+        assertEquals(0, glow.bleedRepaints)
+        settings.state.editorText = true
+        settings.state.uiText = false
+        settings.state.icons = false
+        assertNotNull(paintedBounds(paint(editor, glow)))
+        assertEquals(7, glow.renderer.lastGlyphCount)
+    }
+
+    fun `test brightness fades fallback halos and zero avoids painting and bleed repaints`() = withEditor("Brightness") { editor, glow ->
+        fun alphaSum(image: BufferedImage): Long = image.getRGB(0, 0, image.width, image.height, null, 0, image.width)
+            .sumOf { (it ushr 24).toLong() }
+        val blits = mutableListOf<Pair<Image, AffineTransform>>()
+        fun capture(graphics: Graphics2D): Graphics2D = object : Graphics2DDelegate(graphics) {
+            override fun create(): Graphics = capture(myDelegate.create() as Graphics2D)
+            override fun drawImage(image: Image?, transform: AffineTransform?, observer: ImageObserver?): Boolean {
+                blits += checkNotNull(image) to AffineTransform(checkNotNull(transform))
+                return myDelegate.drawImage(image, transform, observer)
+            }
+        }
+        val full = BufferedImage(400, 160, BufferedImage.TYPE_INT_ARGB)
+        val captured = capture(full.createGraphics())
+        try {
+            captured.clip = Rectangle(0, 0, 400, 160)
+            glow.renderer.paint(editor, glow.highlighter!!, captured)
+        } finally { captured.dispose() }
+        assertEquals(10, blits.size)
+        val misses = manager.atlas.misses
+        settings.state.brightness = 0.45f
+        val dim = paint(editor, glow)
+        assertEquals(misses, manager.atlas.misses)
+        val expected = BufferedImage(400, 160, BufferedImage.TYPE_INT_ARGB)
+        val reference = expected.createGraphics()
+        try {
+            reference.composite = AlphaComposite.SrcOver.derive(0.45f)
+            for ((mask, transform) in blits) reference.drawImage(mask, transform, null)
+        } finally { reference.dispose() }
+        assertTrue(alphaSum(dim) > 0 && alphaSum(dim) < alphaSum(full))
+        // Overlapping glyphs compose separately, not as one finished layer with a linear alpha sum.
+        assertTrue(expected.getRGB(0, 0, 400, 160, null, 0, 400)
+            .contentEquals(dim.getRGB(0, 0, 400, 160, null, 0, 400)))
+        val image = BufferedImage(400, 160, BufferedImage.TYPE_INT_ARGB)
+        val g = image.createGraphics()
+        try {
+            g.clip = Rectangle(0, 0, 400, 160)
+            val composite = g.composite
+            glow.renderer.paint(editor, glow.highlighter!!, g)
+            assertEquals("painting must not fade the caller's subsequent text", composite, g.composite)
+        } finally { g.dispose() }
+        settings.state.brightness = 0f
+        manager.atlas.clear()
+        assertNull(paintedBounds(paint(editor, glow)))
+        assertEquals(0, glow.renderer.lastGlyphCount)
+        assertEquals(0, manager.atlas.size)
+        WriteCommandAction.runWriteCommandAction(project) { editor.document.insertString(0, "x") }
+        assertEquals(0, glow.bleedRepaints)
+    }
+
     fun `test empty and blank documents paint nothing without errors`() {
         withEditor("") { editor, glow ->
             assertNull(paintedBounds(paint(editor, glow)))
@@ -165,5 +260,114 @@ class GlowHighlighterRendererTest : BasePlatformTestCase() {
         assertEquals(0, glow.bleedRepaints)
         WriteCommandAction.runWriteCommandAction(project) { editor.document.insertString(0, "x") }
         assertEquals(1, glow.bleedRepaints)
+    }
+
+    fun `test SynthWave fallback retains ordinary text halos and brightness semantics`() = withEditor("ordinary") { editor, glow ->
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0xf0eaf7), null, null, null, 0))
+        editor.colorsScheme = scheme
+        settings.state.brightness = 0.45f
+        settings.state.editorGlowStrength = 0.65f
+        val original = paint(editor, glow)
+        assertNotNull(paintedBounds(original))
+        manager.atlas.clear()
+        settings.state.synthwaveStyle = true
+        val styled = paint(editor, glow)
+        assertNotNull("ordinary theme colours must retain glow", paintedBounds(styled))
+        assertEquals(8, glow.renderer.lastGlyphCount)
+        assertTrue(original.getRGB(0, 0, 400, 160, null, 0, 400)
+            .contentEquals(styled.getRGB(0, 0, 400, 160, null, 0, 400)))
+        settings.state.brightness = 0f
+        assertNull(paintedBounds(paint(editor, glow)))
+    }
+
+    fun `test SynthWave fallback shares layered cached masks`() = withEditor("neon") { editor, glow ->
+        settings.state.synthwaveStyle = true
+        settings.state.brightness = 0.45f
+        settings.state.intensity = 1f
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        editor.colorsScheme = scheme
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0x36f9f6), Color(0x262335), null, null, 0))
+        assertNotNull(paintedBounds(paint(editor, glow)))
+        assertEquals(4, glow.renderer.lastGlyphCount)
+        val misses = manager.atlas.misses
+        paint(editor, glow)
+        assertEquals(misses, manager.atlas.misses)
+        assertTrue(manager.atlas.hits >= 4)
+        settings.state.brightness = 1f
+        paint(editor, glow)
+        assertTrue(manager.atlas.misses > misses)
+        assertEquals(Color(0x36f9f6), scheme.defaultForeground)
+        assertTrue(GlowHighlighterRenderer.repaintInflation(6f, true) > GlowHighlighterRenderer.repaintInflation(6f))
+    }
+
+    fun `test fallback regular text switch skips ordinary halos and retains eligible layered halos`() = withEditor("neon") { editor, glow ->
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        editor.colorsScheme = scheme
+        settings.state.regularText = false
+        for (style in listOf(false, true)) for (source in listOf(0xf0eaf7, 0x36f9f6, 0xcc7832)) {
+            for (background in listOf(Color(0x262335), Color.WHITE)) {
+                manager.atlas.clear()
+                settings.state.synthwaveStyle = style
+                scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(source), background, null, null, 0))
+                val eligible = style && (if (background == Color.WHITE) source == 0xcc7832 else source != 0xf0eaf7)
+                assertEquals(eligible, paintedBounds(paint(editor, glow)) != null)
+                assertEquals(if (eligible) 4 else 0, glow.renderer.lastGlyphCount)
+                assertEquals(eligible, manager.atlas.size > 0)
+                assertEquals(Color(source), scheme.defaultForeground)
+            }
+        }
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0xf0eaf7), Color(0x262335), null, null, 0))
+        settings.state.regularText = true
+        assertNotNull(paintedBounds(paint(editor, glow)))
+        val misses = manager.atlas.misses
+        settings.state.regularText = false
+        assertNull(paintedBounds(paint(editor, glow)))
+        assertEquals(0, glow.renderer.lastGlyphCount)
+        assertEquals(misses, manager.atlas.misses)
+    }
+
+    fun `test light fallback keeps syntax halos with regular text off and preserves scheme colours`() = withEditor("code") { editor, glow ->
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        editor.colorsScheme = scheme
+        settings.state.synthwaveStyle = true
+        settings.state.regularText = false
+        for (source in listOf(0x000080, 0x008000, 0x795e26, 0x7a3e9d, 0xaa0000)) {
+            manager.atlas.clear()
+            scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(source), Color.WHITE, null, null, 0))
+            assertNotNull("coloured syntax should glow on light schemes", paintedBounds(paint(editor, glow)))
+            assertEquals(4, glow.renderer.lastGlyphCount)
+            assertEquals(Color(source), scheme.defaultForeground)
+            val misses = manager.atlas.misses
+            paint(editor, glow)
+            assertEquals(misses, manager.atlas.misses)
+            settings.state.synthwaveStyle = false
+            assertNull(paintedBounds(paint(editor, glow)))
+            settings.state.synthwaveStyle = true
+        }
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color.BLACK, Color.WHITE, null, null, 0))
+        assertNull(paintedBounds(paint(editor, glow)))
+    }
+
+    fun `test fallback adapts ordinary theme halos on dark and light schemes without modifying source colours`() = withEditor("neon") { editor, glow ->
+        settings.state.brightness = 0.45f
+        settings.state.intensity = 1f
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        editor.colorsScheme = scheme
+        for (background in listOf(Color(0x2b2b2b), Color.WHITE)) {
+            scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0xcc7832), background, null, null, 0))
+            settings.state.synthwaveStyle = false
+            val original = paint(editor, glow)
+            settings.state.synthwaveStyle = true
+            val styled = paint(editor, glow)
+            assertNotNull(paintedBounds(styled))
+            assertEquals(4, glow.renderer.lastGlyphCount)
+            assertFalse(original.getRGB(0, 0, 400, 160, null, 0, 400)
+                .contentEquals(styled.getRGB(0, 0, 400, 160, null, 0, 400)))
+            val misses = manager.atlas.misses
+            paint(editor, glow)
+            assertEquals(misses, manager.atlas.misses)
+            assertEquals(Color(0xcc7832), scheme.defaultForeground)
+        }
     }
 }

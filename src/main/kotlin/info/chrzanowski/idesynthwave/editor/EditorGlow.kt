@@ -3,7 +3,6 @@ package info.chrzanowski.idesynthwave.editor
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
@@ -15,6 +14,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import info.chrzanowski.idesynthwave.GlowManager
 import info.chrzanowski.idesynthwave.settings.GlowSettings
+import java.awt.Rectangle
 import kotlin.math.max
 import kotlin.math.min
 
@@ -37,11 +37,21 @@ class EditorGlow(
     var bleedRepaints: Int = 0
         private set
 
+    private var beforeEditBounds: Rectangle? = null
+
     private val documentListener = object : DocumentListener {
+        override fun beforeDocumentChange(event: DocumentEvent) {
+            beforeEditBounds = if (!event.document.isInBulkUpdate && canRepaintBleed()) {
+                repaintBounds(event.offset, event.oldLength)
+            } else null
+        }
+
         override fun documentChanged(event: DocumentEvent) {
+            val previousBounds = beforeEditBounds
+            beforeEditBounds = null
             ensureHighlighter()
             if (event.document.isInBulkUpdate) return
-            repaintBleed(event)
+            repaintBleed(event, previousBounds)
         }
 
         override fun bulkUpdateFinished(document: Document) {
@@ -80,24 +90,38 @@ class EditorGlow(
      * The editor repaints exactly the edited lines; halos spill [GlowHighlighterRenderer.repaintInflation] pixels
      * into the neighbours, so the changed visual-line range is repainted inflated by that amount, full width.
      */
-    private fun repaintBleed(event: DocumentEvent) {
-        if (editor.isDisposed || !settings.state.enabled) return
-        val document = event.document
-        val firstLine = document.getLineNumber(event.offset)
-        val lastLine = document.getLineNumber(min(event.offset + event.newLength, document.textLength))
-        val pad = GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx)
-        val startVisual = editor.logicalToVisualPosition(LogicalPosition(firstLine, 0)).line
-        val endVisual = editor.logicalToVisualPosition(LogicalPosition(lastLine, 0)).line
-        val top = editor.visualLineToY(startVisual) - pad
-        val bottom = editor.visualLineToY(endVisual + 1) + pad
-        val component = editor.contentComponent
-        component.repaint(0, max(top, 0), component.width, bottom - max(top, 0))
+    private fun repaintBleed(event: DocumentEvent, previousBounds: Rectangle?) {
+        if (!canRepaintBleed()) return
+        val bounds = repaintBounds(event.offset, event.newLength)
+        previousBounds?.let { bounds.add(it) }
+        editor.contentComponent.repaint(bounds.x, bounds.y, bounds.width, bounds.height)
         bleedRepaints++
+    }
+
+    private fun canRepaintBleed(): Boolean = !editor.isDisposed && settings.state.enabled &&
+        settings.state.editorText && settings.state.brightness > 0f && settings.state.editorGlowStrength > 0f
+
+    private fun repaintBounds(offset: Int, length: Int): Rectangle {
+        val document = editor.document
+        val firstLine = document.getLineNumber(offset)
+        val lastLine = document.getLineNumber(min(offset + length, document.textLength))
+        val pad = GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx, settings.state.synthwaveStyle)
+        val startVisual = editor.offsetToVisualPosition(document.getLineStartOffset(firstLine)).line
+        val endVisual = editor.offsetToVisualPosition(document.getLineEndOffset(lastLine)).line
+        val top = max(editor.visualLineToY(startVisual) - pad, 0)
+        val bottom = editor.visualLineToY(endVisual + 1) + pad
+        return Rectangle(0, top, editor.contentComponent.width, bottom - top)
     }
 
     /** Repaints the whole visible editor content. */
     fun repaint() {
         if (!editor.isDisposed) editor.contentComponent.repaint()
+    }
+
+    /** Removes editor ownership as well as the highlighter and document listener, including during plugin unload. */
+    fun detach() {
+        if (of(editor) === this) editor.putUserData(KEY, null)
+        Disposer.dispose(this)
     }
 
     override fun dispose() {
@@ -127,8 +151,7 @@ class EditorGlow(
         @JvmStatic
         fun detach(editor: Editor) {
             val glow = of(editor) ?: return
-            editor.putUserData(KEY, null)
-            Disposer.dispose(glow)
+            glow.detach()
         }
     }
 }
