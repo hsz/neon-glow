@@ -1,21 +1,54 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>info.chrzanowski.idesynthwave</id>
+
+    <!-- Public plugin name should be written in Title Case.
+     Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
     <name>IDE Synthwave</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor url="https://chrzanowski.info">Jakub Chrzanowski</vendor>
-    <description>A SynthWave-inspired theme for JetBrains IDEs.</description>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        Complete SynthWave-inspired dark IDE themes with coordinated editor, console and terminal palettes,
+        recoloured standard icons, and optional neon text/icon glow. Choose Classic, Midnight or Accessible under
+        <b>Settings | Appearance &amp; Behavior | Appearance</b>.<br><br>
+        Glow offers Classic, Neon, Focus and Accessible presets, independent editor/UI/icon strengths, a draft
+        preview and bounded cold-cache work in performance mode.<br><br>
+        The glow is static (no animation), respects Power Save mode, follows colour scheme changes and can be tuned or
+        switched off under <b>Settings | Appearance &amp; Behavior | Synthwave</b> or via
+        <b>View | Appearance | Synthwave Glow</b>.
+        ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+
     <resource-bundle>messages.SynthwaveBundle</resource-bundle>
 
+    <!-- Extensions defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <themeProvider id="info.chrzanowski.idesynthwave.theme.classic" path="/themes/synthwave.theme.json"/>
+        <themeProvider id="info.chrzanowski.idesynthwave.theme.midnight" path="/themes/synthwave-midnight.theme.json"/>
+        <themeProvider id="info.chrzanowski.idesynthwave.theme.accessible" path="/themes/synthwave-accessible.theme.json"/>
         <editorFactoryListener implementation="info.chrzanowski.idesynthwave.editor.GlowEditorFactoryListener"/>
-        <applicationConfigurable groupId="appearance"
-                                instance="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
-                                id="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
-                                displayName="Synthwave"/>
+        <postStartupActivity implementation="info.chrzanowski.idesynthwave.ui.GlowStartupActivity"/>
+
+        <applicationConfigurable
+                groupId="appearance"
+                instance="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
+                id="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
+                displayName="Synthwave"/>
     </extensions>
 
     <applicationListeners>
+        <listener class="info.chrzanowski.idesynthwave.listeners.GlowApplicationListener"
+                  topic="com.intellij.ide.AppLifecycleListener"/>
+        <!-- Colour scheme switched or edited (a LaF change switches the scheme too): recolour the glow. -->
         <listener class="info.chrzanowski.idesynthwave.listeners.GlowColorsListener"
                   topic="com.intellij.openapi.editor.colors.EditorColorsListener"/>
         <listener class="info.chrzanowski.idesynthwave.listeners.GlowPowerSaveListener"
@@ -23,9 +56,20 @@
     </applicationListeners>
 
     <actions>
+        <!-- View | Appearance | Synthwave Glow; text/description come from the resource bundle. -->
         <action id="info.chrzanowski.idesynthwave.ToggleGlowAction"
                 class="info.chrzanowski.idesynthwave.actions.ToggleGlowAction">
             <add-to-group group-id="UIToggleActions" anchor="last"/>
         </action>
+        <group id="info.chrzanowski.idesynthwave.Tools" popup="true">
+            <add-to-group group-id="UIToggleActions" anchor="last"/>
+            <action id="info.chrzanowski.idesynthwave.OpenGlowSettingsAction"
+                    class="info.chrzanowski.idesynthwave.actions.OpenGlowSettingsAction"/>
+            <action id="info.chrzanowski.idesynthwave.ClearGlowCachesAction"
+                    class="info.chrzanowski.idesynthwave.actions.ClearGlowCachesAction"/>
+            <action id="info.chrzanowski.idesynthwave.CopyGlowDiagnosticsAction"
+                    class="info.chrzanowski.idesynthwave.actions.CopyGlowDiagnosticsAction"/>
+        </group>
     </actions>
+
 </idea-plugin>
