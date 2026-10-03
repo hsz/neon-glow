@@ -2,19 +2,19 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.changelog")
     id("org.jetbrains.intellij.platform")
 }
 
-kotlin {
-    jvmToolchain(21)
-}
-
+// Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
     testImplementation("junit:junit:4.13.2")
 
+    // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
         intellijIdea(providers.gradleProperty("platformVersion").orElse("2025.3.6.1"))
         testFramework(TestFrameworkType.Platform)
+        pluginVerifier()
     }
 }
 
@@ -25,6 +25,14 @@ intellijPlatform {
             untilBuild = provider { null }
         }
     }
+    pluginVerification {
+        ides {
+            create("IU", "2025.3.6.1")
+            create("IU", "2026.1")
+            create("IU", "2026.1.5")
+            create("IU", "2026.2.3")
+        }
+    }
 }
 
 tasks {
@@ -33,5 +41,10 @@ tasks {
             into("META-INF")
             rename { "LICENSE.synthwave84" }
         }
+    }
+
+    runIde {
+        // Periodic paint-cost / atlas statistics in the sandbox idea.log (see GlowStats).
+        jvmArgs("-Dide.synthwave.debug=true")
     }
 }

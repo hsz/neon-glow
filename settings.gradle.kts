@@ -5,6 +5,7 @@ rootProject.name = "ide-synthwave"
 pluginManagement {
     plugins {
         id("org.jetbrains.kotlin.jvm") version "2.3.20"
+        id("org.jetbrains.changelog") version "2.5.0"
     }
 }
 
@@ -14,8 +15,11 @@ plugins {
 }
 
 dependencyResolutionManagement {
+    // Configure all projects' repositories
     repositories {
         mavenCentral()
+
+        // IntelliJ Platform Gradle Plugin Repositories Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-repositories-extension.html
         intellijPlatform {
             defaultRepositories()
         }
