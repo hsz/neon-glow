@@ -167,12 +167,15 @@ no upper bound). Release artifacts are built against the default **2025.3.6.1** 
 backward compatibility. Use `platformVersion` for additional test/sandbox targets; build release packages without
 that override. Building/testing against 2026.2 requires a Java 25 toolchain; Gradle selects the target's runtime.
 
-All 173 tests pass on 2025.3.6.1, 2026.1.5 and 2026.2.3. Tests use platform APIs without unrelated bundled plugin
+All 176 tests pass on 2025.3.6.1, 2026.1.5 and 2026.2.3. Tests use platform APIs without unrelated bundled plugin
 jars on their shared test classpath; this avoids obfuscated-class collisions in 2026.2, without disabling tests
 or changing the production plugin. Plugin Verifier checks the baseline-built artifact against the four versions
 above. An open upper bound allows future installation, not a guarantee about untested releases or IDE products.
 The three experimental editor-fallback API usages, a 2026.2 preset-renderer deprecation and manual visual checks are documented in
 [`docs/theme-quality.md`](docs/theme-quality.md).
+
+The commit sequence was reconstructed from an existing AI-assisted implementation. Its assigned dates are
+not the original development timeline; see [the history note](docs/history-reconstruction.md).
 
 ## License
 

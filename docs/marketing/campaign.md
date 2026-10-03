@@ -79,11 +79,11 @@ Recheck these against the version actually distributed; historical results do no
 | Coordinated editor, console and terminal palettes; recoloured standard SVG icons | Descriptor description; README; resource checks in quality checklist | Not every third-party painter or terminal engine shares glow coverage |
 | Classic, Neon, Focus and Accessible glow presets | README settings; quality checklist | Selecting a preset fills draft controls immediately; Apply/OK commits; no automatic theme/font/layout change |
 | Independent editor/UI/icon switches and strengths | README settings; automated target tests documented in quality checklist | UI/icon glow is experimental; standard images, not all custom vector icons |
-| Optional SynthWave-style text with your current IDE theme | README; implemented equivalents in `docs/synthwave-options.md` | Eligible vivid colours on dark backgrounds only; light/unknown backgrounds retain originals and same-colour glow; historical upstream hotpink is not contrast-certified |
+| Optional SynthWave-style text with your current IDE theme | README; implemented equivalents in `docs/synthwave-options.md` | Eligible colours get layered halos; dark backgrounds can get tinted cores, light backgrounds retain original cores, and unknown backgrounds use regular glow; historical upstream hotpink is not contrast-certified |
 | Glow settings apply without restarting | README settings | Applies to settings changes, not a guarantee that plugin installation needs no restart |
 | Static glow respects Power Save | README; quality checklist | Actual live rendering, not isolated draft preview, is evidence |
 | Performance mode limits new mask work | README; quality checklist | Best-effort admission limit, not zero overhead or a total repaint-time bound |
-| Named compatibility evidence | Quality checklist compatibility matrix | 141 tests on 2025.3.6.1, 2026.1.5, 2026.2.3; Plugin Verifier also on 2026.1; no universal visual certification |
+| Named compatibility evidence | Quality checklist compatibility matrix | 176 tests on 2025.3.6.1, 2026.1.5, 2026.2.3; Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; no universal visual certification |
 | Accessible is a brighter, flat-readable theme option | Quality checklist contrast checks | Name is not accessibility certification; select Accessible glow preset or disable glow separately |
 
 Forbidden shortcuts: “all IDE surfaces/icons,” “zero overhead,” “certified accessible,” “boosts productivity,”

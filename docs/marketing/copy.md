@@ -30,14 +30,15 @@ draft controls immediately; **Apply** or **OK** updates the live IDE without res
 
 Keep your current IDE theme if you prefer: optional **SynthWave '84-style text** adapts eligible vivid colours on
 dark backgrounds with pale tinted cores and layered neon, while preserving five upstream colour rules. Neutral,
-muted and low-contrast text keeps its core and same-colour glow; light/unknown backgrounds do too. Icons are unchanged.
+muted and low-contrast text keeps its core and follows **Regular text glow**. Eligible colours on light backgrounds
+keep their original cores with layered halos; unknown backgrounds use regular glow. Icons are unchanged.
 This is an adaptation, not pixel-identical CSS rendering, contrast certification or an endorsed official port.
 
 Glow is static and respects Power Save mode. Performance mode limits new mask work, but does not eliminate
 overhead or guarantee total repaint time. The isolated draft preview is not proof of live IDE rendering.
 
-**Compatibility evidence:** the repository records 141 passing tests on IntelliJ IDEA 2025.3.6.1, 2026.1.5
-and 2026.2.3, with Plugin Verifier compatibility on those versions plus 2026.1. This is binary/automated evidence,
+**Compatibility evidence:** the repository records 176 passing tests on IntelliJ IDEA 2025.3.6.1, 2026.1.5
+and 2026.2.3. Plugin Verifier reports Compatible on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. This is binary/automated evidence,
 not complete visual certification. The plugin declares a 2025.3 minimum and no upper bound; untested future
 releases and other IDE products are not guaranteed.
 
@@ -148,8 +149,8 @@ upstream styling is not contrast certification, especially hotpink. No preset au
 ## FAQ draft
 
 **Which IDE versions have evidence?**
-The quality checklist records the 2026-10-04 matrix: 141 tests passed on IntelliJ IDEA 2025.3.6.1, 2026.1.5
-and 2026.2.3; Plugin Verifier also passed on 2026.1. The minimum platform is 2025.3, with no upper installation
+The quality checklist records the 2026-10-04 matrix: 176 tests passed on IntelliJ IDEA 2025.3.6.1, 2026.1.5
+and 2026.2.3; Plugin Verifier passed on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. The minimum platform is 2025.3, with no upper installation
 bound. That does not certify every newer build, other JetBrains products or all visual/display-scale states.
 
 **Does it glow everywhere?**
@@ -175,8 +176,9 @@ Apply, then inspect real editor and UI surfaces; the preview alone cannot verify
 **Is this the same as the VS Code extension?**
 It is inspired by Robb Owen's SynthWave '84, not affiliated with or endorsed by its author. Swing Gaussian
 blurs are not pixel-identical CSS shadows. The optional text style preserves five upstream rules on known dark
-backgrounds and adapts other eligible vivid colours with same-hue neon. Light/unknown backgrounds keep originals
-and same-colour glow; UI backdrop detection is best-effort, and editor fallback cannot replace cores. Icons are
+backgrounds and adapts other eligible vivid colours with same-hue neon. Light backgrounds keep original cores with
+layered halos for eligible colours; unknown backgrounds use regular glow. UI backdrop detection is best-effort,
+and editor fallback cannot replace cores. Icons are
 unchanged. Upstream copyright and MIT permission notices are preserved.
 
 **Is there a Pro plan, price or trial?**

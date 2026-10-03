@@ -304,3 +304,23 @@ the complete rendered appearance, antialiasing or transparent text as accessible
 - All **173 tests** pass on **2025.3.6.1**, **2026.1.5** and **2026.2.3**, with zero failures, errors or skips.
 - IDE compilation and baseline plugin packaging pass. No new API dependencies were introduced; Plugin Verifier was not rerun for this policy-only fix.
 - No live visual comparison or user trial was performed. Light-theme appearance and mixed-display visual checks remain manual validation items.
+
+## Public history verification (2026-10-04)
+
+The [reconstructed history](history-reconstruction.md) retains the production source above and adds three blur
+boundary tests. Earlier entries are historical validation snapshots; the current results are:
+
+| IntelliJ version | Full test suite | Baseline artifact Plugin Verifier |
+|---|---|---|
+| 2025.3.6.1 | 176 passed, zero failures/errors/skips | Compatible (IU-253.33813.55) |
+| 2026.1 | Not run | Compatible (IU-261.22158.277) |
+| 2026.1.5 | 176 passed, zero failures/errors/skips | Compatible (IU-261.27258.48) |
+| 2026.2.3 | 176 passed, zero failures/errors/skips | Compatible (IU-262.10968.63) |
+
+Clean test runs were used after constructor changes to avoid stale instrumented bytecode during staged imports.
+`clean test buildPlugin verifyPlugin` succeeded on the default 2025.3.6.1/Java 21 baseline. Separate clean full-suite
+runs succeeded with `-PplatformVersion=2026.1.5` and `-PplatformVersion=2026.2.3`.
+
+Verifier warnings remain: three experimental editor-fallback API usages on each target, and the preset renderer's
+`SimpleListCellRenderer.create(String, Function)` deprecation/scheduled removal on 2026.2.3. No API compatibility
+failures were reported. The manual visual matrix and user trial remain unperformed; no public upload was made.
