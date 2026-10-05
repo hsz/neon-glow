@@ -77,9 +77,9 @@ announcement and installation guide are in the copy pack. Do not create accounts
 
 1. Same-code before/after, with baseline named and genuine screenshot.
 2. Install from the verified listing (or honestly explain prelaunch local-build status).
-3. Keep your theme; in Neon Glow settings enable glow and Editor text, expand Fine-Tune Glow, enable SynthWave '84-style
-   text, then Apply/OK. Recommend brightness 45%, intensity 100%, radius 6 px; no preset needed. Explain that adaptation
-   needs eligible vivid colours on known dark backgrounds; light/unknown backgrounds keep originals and same-colour glow.
+3. Keep your theme; in Neon Glow settings enable glow and Editor text, expand Fine-Tune Glow, enable Neon text styling,
+   then Apply/OK. Recommend brightness 45%, intensity 100%, radius 6 px; no preset needed. Explain that eligible colours
+   get layered halos; light backgrounds keep original letter colours, while unknown backgrounds follow Regular text glow.
 4. Show Midnight/Focus and Accessible/master-off; explain why theme choice alone does not disable effects.
 5. Explain Power Save, performance-mode costs and expected excluded surfaces.
 6. One verified installation/demo CTA; voluntary specific feedback invitation.

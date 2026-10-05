@@ -129,19 +129,19 @@ class GlowConfigurable internal constructor(
                     strengthSlider("editorGlowStrength", { currentDraft().editorGlowStrength.toPercent() },
                         { currentDraft().editorGlowStrength = it.toScale() }, "settings.strength.editor")
                         .applyToComponent { editorStrength = this }
+                        .comment(NeonGlowBundle.message("settings.strength.editor.comment"))
                 }
                 row(NeonGlowBundle.message("settings.strength.ui")) {
                     strengthSlider("uiGlowStrength", { currentDraft().uiGlowStrength.toPercent() },
                         { currentDraft().uiGlowStrength = it.toScale() }, "settings.strength.ui")
                         .applyToComponent { uiStrength = this }
+                        .comment(NeonGlowBundle.message("settings.strength.ui.comment"))
                 }
                 row(NeonGlowBundle.message("settings.strength.icons")) {
                     strengthSlider("iconGlowStrength", { currentDraft().iconGlowStrength.toPercent() },
                         { currentDraft().iconGlowStrength = it.toScale() }, "settings.strength.icons")
                         .applyToComponent { iconStrength = this }
-                }
-                row {
-                    comment(NeonGlowBundle.message("settings.strength.comment"))
+                        .comment(NeonGlowBundle.message("settings.strength.icons.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.synthwaveStyle"))

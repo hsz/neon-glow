@@ -22,7 +22,7 @@ reproducible. Do not add more features or a first-run wizard merely to compensat
 | Toggle, cache reset and diagnostics | Recover or report without reinstalling | Lifecycle/action tests; reports are reviewed and shared voluntarily |
 
 No preset silently changes the theme, fonts, layout or keymap. Keep those guarantees when simplifying settings.
-All three targets are enabled by default, with SynthWave-style text on and regular text glow off.
+All three targets are enabled by default, with **Neon text styling** on and regular text glow off.
 Explicit saved preferences are retained; recommending Focus in onboarding is not silently migrating preferences.
 
 ## Five-developer formative trial

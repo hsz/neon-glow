@@ -28,7 +28,7 @@ Choose your theme in **Settings | Appearance & Behavior | Appearance**. Then con
 tune their strengths, or start with Classic, Neon, Focus or Accessible glow presets. Selecting a preset fills the
 draft controls immediately; **Apply** or **OK** updates the live IDE without restarting. Theme selection does not replace your glow preferences.
 
-Keep your current IDE theme if you prefer: optional **SynthWave '84-style text** adapts eligible vivid colours on
+Keep your current IDE theme if you prefer: optional **Neon text styling** adapts eligible vivid colours on
 dark backgrounds with pale tinted cores and layered neon, while preserving five upstream colour rules. Neutral,
 muted and low-contrast text keeps its core and follows **Regular text glow**. Eligible colours on light backgrounds
 keep their original cores with layered halos; unknown backgrounds use regular glow. Icons are unchanged.
@@ -111,8 +111,8 @@ glow preferences remain independent. You can use the themes with glow disabled.
 
 ### 3. Choose and apply glow
 
-For SynthWave-style text with your current theme, open **Settings | Appearance & Behavior | Neon Glow**, enable
-**Enable glow** and **Editor text**, expand **Fine-Tune Glow**, check **SynthWave '84-style text**, then **Apply** or
+For neon-styled text with your current theme, open **Settings | Appearance & Behavior | Neon Glow**, enable
+**Enable glow** and **Editor text**, expand **Fine-Tune Glow**, check **Neon text styling**, then **Apply** or
 **OK**. Recommended: **45% brightness**, **100% intensity**, **6 px radius**. No preset is needed; existing settings
 and presets are unchanged.
 

@@ -89,9 +89,9 @@ rendering, including any mapped foreground cores, for the affected targets. This
 brightness zero intentionally differs from upstream's pink-shadow behavior and malformed zero-alpha CSS.
 All controls take effect on **Apply**, without installation-file edits or restart.
 
-### Optional SynthWave '84 style
+### Neon text styling (SynthWave '84-inspired)
 
-**SynthWave '84-style text** is a checkbox persisted as `State.synthwaveStyle = true` by default.
+**Neon text styling** is a checkbox persisted as `State.synthwaveStyle = true` by default.
 It works with your current IDE theme on enabled editor-text and UI-text targets; no theme installation or
 new preset is required. Explicit saved choices and named presets stay unchanged. Fresh installs use
 **50% brightness**, **200% intensity**, **6 px radius**, **75% editor strength** and **50% UI/icon strength**.

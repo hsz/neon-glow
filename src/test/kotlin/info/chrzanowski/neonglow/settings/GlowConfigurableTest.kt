@@ -93,6 +93,28 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified())
     }
 
+    fun `test neon styling and every strength have separate descriptions`() {
+        val descriptions = descendants(component).mapNotNull {
+            when (it) {
+                is JLabel -> it.text
+                is JTextComponent -> it.document.getText(0, it.document.length)
+                else -> null
+            }
+        }.map { it.replace(Regex("\\s+"), " ").trim() }.toList()
+        assertEquals("Neon text styling", checkBox("synthwaveStyle").text)
+        for (key in listOf("settings.synthwaveStyle", "settings.strength.editor", "settings.strength.ui",
+            "settings.strength.icons")) {
+            val description = NeonGlowBundle.message("$key.comment")
+            assertTrue("$key must have a separate description", descriptions.any { description in it })
+        }
+        for (target in listOf("regularText", "icons")) {
+            assertTrue(NeonGlowBundle.message("settings.$target.comment").contains("Neon text styling"))
+        }
+        assertFalse(configurable.isModified())
+        assertEquals(GlowSettings.State(), settings.state)
+        assertTrue(applied.isEmpty())
+    }
+
     fun `test everyday controls are visible and fine tuning is initially collapsed`() {
         for (name in listOf("enabled", "editorText", "uiText", "regularText", "icons", "performanceMode", "showPreview")) {
             assertTrue("$name must be visible", visibleWithinPage(checkBox(name)))

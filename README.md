@@ -2,8 +2,8 @@
 
 Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.
 
-Editors, tool windows, tabs, menus, popups and dialogs can get blurred text/icon halos. An optional SynthWave '84
-text style adds layered halos to eligible coloured text: tinted cores on dark backgrounds, original cores on light
+Editors, tool windows, tabs, menus, popups and dialogs can get blurred text/icon halos. Optional **Neon text styling**,
+inspired by SynthWave '84, adds layered halos to eligible coloured text: tinted cores on dark backgrounds, original cores on light
 backgrounds, without changing your IDE theme. Bundled SynthWave-inspired themes also coordinate editor, console
 and terminal palettes.
 
@@ -22,7 +22,7 @@ and terminal palettes.
 - Optional **Performance mode** bounds new masks per paint; clipping and raster-size guards avoid unnecessary
   or excessive allocations. Recovery tools reset caches and copy a project-content-free diagnostic report.
 - Paints a Gaussian-blurred copy of text throughout Swing IDE windows, including console/diff editors and the
-  welcome screen. SynthWave '84 style is enabled by default: it preserves five upstream colour rules on known dark
+  welcome screen. **Neon text styling** is enabled by default: it preserves five upstream colour rules on known dark
   backgrounds and adapts other eligible vivid colours. Neutral, muted and low-contrast text stays crisp by default;
   enable **Regular text glow** to give it same-colour halos too.
 - Adds multicolour halos to standard SVG and raster icons, preserving transparency and crisp original pixels.
@@ -43,7 +43,7 @@ and terminal palettes.
 
 1. Keep your current IDE theme. Open `Settings | Appearance & Behavior | Neon Glow` and enable **Enable glow**
    and **Editor text**.
-2. Fresh installs already enable **SynthWave '84-style text** and leave **Regular text glow** off. Defaults are
+2. Fresh installs already enable **Neon text styling** and leave **Regular text glow** off. Defaults are
    **50% brightness**, **75% editor strength**, **50% UI/icon strength**, **200% intensity** and **6 px radius**.
    Adjust the controls if needed, then **Apply** or **OK**. No preset is required.
 3. Optional: choose **Neon Glow Midnight** or **Neon Glow** under `Settings | Appearance & Behavior | Appearance`,
@@ -56,8 +56,8 @@ Presets and edits remain drafts until Apply; Reset discards them. Existing prefe
 by opening this page, and untouched fractional values remain precise even though sliders use whole ticks.
 
 The defaults keep ordinary text crisp while coloured text gets layered neon: **Regular text glow** is off and
-**SynthWave '84-style text** is on. This works in both enabled text targets;
-icons remain independent. With SynthWave styling off, disabling Regular text glow disables all text glow.
+**Neon text styling** is on. This works in both enabled text targets;
+icons remain independent. With Neon text styling off, disabling Regular text glow disables all text glow.
 
 ## Settings
 
@@ -72,11 +72,11 @@ an entirely flat experience; choosing the Accessible **theme** alone does not ov
 | Enable glow | on | Also toggled by `View | Appearance | Neon Glow`. |
 | Editor text | on | Code, console/diff text and editor gutters. |
 | UI text | on | Tool windows, tabs, menus, popups, dialogs and other Swing UI text. |
-| Regular text glow | off | Same-colour halos for text without an eligible SynthWave-style rule, in both enabled text targets. Off leaves original cores with no halos; eligible layered text and icons are unaffected. With style off, this controls all text glow. |
+| Regular text glow | off | Same-colour halos for text not handled by Neon text styling, in both enabled text targets. Off leaves original cores with no halos; eligible layered text and icons are unaffected. With styling off, this controls all text glow. |
 | Icons | on | Standard SVG and raster icons, independently of text. |
 | Editor / UI / Icon strength | 75 % / 50 % / 50 % | Separate 0–100% halo multipliers; zero also disables styled-core replacement for that target. |
 | Performance mode | off | At most 24 new glyph masks and 4 new icon masks per graphics paint tree, with a shared 2 ms admission deadline. Cached masks remain available. |
-| SynthWave '84-style text | on | Layered halos for eligible coloured text. Dark backgrounds get tinted cores; light backgrounds keep original cores with coloured halos, even when Regular text glow is off. Unknown backgrounds use regular glow. Icons are unchanged. |
+| Neon text styling | on | Layered halos selected by text colour and background contrast, not syntax role: colourful comments can qualify too. Dark backgrounds may get tinted letters; light backgrounds keep original letter colours. Other text and unknown backgrounds follow Regular text glow. Does not switch themes or affect icons. |
 | Brightness | 50 % | Halo opacity, from 0–100%, applied after intensity. In style mode it controls variable coloured layers, including adaptive layers, not fixed upstream pink/dark layers. Zero restores all original rendering, including text cores. |
 | Radius | 6 px | Same-colour halo reach in user-space pixels. In style mode, 6 px uses reference layer blur sizes; other values scale all layers proportionally. |
 | Intensity | 200 % | Coverage multiplier before brightness; thin fonts need more than bold ones. |
@@ -104,7 +104,7 @@ and remaining visual checks, and [the usability trial](docs/usability-checklist.
 
 The [original extension](https://marketplace.visualstudio.com/items?itemName=RobbOwen.synthwave-vscode) exposes
 brightness (0–1, default 0.45) and editor glow disablement, plus commands to install/remove Neon Dreams styling.
-For an upstream-inspired look, enable **SynthWave '84-style text** and use **45% brightness**, **100% intensity**
+For an upstream-inspired look, enable **Neon text styling** and use **45% brightness**, **100% intensity**
 and the default **6 px radius**; no preset or theme change is required. The five exact upstream rules below remain
 on known dark backgrounds. They are historical styling, not contrast certification—especially the hotpink core.
 The Classic/Midnight schemes coordinate their token colours with those rules; Accessible intentionally uses brighter
