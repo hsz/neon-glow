@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+    <defs>
+        <linearGradient id="tile" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#2C253C"/>
+            <stop offset="1" stop-color="#171520"/>
+        </linearGradient>
+        <linearGradient id="neon" x1="12" y1="13" x2="28" y2="27" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#36F9F6"/>
+            <stop offset="0.5" stop-color="#B891FF"/>
+            <stop offset="1" stop-color="#FF7EDB"/>
+        </linearGradient>
+    </defs>
+    <rect x="4" y="4" width="32" height="32" rx="8" fill="url(#tile)"/>
+    <rect x="4.5" y="4.5" width="31" height="31" rx="7.5" fill="none" stroke="#514361" stroke-opacity="0.6"/>
+    <g fill="none" stroke="url(#neon)" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 27V13L28 27V13" stroke-width="8" stroke-opacity="0.07"/>
+        <path d="M12 27V13L28 27V13" stroke-width="5.5" stroke-opacity="0.14"/>
+        <path d="M12 27V13L28 27V13" stroke-width="3.5" stroke-opacity="0.26"/>
+        <path d="M12 27V13L28 27V13" stroke-width="2"/>
+        <path d="M12 27V13L28 27V13" stroke="#F5F1FF" stroke-width="0.6" stroke-opacity="0.85"/>
+    </g>
+</svg>
