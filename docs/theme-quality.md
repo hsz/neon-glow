@@ -1,4 +1,4 @@
-# SynthWave quality and release checklist
+# Neon Glow quality and release checklist
 
 ## Design contract
 
@@ -68,7 +68,7 @@ certification. Third-party custom painters and icons may use their own colours.
 - Existing glow mappings and options: [source comparison](synthwave-options.md).
 
 Theme keys must be checked against the installed target's resources/schema; live SDK pages are not compatibility
-proof for older builds. Preserve `LICENSE.upstream` for adapted upstream material, including packaged notices.
+proof for older builds. Preserve `LICENSE.synthwave84` for adapted upstream material, including packaged notices.
 
 ## Implementation review
 
@@ -308,7 +308,7 @@ the complete rendered appearance, antialiasing or transparent text as accessible
 ## Public history verification (2026-10-04)
 
 The [reconstructed history](history-reconstruction.md) retains the production source above and adds three blur
-boundary tests. Earlier entries are historical validation snapshots; the current results are:
+boundary tests. These are the pre-rename validation results:
 
 | IntelliJ version | Full test suite | Baseline artifact Plugin Verifier |
 |---|---|---|
@@ -324,3 +324,20 @@ runs succeeded with `-PplatformVersion=2026.1.5` and `-PplatformVersion=2026.2.3
 Verifier warnings remain: three experimental editor-fallback API usages on each target, and the preset renderer's
 `SimpleListCellRenderer.create(String, Function)` deprecation/scheduled removal on 2026.2.3. No API compatibility
 failures were reported. The manual visual matrix and user trial remain unperformed; no public upload was made.
+
+## Neon Glow rename verification (2026-10-05)
+
+The plugin ID and Kotlin namespace are now `info.chrzanowski.neonglow`, and the Gradle project name is `neon-glow`.
+The display name, bundled themes/schemes, resource bundle, action IDs, settings storage and diagnostic labels
+use Neon Glow branding. SynthWave '84 remains the optional text-style feature and upstream inspiration; its
+licence notices are unchanged. Older development settings are not migrated to the new identity.
+
+- `./gradlew clean test buildPlugin verifyPlugin --console=plain` succeeded on the 2025.3.6.1 release baseline.
+- All **177 tests** passed with zero failures, errors or skips, including a new plugin/settings/theme identity test.
+  The 2026.1.5 and 2026.2.3 test suites were not rerun for this rename; their earlier results above remain historical.
+- Plugin Verifier reports Compatible for the renamed artifact on **2025.3.6.1**, **2026.1**, **2026.1.5** and
+  **2026.2.3**. The same three experimental editor-fallback API usages and 2026.2.3 preset-renderer deprecation remain.
+- `build/distributions/neon-glow-0.1.0.zip` contains the new descriptor, namespace, message bundle, all six renamed
+  theme/scheme resources and `META-INF/LICENSE.synthwave84`, with no old plugin namespace or theme-resource paths.
+
+No live visual matrix, usability trial or public upload was performed for this rename.

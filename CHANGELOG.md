@@ -1,11 +1,14 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# IDE Synthwave Changelog
+# Neon Glow Changelog
 
 ## Unreleased
 
 ### Changed
 
+- Rename the project to Neon Glow before publication, including plugin ID and namespace
+  `info.chrzanowski.neonglow`, bundled themes, actions, settings storage and the `neon-glow` build artifact.
+  Retain SynthWave '84 inspiration and upstream licence notices. Older development settings are not migrated.
 - Extend the existing opt-in SynthWave '84-style text to regular IDE themes: eligible vivid colours on dark
   backgrounds get pale same-hue cores and layered neon. Preserve the five upstream rules on known dark backgrounds,
   original alpha, saved settings and presets; style remains off by default. No theme change or preset is required.
@@ -31,7 +34,7 @@
   uses component opacity and known solid fills on a best-effort basis, not a universal custom-painter guarantee.
 - Preserve untouched fractional settings during Apply and preview instead of rounding every saved value to slider ticks.
 - Repaint all affected soft-wrapped visual lines, including the old tail after deletion, to clear glow bleed.
-- Remove the Synthwave root wrapper when nested in another layered pane on unload, preserving foreign panes,
+- Remove the Neon Glow root wrapper when nested in another layered pane on unload, preserving foreign panes,
   popup layers, bounds and component order.
 
 ### Added
@@ -47,7 +50,7 @@
   protection. Cache invalidation and settings updates are serialized on the UI thread.
 - Thread-safe editor registration and complete unload cleanup of highlighters, document listeners and editor
   ownership, including editors that remain open when the application service is disposed.
-- Settings, cache-reset and project-content-free diagnostic-copy actions under Synthwave Tools; upstream MIT
+- Settings, cache-reset and project-content-free diagnostic-copy actions under Neon Glow Tools; upstream MIT
   notices included in the distributable plugin.
 - Optional SynthWave '84-style text colour mapping and layered glow, disabled by default to preserve same-colour
   rendering. Beyond the five upstream rules, near/nonexact colours qualify at saturation >=0.35, value >=0.5,
@@ -71,5 +74,5 @@
   scheme foreground, painted under the text via a document-wide `CustomHighlighterRenderer`.
 - Per-glyph glow mask atlas (LRU, HiDPI device-pixel masks) so typing and scrolling never re-blur.
 - Bleed-safe repaints around edited lines; colour scheme / theme change and Power Save awareness.
-- `Settings | Appearance & Behavior | Synthwave` (enable, radius, intensity) and `View | Appearance | Synthwave Glow`.
-- Debug statistics in `idea.log` with `-Dide.synthwave.debug=true`; measurements in `docs/glow-investigation.md`.
+- `Settings | Appearance & Behavior | Neon Glow` (enable, radius, intensity) and `View | Appearance | Neon Glow`.
+- Debug statistics in `idea.log` with `-Dide.neon.glow.debug=true`; measurements in `docs/glow-investigation.md`.

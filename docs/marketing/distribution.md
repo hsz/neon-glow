@@ -1,4 +1,4 @@
-# IDE Synthwave distribution and outreach
+# Neon Glow distribution and outreach
 
 **Owner-operated drafts, not permission to publish, contact anyone or spend.** No messages were sent, no account
 settings changed and no placement purchased. Destinations, assets and contacts remain pending. Use the gates in
@@ -57,7 +57,7 @@ of an uncommercialized plugin.
 
 **Marketplace co-marketing request draft — owner to send through a verified official contact:**
 
-> Hello Marketplace team, I'm Jakub Chrzanowski, author of IDE Synthwave. It provides three SynthWave-inspired
+> Hello Marketplace team, I'm Jakub Chrzanowski, author of Neon Glow. It provides three SynthWave-inspired
 > IntelliJ IDEA themes and independently configurable experimental text/icon glow. The verified listing is
 > `[LISTING_URL]`; the genuine captioned demo and installation guide are `[DEMO_GUIDE_URL]`.
 > Would this be a fit for any available theme/customization editorial or co-marketing opportunity? I can share
@@ -77,7 +77,7 @@ announcement and installation guide are in the copy pack. Do not create accounts
 
 1. Same-code before/after, with baseline named and genuine screenshot.
 2. Install from the verified listing (or honestly explain prelaunch local-build status).
-3. Keep your theme; in Synthwave settings enable glow and Editor text, expand Fine-Tune Glow, enable SynthWave '84-style
+3. Keep your theme; in Neon Glow settings enable glow and Editor text, expand Fine-Tune Glow, enable SynthWave '84-style
    text, then Apply/OK. Recommend brightness 45%, intensity 100%, radius 6 px; no preset needed. Explain that adaptation
    needs eligible vivid colours on known dark backgrounds; light/unknown backgrounds keep originals and same-colour glow.
 4. Show Midnight/Focus and Accessible/master-off; explain why theme choice alone does not disable effects.
@@ -93,7 +93,7 @@ no permission means no post. Record the rule URL/date and approved format. Do no
 
 **IntelliJ customization / feedback post:**
 
-> I'm the author of IDE Synthwave and would like feedback on this live IntelliJ IDEA theme demo, if permitted
+> I'm the author of Neon Glow and would like feedback on this live IntelliJ IDEA theme demo, if permitted
 > here. It pairs dark themes with optional independent editor, UI-text and standard icon glow. Midnight/Focus
 > lights only code; Accessible with the master switch off is flat. Which selected-tab or Project-tree state
 > is hardest to read? Glow is experimental and does not cover every native/browser/custom-painted surface.
@@ -101,7 +101,7 @@ no permission means no post. Record the rule URL/date and approved format. Do no
 
 **Java workspace demonstration:**
 
-> For Java developers who customize IntelliJ IDEA: I made IDE Synthwave, and this genuine Java capture shows
+> For Java developers who customize IntelliJ IDEA: I made Neon Glow, and this genuine Java capture shows
 > its editor palette alongside Project/VCS states. Amber warnings and mint additions remain separate; glow
 > is optional. I'd value feedback on diagnostic and selection readability, not a productivity comparison.
 > Experimental glow has native/browser/custom-painted exclusions.
@@ -111,7 +111,7 @@ Only use this variant after an authentic **Java** capture exists; do not label K
 
 **Kotlin workspace/configuration post:**
 
-> I built IDE Synthwave for an after-dark IntelliJ IDEA look. This Kotlin demo keeps the same code while
+> I built Neon Glow for an after-dark IntelliJ IDEA look. This Kotlin demo keeps the same code while
 > switching Classic glow to Midnight/Focus, then Accessible with glow explicitly off. Theme selection and glow
 > are independent: selecting a glow preset fills the settings; Apply or OK changes the IDE. Was that separation clear in the guide?
 > I'm the author; glow remains experimental with native/browser/custom-painted exclusions.
@@ -119,7 +119,7 @@ Only use this variant after an authentic **Java** capture exists; do not label K
 
 **SynthWave migration audience:**
 
-> If you're moving from VS Code to IntelliJ IDEA and enjoy SynthWave '84: I'm building IDE Synthwave with
+> If you're moving from VS Code to IntelliJ IDEA and enjoy SynthWave '84: I'm building Neon Glow with
 > upstream-inspired palettes and optional mapped text glow. It's an independent adaptation, not an endorsed
 > or pixel-identical port. This live demo shows separate editor/UI/icon controls and a flat alternative.
 > Experimental glow does not cover every native/browser/custom-painted surface.
@@ -155,7 +155,7 @@ Qualifying evidence for every candidate:
 **Personalized outreach draft:**
 
 > Hi `[CREATOR]`, I enjoyed `[SPECIFIC_POST + DATE]`, particularly `[OBSERVATION ABOUT THEIR IDE WORKFLOW]`.
-> I'm Jakub, author of IDE Synthwave: SynthWave-inspired IntelliJ IDEA themes with optional editor/UI/icon glow.
+> I'm Jakub, author of Neon Glow: SynthWave-inspired IntelliJ IDEA themes with optional editor/UI/icon glow.
 > Would you be interested in a hands-on demo for your workspace-customization audience? Here's the authentic
 > demo/guide: `[DEMO_GUIDE_URL]`. Glow is experimental; the guide states coverage and performance limits.
 > There's no expectation of praise or a review. If you offer sponsored demonstrations, please share your
@@ -174,7 +174,7 @@ appropriate; honour refusals/no-contact requests. Do not mass-send five identica
   do not assume reuse, exclusivity or guaranteed views are included.
 - Creative independence: show actual experience; criticism and negative findings are allowed. Review only
   objective factual errors/privacy, never condition payment on a positive opinion or Marketplace rating.
-- Disclosure: clear “Sponsored by IDE Synthwave” near the endorsement; video disclosure visible/in the spoken
+- Disclosure: clear “Sponsored by Neon Glow” near the endorsement; video disclosure visible/in the spoken
   segment as appropriate, not only buried in a description. Disclose compensation or other material benefits;
   creator/owner must check applicable jurisdiction and platform rules.
 - Approval: exact deliverables, disclosure, all-in quote ≤$200, dates, rights and payment terms approved by

@@ -1,9 +1,11 @@
-# IDE Synthwave
+# Neon Glow
 
-Complete SynthWave-inspired IntelliJ themes, coordinated editor/console/terminal palettes and optional neon glow.
+Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.
+
 Editors, tool windows, tabs, menus, popups and dialogs can get blurred text/icon halos. An optional SynthWave '84
 text style adds layered halos to eligible coloured text: tinted cores on dark backgrounds, original cores on light
-backgrounds, without changing your IDE theme.
+backgrounds, without changing your IDE theme. Bundled SynthWave-inspired themes also coordinate editor, console
+and terminal palettes.
 
 > The declarative themes work without glow. Glow remains an experimental Java2D enhancement:
 > [`docs/glow-investigation.md`](docs/glow-investigation.md) explains the approach
@@ -12,7 +14,7 @@ backgrounds, without changing your IDE theme.
 
 ## What it does
 
-- Bundles **SynthWave '84**, **SynthWave Midnight** and **SynthWave Accessible**, with matching editor schemes,
+- Bundles **Neon Glow** (Classic), **Neon Glow Midnight** and **Neon Glow Accessible**, with matching editor schemes,
   familiar recoloured SVG icons, dark-purple surfaces, clear keyboard focus and distinct selection states.
   Amber warnings remain distinguishable from mint success/additions. Accessible colours are tested without glow.
 - Offers **Classic**, **Neon**, **Focus** and **Accessible** glow presets, independent target strengths and an
@@ -39,16 +41,16 @@ backgrounds, without changing your IDE theme.
 
 ## Quick start
 
-1. Keep your current IDE theme. Open `Settings | Appearance & Behavior | Synthwave` and enable **Enable glow**
+1. Keep your current IDE theme. Open `Settings | Appearance & Behavior | Neon Glow` and enable **Enable glow**
    and **Editor text**.
 2. Expand **Fine-Tune Glow**, enable **SynthWave '84-style text**, then **Apply** or **OK**. No preset is needed.
    For the recommended look, use **45% brightness**, **100% intensity** and **6 px radius**.
-3. Optional: choose **SynthWave Midnight** or **SynthWave '84** under `Settings | Appearance & Behavior | Appearance`,
+3. Optional: choose **Neon Glow Midnight** or **Neon Glow** under `Settings | Appearance & Behavior | Appearance`,
    or try **Focus** (editor-only) or **Classic** glow presets. Selecting a preset fills the draft controls immediately;
    Apply/OK commits them. Every slider shows its numeric value.
 
 Use **Accessible** as a glow preset, or turn off **Enable glow**, for flat rendering. The similarly named theme
-does not disable glow automatically. `View | Appearance | Synthwave Glow` is the quick on/off switch.
+does not disable glow automatically. `View | Appearance | Neon Glow` is the quick on/off switch.
 Presets and edits remain drafts until Apply; Reset discards them. Existing preferences are never replaced just
 by opening this page, and untouched fractional values remain precise even though sliders use whole ticks.
 
@@ -62,11 +64,11 @@ Choose the IDE theme under `Settings | Appearance & Behavior | Appearance`; its 
 Themes do not enable glow or overwrite glow preferences. Choose the Accessible glow preset (or disable glow) for
 an entirely flat experience; choosing the Accessible **theme** alone does not override an existing enabled effect.
 
-`Settings | Appearance & Behavior | Synthwave`
+`Settings | Appearance & Behavior | Neon Glow`
 
 | Setting | Default | Meaning |
 |---|---|---|
-| Enable glow | on | Also toggled by `View | Appearance | Synthwave Glow`. |
+| Enable glow | on | Also toggled by `View | Appearance | Neon Glow`. |
 | Editor text | on | Code, console/diff text and editor gutters. |
 | UI text | on | Tool windows, tabs, menus, popups, dialogs and other Swing UI text. |
 | Regular text glow | on | Same-colour halos for text without an eligible SynthWave-style rule, in both enabled text targets. Off leaves original cores with no halos; eligible layered text and icons are unaffected. With style off, this controls all text glow. |
@@ -78,7 +80,7 @@ an entirely flat experience; choosing the Accessible **theme** alone does not ov
 | Radius | 6 px | Same-colour halo reach in user-space pixels. In style mode, 6 px uses reference layer blur sizes; other values scale all layers proportionally. |
 | Intensity | 300 % | Coverage multiplier before brightness; thin fonts need more than bold ones. |
 
-Settings are stored in `ide-synthwave.xml`. Target choices are independent; turning the master switch off and
+Settings are stored in `neon-glow.xml`. Target choices are independent; turning the master switch off and
 back on preserves them. Changes take effect on **Apply**, without an IDE restart.
 
 Choosing a preset changes the draft immediately, not the live IDE. Classic uses upstream-inspired editor glow and restrained UI
@@ -87,8 +89,8 @@ glow. Customize any preset, use the optional **Show draft preview**, then Apply/
 Power Save and cold-work limits so you can inspect the intended appearance; the actual IDE always respects
 Power Save. No theme, font or layout is automatically changed.
 
-`View | Appearance | Synthwave Tools` and Find Action expose **Synthwave Settings**, **Reset Synthwave Glow Caches**
-and **Copy Synthwave Diagnostics**. Diagnostics include IDE/runtime versions, rendering status, settings, scheme
+`View | Appearance | Neon Glow Tools` and Find Action expose **Neon Glow Settings**, **Reset Neon Glow Caches**
+and **Copy Neon Glow Diagnostics**. Diagnostics include IDE/runtime versions, rendering status, settings, scheme
 name and cache counts—not project paths or document contents. Review the clipboard text before sharing.
 
 Performance mode is a best-effort cold-work limiter, **not** a total repaint-time guarantee: one mask can exceed
@@ -149,9 +151,13 @@ your current theme, with no restart or changes to IDE installation files. Saved 
 
 ## Development
 
+Use `neon-glow` as the repository name; the Gradle project name is `neon-glow`. The plugin ID, Gradle group and
+Kotlin namespace are `info.chrzanowski.neonglow`. The pre-release rename changes plugin/theme IDs and settings storage. Uninstall any
+older development build before installing Neon Glow; previous development settings are not migrated.
+
 ```shell
 ./gradlew test       # unit + light platform tests (incl. GlowPaintBenchmarkTest, which prints paint costs with -i)
-./gradlew runIde     # sandbox IDE with -Dide.synthwave.debug=true
+./gradlew runIde     # sandbox IDE with -Dide.neon.glow.debug=true
 ./gradlew buildPlugin
 ./gradlew verifyPlugin   # 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3
 ./gradlew test -PplatformVersion=2026.1.5
@@ -159,7 +165,7 @@ your current theme, with no restart or changes to IDE installation files. Saved 
 ./gradlew runIde -PplatformVersion=2026.1.5
 ```
 
-With `-Dide.synthwave.debug=true` the plugin logs a `synthwave: paints=… paint avg=…µs …` line to `idea.log` every
+With `-Dide.neon.glow.debug=true` the plugin logs a `[NeonGlow] paints=… paint avg=…µs …` line to `idea.log` every
 10 seconds with glow cost, glyphs per text run (or editor fallback paint), layout fallbacks and atlas statistics.
 
 The plugin supports IntelliJ Platform **2025.3 and newer, including 2026.1 and 2026.2** (`since-build=253`,
@@ -167,8 +173,11 @@ no upper bound). Release artifacts are built against the default **2025.3.6.1** 
 backward compatibility. Use `platformVersion` for additional test/sandbox targets; build release packages without
 that override. Building/testing against 2026.2 requires a Java 25 toolchain; Gradle selects the target's runtime.
 
-All 176 tests pass on 2025.3.6.1, 2026.1.5 and 2026.2.3. Tests use platform APIs without unrelated bundled plugin
-jars on their shared test classpath; this avoids obfuscated-class collisions in 2026.2, without disabling tests
+Neon Glow passes all **177 tests** on 2025.3.6.1, including the new identity regression check. Its baseline-built
+artifact passes Plugin Verifier on all four versions above. Pre-rename verification recorded 176 passing tests
+on 2025.3.6.1, 2026.1.5 and 2026.2.3; the newer-platform test suites were not rerun for the rename.
+Tests use platform APIs without unrelated bundled plugin jars on their shared test classpath; this avoids
+obfuscated-class collisions in 2026.2, without disabling tests
 or changing the production plugin. Plugin Verifier checks the baseline-built artifact against the four versions
 above. An open upper bound allows future installation, not a guarantee about untested releases or IDE products.
 The three experimental editor-fallback API usages, a 2026.2 preset-renderer deprecation and manual visual checks are documented in

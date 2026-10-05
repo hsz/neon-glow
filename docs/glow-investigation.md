@@ -1,6 +1,6 @@
 # Glow investigation: a real, blurred halo behind IDE text
 
-This document records the proof of concept behind IDE Synthwave: **can a plugin paint a real neon glow — a blurred,
+This document records the proof of concept behind Neon Glow: **can a plugin paint a real neon glow — a blurred,
 tinted copy of every glyph — under the text of an IntelliJ editor with plain Java2D, at a cost that keeps up with
 typing and scrolling?** Short answer: yes, with one caveat about full-viewport repaints on HiDPI, see §6.
 The original editor-only measurements below remain historical; the IDE-wide extension is described in §10.
@@ -119,8 +119,8 @@ Reading the numbers:
   pipeline the masks are cached as textures after two draws and the per-glyph cost becomes draw-call overhead; the
   sandbox run confirmed the glow renders correctly in LightEdit at 2x (syntax-coloured halos, no errors in
   `idea.log`), but a modal dialog prevented collecting `GlowStats` lines in that session — run
-  `./gradlew runIde`, open a file, type and scroll for 10 s and read the `synthwave:` lines in
-  `.intellijPlatform/sandbox/ide-synthwave/IU-2025.3.6.1/log_runIde/idea.log` to get Metal numbers.
+  `./gradlew runIde`, open a file, type and scroll for 10 s and read the `[NeonGlow]` lines in
+  `.intellijPlatform/sandbox/neon-glow/IU-2025.3.6.1/log_runIde/idea.log` to get Metal numbers.
 - **Cold atlas**: ~0.4 ms per mask (blur dominates); a new colour scheme or font triggers one such burst for the
   visible glyph set and is not noticeable.
 
@@ -131,10 +131,10 @@ colours, scale)` which turns a full repaint into ~40 blits.
 
 ## 7. Debug statistics
 
-With `-Dide.synthwave.debug=true` (set by `./gradlew runIde`) `GlowStats` logs every 10 s:
+With `-Dide.neon.glow.debug=true` (set by `./gradlew runIde`) `GlowStats` logs every 10 s:
 
 ```
-synthwave: paints=… paint avg=…µs max=…µs (… glyphs) glyphs/paint=… fallback segments=… atlas hits=… misses=… size=… (… MB) evictions=… cpu≈…%
+[NeonGlow] paints=… paint avg=…µs max=…µs (… glyphs) glyphs/paint=… fallback segments=… atlas hits=… misses=… size=… (… MB) evictions=… cpu≈…%
 ```
 
 `fallback segments` should stay at 0 for ordinary code; a non-zero value points at ligatures, inlays or fonts that
@@ -163,8 +163,8 @@ disagree with the glyph-vector advances and are handled by the slower per-charac
    stays crisp at 2x.
 5. `File | Power Save Mode`: the glow disappears; switching it off brings it back.
 6. Switch the colour scheme / Light–Dark theme: halos recolour immediately.
-7. `Settings | Appearance & Behavior | Synthwave`: radius and intensity apply on *Apply*; the checkbox and
-   `View | Appearance | Synthwave Glow` toggle it.
+7. `Settings | Appearance & Behavior | Neon Glow`: radius and intensity apply on *Apply*; the checkbox and
+   `View | Appearance | Neon Glow` toggle it.
 8. Inspect tool-window trees, table cells, editor tabs, status labels, buttons, search popups and settings dialogs:
    text and standard icons glow in their current colours; selection, hover and disabled states remain usable.
 9. Open a new dialog or detached tool window after startup, then close it. Toggle glow and Power Save while a

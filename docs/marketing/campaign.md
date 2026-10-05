@@ -1,4 +1,4 @@
-# IDE Synthwave launch campaign
+# Neon Glow launch campaign
 
 Planning baseline: 2026-10-04. **Draft materials only; nothing is published and no spending is authorized.**
 
@@ -6,7 +6,8 @@ Planning baseline: 2026-10-04. **Draft materials only; nothing is published and 
 
 **Your IDE. After dark.**
 
-SynthWave-inspired themes with optional glow for code, UI text and standard icons—dial each one to your taste.
+Configurable neon glow for code, UI text and standard icons. Keep your theme, add some light;
+optional SynthWave-inspired themes provide a coordinated palette.
 
 Sell the transformation, demonstrate the control, earn trust with honest limits. Start with a 30-day,
 organic-first pilot for IntelliJ IDEA; consider paid distribution only after the launch gates pass.
@@ -38,14 +39,14 @@ not a URL; never publish bracketed placeholders or invent a Marketplace ID.
 
 | Key used in drafts | Current state | Acceptance check |
 |---|---|---|
-| `[LISTING_URL]` | PENDING: no verified public listing | Logged-out access; correct name, vendor and plugin ID `info.chrzanowski.idesynthwave`; usable compatible release; install route works |
+| `[LISTING_URL]` | PENDING: no verified public listing | Logged-out access; correct name, vendor and plugin ID `info.chrzanowski.neonglow`; usable compatible release; install route works |
 | `[DEMO_GUIDE_URL]` | PENDING: no verified public demo/guide destination | Authentic demo and current installation guide accessible without an account; no unavailable installation promise |
 | `[FEEDBACK_URL]` | PENDING: owner-approved public support/issue destination | Owner monitors it; submit/read permissions and privacy expectations checked |
 | `[DEMO_URL]` | PENDING: recording not supplied | Captioned genuine live IDE footage; playback works; destination requirements checked |
 
 - Before a listing is verified: **See the demo and installation guide** → `[DEMO_GUIDE_URL]`, but only once
   that page and its authentic demo are available. Until then, keep the copy unpublished.
-- After a listing is verified: **Install IDE Synthwave** → `[LISTING_URL]`.
+- After a listing is verified: **Install Neon Glow** → `[LISTING_URL]`.
 - One primary CTA per asset. Feedback may be a secondary invitation in longer organic posts, not a second ad button.
 - Never use “Buy,” “Try Pro,” “Start your trial” or price messaging without actual commercial packaging,
   licensing, customer terms and owner approval.
@@ -70,12 +71,12 @@ A complete documentation kit is not a launched campaign. Missing visual evidence
 ## Claim checklist
 
 Source baseline: [`README.md`](../../README.md), [`plugin.xml`](../../src/main/resources/META-INF/plugin.xml)
-and [`docs/theme-quality.md`](../theme-quality.md), especially its 2026-10-04 validation snapshots.
+and [`docs/theme-quality.md`](../theme-quality.md), especially its 2026-10-05 rename verification.
 Recheck these against the version actually distributed; historical results do not validate a changed binary.
 
 | Permitted claim | Grounding | Necessary qualification |
 |---|---|---|
-| Three complete theme/scheme pairs | README “What it does”; three `themeProvider` entries | Display names: SynthWave '84, SynthWave Midnight, SynthWave Accessible; theme and glow are separate |
+| Three complete theme/scheme pairs | README “What it does”; three `themeProvider` entries | Display names: Neon Glow, Neon Glow Midnight, Neon Glow Accessible; the first is the Classic palette, and theme and glow are separate |
 | Coordinated editor, console and terminal palettes; recoloured standard SVG icons | Descriptor description; README; resource checks in quality checklist | Not every third-party painter or terminal engine shares glow coverage |
 | Classic, Neon, Focus and Accessible glow presets | README settings; quality checklist | Selecting a preset fills draft controls immediately; Apply/OK commits; no automatic theme/font/layout change |
 | Independent editor/UI/icon switches and strengths | README settings; automated target tests documented in quality checklist | UI/icon glow is experimental; standard images, not all custom vector icons |
@@ -83,7 +84,7 @@ Recheck these against the version actually distributed; historical results do no
 | Glow settings apply without restarting | README settings | Applies to settings changes, not a guarantee that plugin installation needs no restart |
 | Static glow respects Power Save | README; quality checklist | Actual live rendering, not isolated draft preview, is evidence |
 | Performance mode limits new mask work | README; quality checklist | Best-effort admission limit, not zero overhead or a total repaint-time bound |
-| Named compatibility evidence | Quality checklist compatibility matrix | 176 tests on 2025.3.6.1, 2026.1.5, 2026.2.3; Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; no universal visual certification |
+| Named compatibility evidence | Quality checklist rename verification | 177 tests on 2025.3.6.1; historical pre-rename results of 176 tests on 2026.1.5 and 2026.2.3, not rerun after rename; renamed artifact Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; no universal visual certification |
 | Accessible is a brighter, flat-readable theme option | Quality checklist contrast checks | Name is not accessibility certification; select Accessible glow preset or disable glow separately |
 
 Forbidden shortcuts: “all IDE surfaces/icons,” “zero overhead,” “certified accessible,” “boosts productivity,”

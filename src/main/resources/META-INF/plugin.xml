@@ -1,11 +1,11 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>info.chrzanowski.idesynthwave</id>
+    <id>info.chrzanowski.neonglow</id>
 
     <!-- Public plugin name should be written in Title Case.
      Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>IDE Synthwave</name>
+    <name>Neon Glow</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor url="https://chrzanowski.info">Jakub Chrzanowski</vendor>
@@ -13,62 +13,63 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Complete SynthWave-inspired dark IDE themes with coordinated editor, console and terminal palettes,
-        recoloured standard icons, and optional neon text/icon glow. Choose Classic, Midnight or Accessible under
+        Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.<br><br>
+        Add text and icon halos with Classic, Neon, Focus and Accessible presets, independent editor/UI/icon
+        strengths, a draft preview and bounded cold-cache work in performance mode.<br><br>
+        Optional SynthWave-inspired dark themes coordinate editor, console and terminal palettes and recolour
+        standard icons. Choose Neon Glow, Neon Glow Midnight or Neon Glow Accessible under
         <b>Settings | Appearance &amp; Behavior | Appearance</b>.<br><br>
-        Glow offers Classic, Neon, Focus and Accessible presets, independent editor/UI/icon strengths, a draft
-        preview and bounded cold-cache work in performance mode.<br><br>
         The glow is static (no animation), respects Power Save mode, follows colour scheme changes and can be tuned or
-        switched off under <b>Settings | Appearance &amp; Behavior | Synthwave</b> or via
-        <b>View | Appearance | Synthwave Glow</b>.
+        switched off under <b>Settings | Appearance &amp; Behavior | Neon Glow</b> or via
+        <b>View | Appearance | Neon Glow</b>.
         ]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.SynthwaveBundle</resource-bundle>
+    <resource-bundle>messages.NeonGlowBundle</resource-bundle>
 
     <!-- Extensions defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <themeProvider id="info.chrzanowski.idesynthwave.theme.classic" path="/themes/synthwave.theme.json"/>
-        <themeProvider id="info.chrzanowski.idesynthwave.theme.midnight" path="/themes/synthwave-midnight.theme.json"/>
-        <themeProvider id="info.chrzanowski.idesynthwave.theme.accessible" path="/themes/synthwave-accessible.theme.json"/>
-        <editorFactoryListener implementation="info.chrzanowski.idesynthwave.editor.GlowEditorFactoryListener"/>
-        <postStartupActivity implementation="info.chrzanowski.idesynthwave.ui.GlowStartupActivity"/>
+        <themeProvider id="info.chrzanowski.neonglow.theme.classic" path="/themes/neon-glow.theme.json"/>
+        <themeProvider id="info.chrzanowski.neonglow.theme.midnight" path="/themes/neon-glow-midnight.theme.json"/>
+        <themeProvider id="info.chrzanowski.neonglow.theme.accessible" path="/themes/neon-glow-accessible.theme.json"/>
+        <editorFactoryListener implementation="info.chrzanowski.neonglow.editor.GlowEditorFactoryListener"/>
+        <postStartupActivity implementation="info.chrzanowski.neonglow.ui.GlowStartupActivity"/>
 
         <applicationConfigurable
                 groupId="appearance"
-                instance="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
-                id="info.chrzanowski.idesynthwave.settings.GlowConfigurable"
-                displayName="Synthwave"/>
+                instance="info.chrzanowski.neonglow.settings.GlowConfigurable"
+                id="info.chrzanowski.neonglow.settings.GlowConfigurable"
+                displayName="Neon Glow"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="info.chrzanowski.idesynthwave.listeners.GlowApplicationListener"
+        <listener class="info.chrzanowski.neonglow.listeners.GlowApplicationListener"
                   topic="com.intellij.ide.AppLifecycleListener"/>
         <!-- Colour scheme switched or edited (a LaF change switches the scheme too): recolour the glow. -->
-        <listener class="info.chrzanowski.idesynthwave.listeners.GlowColorsListener"
+        <listener class="info.chrzanowski.neonglow.listeners.GlowColorsListener"
                   topic="com.intellij.openapi.editor.colors.EditorColorsListener"/>
-        <listener class="info.chrzanowski.idesynthwave.listeners.GlowPowerSaveListener"
+        <listener class="info.chrzanowski.neonglow.listeners.GlowPowerSaveListener"
                   topic="com.intellij.ide.PowerSaveMode$Listener"/>
     </applicationListeners>
 
     <actions>
-        <!-- View | Appearance | Synthwave Glow; text/description come from the resource bundle. -->
-        <action id="info.chrzanowski.idesynthwave.ToggleGlowAction"
-                class="info.chrzanowski.idesynthwave.actions.ToggleGlowAction">
+        <!-- View | Appearance | Neon Glow; text/description come from the resource bundle. -->
+        <action id="info.chrzanowski.neonglow.ToggleGlowAction"
+                class="info.chrzanowski.neonglow.actions.ToggleGlowAction">
             <add-to-group group-id="UIToggleActions" anchor="last"/>
         </action>
-        <group id="info.chrzanowski.idesynthwave.Tools" popup="true">
+        <group id="info.chrzanowski.neonglow.Tools" popup="true">
             <add-to-group group-id="UIToggleActions" anchor="last"/>
-            <action id="info.chrzanowski.idesynthwave.OpenGlowSettingsAction"
-                    class="info.chrzanowski.idesynthwave.actions.OpenGlowSettingsAction"/>
-            <action id="info.chrzanowski.idesynthwave.ClearGlowCachesAction"
-                    class="info.chrzanowski.idesynthwave.actions.ClearGlowCachesAction"/>
-            <action id="info.chrzanowski.idesynthwave.CopyGlowDiagnosticsAction"
-                    class="info.chrzanowski.idesynthwave.actions.CopyGlowDiagnosticsAction"/>
+            <action id="info.chrzanowski.neonglow.OpenGlowSettingsAction"
+                    class="info.chrzanowski.neonglow.actions.OpenGlowSettingsAction"/>
+            <action id="info.chrzanowski.neonglow.ClearGlowCachesAction"
+                    class="info.chrzanowski.neonglow.actions.ClearGlowCachesAction"/>
+            <action id="info.chrzanowski.neonglow.CopyGlowDiagnosticsAction"
+                    class="info.chrzanowski.neonglow.actions.CopyGlowDiagnosticsAction"/>
         </group>
     </actions>
 

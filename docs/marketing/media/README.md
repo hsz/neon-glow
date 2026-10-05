@@ -14,9 +14,9 @@ reference. Preserve upstream notices for adapted material; no endorsement is imp
 
 | Asset ID / planned file | Status | Blocking evidence |
 |---|---|---|
-| `classic.png` | MISSING | SynthWave '84 + applied Classic screenshot, privacy and legibility checks |
-| `midnight-focus.png` | MISSING | SynthWave Midnight + applied Focus; UI/icons off |
-| `accessible-flat.png` | MISSING | SynthWave Accessible + master glow explicitly off |
+| `classic.png` | MISSING | Neon Glow (Classic) + applied Classic screenshot, privacy and legibility checks |
+| `midnight-focus.png` | MISSING | Neon Glow Midnight + applied Focus; UI/icons off |
+| `accessible-flat.png` | MISSING | Neon Glow Accessible + master glow explicitly off |
 | `hero-20s.mp4` | MISSING | Genuine 20-second storyboard, captions, settings paths and verified destination |
 | `hero-20s.vtt` | MISSING | Timed captions reviewed against final footage; no fake caption export before recording |
 | `reddit-a.png` | MISSING / optional paid use | Transformation asset from approved source; 16:9 legible export |

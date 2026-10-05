@@ -45,6 +45,6 @@ tasks {
 
     runIde {
         // Periodic paint-cost / atlas statistics in the sandbox idea.log (see GlowStats).
-        jvmArgs("-Dide.synthwave.debug=true")
+        jvmArgs("-Dide.neon.glow.debug=true")
     }
 }

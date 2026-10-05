@@ -1,6 +1,6 @@
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
 
-rootProject.name = "ide-synthwave"
+rootProject.name = "neon-glow"
 
 pluginManagement {
     plugins {

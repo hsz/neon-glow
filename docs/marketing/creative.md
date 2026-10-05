@@ -1,4 +1,4 @@
-# IDE Synthwave visual production kit
+# Neon Glow visual production kit
 
 **Production specifications, not finished captures.** No approved screenshots or recordings are available in
 the repository inventory. See [media status](media/README.md). Missing captures block visual launch; never
@@ -41,15 +41,15 @@ fun main() {
 ## Reproducible configurations
 
 Select themes separately under **Settings | Appearance & Behavior | Appearance**. Select glow under
-**Settings | Appearance & Behavior | Synthwave** by choosing a preset, then **Apply** or **OK**. Record all overrides.
+**Settings | Appearance & Behavior | Neon Glow** by choosing a preset, then **Apply** or **OK**. Record all overrides.
 Preset values are grounded in `settings/GlowPreset.kt` and README; do not capture preserved unknown settings.
 
 | Capture ID | Theme | Applied glow | Values to record/check |
 |---|---|---|---|
-| `classic` | SynthWave '84 | Classic preset | Enabled; editor/UI/icons on; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance off |
-| `midnight-focus` | SynthWave Midnight | Focus preset | Enabled; editor on at 100%; UI/icons off at 0%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance on |
-| `accessible-flat` | SynthWave Accessible | Accessible preset | **Master glow off**; verify live editor/UI/icons are flat; other saved values do not imply enabled glow |
-| `control-demo` | SynthWave '84 | Classic, then explicit override | Mapped text **off** (same-colour mode), target strengths 100/25/35%, other Classic values; show supported UI text/icon target control live |
+| `classic` | Neon Glow (Classic) | Classic preset | Enabled; editor/UI/icons on; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance off |
+| `midnight-focus` | Neon Glow Midnight | Focus preset | Enabled; editor on at 100%; UI/icons off at 0%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance on |
+| `accessible-flat` | Neon Glow Accessible | Accessible preset | **Master glow off**; verify live editor/UI/icons are flat; other saved values do not imply enabled glow |
+| `control-demo` | Neon Glow (Classic) | Classic, then explicit override | Mapped text **off** (same-colour mode), target strengths 100/25/35%, other Classic values; show supported UI text/icon target control live |
 | `before` | Owner-selected built-in dark theme, named in manifest | Master glow off | Same content/layout/font/zoom; label baseline theme and glow state |
 
 Style mode preserves five upstream rules on known dark backgrounds and adapts other eligible vivid colours;
@@ -67,7 +67,7 @@ captioned export and editable caption text. Timecodes below are edit segments, n
 
 | Time | Live shot and configuration | Visible caption |
 |---|---|---|
-| 0–3 s | Same workspace: labelled built-in dark baseline/glow off → SynthWave '84/control-demo applied | Your IDE. After dark. |
+| 0–3 s | Same workspace: labelled built-in dark baseline/glow off → Neon Glow (Classic)/control-demo applied | Your IDE. After dark. |
 | 3–8 s | Steady editor + Project tree + selected tabs + standard icons, control-demo configuration | More than syntax colours. |
 | 8–13 s | Brief controls close-up; three matched live cuts isolate editor, UI text and icons by changing only the named target, Apply between raw takes | Glow where you want it. |
 | 13–17 s | 2 s Midnight/Focus → 2 s Accessible/master off; exact same workspace | Go neon. Or keep it quiet. |
@@ -77,16 +77,16 @@ For target-control takes, start with all targets off; enable editor only, then U
 control-demo settings for other shots. The edited montage needs small persistent labels (“Editor,” “UI text,”
 “Icons”); keep the raw Apply takes. Never use settings-preview painting as the after frame.
 
-Final card: show **Appearance: choose theme / Synthwave: tune glow**; the guide supplies full paths. Use one CTA
+Final card: show **Appearance: choose theme / Neon Glow: tune glow**; the guide supplies full paths. Use one CTA
 from [campaign.md](campaign.md): prelisting “See the demo and installation guide” only when that destination
-exists, otherwise “Install IDE Synthwave” only after public listing verification. If the CTA cannot fit legibly,
+exists, otherwise “Install Neon Glow” only after public listing verification. If the CTA cannot fit legibly,
 put its full wording in the post and retain one short destination on the card. No fake listing QR code.
 
 Caption/narration text (also suitable as descriptive post text):
 
 > Your IDE. After dark. SynthWave-inspired themes, beyond syntax colours. Control code, UI text and standard
 > icon glow separately. Choose Midnight with Focus, or Accessible with glow off. Select your theme in Appearance;
-> tune glow in Synthwave settings. Experimental glow; some native, browser and custom-painted surfaces are excluded.
+> tune glow in Neon Glow settings. Experimental glow; some native, browser and custom-painted surfaces are excluded.
 
 Keep captions outside important code/control areas; use an opaque readable backing and check at actual player
 size with sound off. Add a small “Experimental glow” label during effect shots; provide the full limitations in
@@ -101,9 +101,9 @@ raw capture; any title band is visibly editorial and must not cover meaningful l
 
 | Export name | Visible configuration | Title / caption | Alt text draft |
 |---|---|---|---|
-| `classic.png` | `classic` | Classic palette. Optional neon. | IntelliJ IDEA with SynthWave '84 and applied Classic glow; Kotlin code, Project tree, tabs and standard icons. |
-| `midnight-focus.png` | `midnight-focus` | Midnight. Focus on code. | Same IntelliJ IDEA workspace with SynthWave Midnight and Focus; editor glow enabled, UI text and icon glow disabled. |
-| `accessible-flat.png` | `accessible-flat` | Accessible palette. Glow off. | Same IntelliJ IDEA workspace with SynthWave Accessible and the master glow switch disabled. |
+| `classic.png` | `classic` | Classic palette. Optional neon. | IntelliJ IDEA with Neon Glow (Classic) and applied Classic glow; Kotlin code, Project tree, tabs and standard icons. |
+| `midnight-focus.png` | `midnight-focus` | Midnight. Focus on code. | Same IntelliJ IDEA workspace with Neon Glow Midnight and Focus; editor glow enabled, UI text and icon glow disabled. |
+| `accessible-flat.png` | `accessible-flat` | Accessible palette. Glow off. | Same IntelliJ IDEA workspace with Neon Glow Accessible and the master glow switch disabled. |
 
 Alt text must be revised to match actual capture content, not copied blindly. “Accessible” is the theme name,
 not accessibility certification. If a screenshot is too dense on mobile, make a clearly labelled genuine crop
@@ -118,7 +118,7 @@ Use one CTA from the registry per asset. Start with A and B in the same eligible
 |---|---|---|---|
 | A / transformation | Your IDE. After dark. | Deep-purple themes. Optional neon text and icon glow. | Matched baseline/after cut or one legible Classic live screenshot; consistent baseline labelling |
 | B / personal control | Neon where you want it. | Tune code, UI text and icon glow independently. | Control-demo target montage with settings applied, not a UI mockup |
-| C / restrained | SynthWave, without the overload. | Choose Midnight, use Focus glow, or switch effects off. | Midnight/Focus and Accessible/master-off matched cuts, settings explicitly labelled |
+| C / restrained | Neon Glow, without the overload. | Choose Midnight, use Focus glow, or switch effects off. | Midnight/Focus and Accessible/master-off matched cuts, settings explicitly labelled |
 
 For each: product name, one headline, genuine capture, one CTA. Keep limitations in nearby supporting copy and
 the destination; if platform format cannot support an honest explanation, do not use that placement.

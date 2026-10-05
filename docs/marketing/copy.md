@@ -1,4 +1,4 @@
-# IDE Synthwave copy pack
+# Neon Glow copy pack
 
 **Unpublished drafts — 2026-10-04.** Resolve destinations through [campaign.md](campaign.md); do not ship
 placeholders. No public listing, approved demo, price, Pro package or trial has been verified for this campaign.
@@ -6,25 +6,25 @@ Choose exactly one CTA variant per asset after its destination gate passes.
 
 ## Marketplace overview draft
 
-Use the existing product name **IDE Synthwave**. The opening line is functional rather than a slogan so the
+Use the existing product name **Neon Glow**. The opening line is functional rather than a slogan so the
 listing preview explains the product. Review against the release before pasting into the listing editor.
 
 ### Short summary
 
-SynthWave-inspired dark themes with optional text and icon glow.
+Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.
 
 ### Description
 
-Give your IntelliJ IDEA workspace a coordinated after-dark look. IDE Synthwave includes three dark themes
-with matching editor, console and terminal palettes, recoloured standard icons and optional neon glow.
+Add configurable text and icon glow to your current JetBrains IDE theme. Neon Glow also includes three optional
+SynthWave-inspired dark themes with matching editor, console and terminal palettes and recoloured standard icons.
 
-- **SynthWave '84:** the classic deep-purple, neon-inspired palette.
-- **SynthWave Midnight:** deeper, quieter surfaces.
-- **SynthWave Accessible:** brighter text alternatives for a readable flat appearance. Disable glow separately
+- **Neon Glow (Classic):** the classic deep-purple, neon-inspired palette.
+- **Neon Glow Midnight:** deeper, quieter surfaces.
+- **Neon Glow Accessible:** brighter text alternatives for a readable flat appearance. Disable glow separately
   for the flat experience; the name does not mean certified accessibility.
 
 Choose your theme in **Settings | Appearance & Behavior | Appearance**. Then configure effects separately in
-**Settings | Appearance & Behavior | Synthwave**: enable editor text, UI text and standard icon glow independently,
+**Settings | Appearance & Behavior | Neon Glow**: enable editor text, UI text and standard icon glow independently,
 tune their strengths, or start with Classic, Neon, Focus or Accessible glow presets. Selecting a preset fills the
 draft controls immediately; **Apply** or **OK** updates the live IDE without restarting. Theme selection does not replace your glow preferences.
 
@@ -37,8 +37,9 @@ This is an adaptation, not pixel-identical CSS rendering, contrast certification
 Glow is static and respects Power Save mode. Performance mode limits new mask work, but does not eliminate
 overhead or guarantee total repaint time. The isolated draft preview is not proof of live IDE rendering.
 
-**Compatibility evidence:** the repository records 176 passing tests on IntelliJ IDEA 2025.3.6.1, 2026.1.5
-and 2026.2.3. Plugin Verifier reports Compatible on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. This is binary/automated evidence,
+**Compatibility evidence:** Neon Glow passes 177 tests on IntelliJ IDEA 2025.3.6.1. The pre-rename implementation
+passed 176 tests on 2026.1.5 and 2026.2.3; those test suites were not rerun for the rename. Plugin Verifier reports
+Compatible for the renamed artifact on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. This is binary/automated evidence,
 not complete visual certification. The plugin declares a 2025.3 minimum and no upper bound; untested future
 releases and other IDE products are not guaranteed.
 
@@ -62,7 +63,7 @@ Use Marketplace's Media section for reviewed captures. Do not add a paid-feature
 
 **Title:** Your IDE. After dark.
 
-I've been building IDE Synthwave for IntelliJ IDEA: three SynthWave-inspired dark themes, matching editor,
+I've been building Neon Glow for IntelliJ IDEA: three SynthWave-inspired dark themes, matching editor,
 console and terminal palettes, and optional glow for code, UI text and standard icons.
 
 The part I most want to show is control. You can tune each glow target independently, choose Midnight with
@@ -76,7 +77,7 @@ and performance mode is a best-effort work limit, not a zero-overhead claim.
 **Insert one closing, only after its gate passes:**
 
 - Before listing: **See the demo and installation guide:** `[DEMO_GUIDE_URL]`.
-- Verified listing: **Install IDE Synthwave:** `[LISTING_URL]`.
+- Verified listing: **Install Neon Glow:** `[LISTING_URL]`.
 
 I'm the author. If you try it, which looks better to you: Classic glow or Midnight with Focus? I'd also welcome
 specific reports of hard-to-read selections, installation friction or rendering problems at `[FEEDBACK_URL]`.
@@ -91,8 +92,8 @@ Do not say “the attached demo” unless it is actually attached and plays.
 **Public Marketplace installation is pending verification.** Do not claim the plugin is searchable until
 `[LISTING_URL]` is checked. Once verified:
 
-1. Open IntelliJ IDEA **Settings | Plugins | Marketplace** and search for **IDE Synthwave**.
-2. Check the listing's vendor **Jakub Chrzanowski**, plugin ID `info.chrzanowski.idesynthwave`, compatible
+1. Open IntelliJ IDEA **Settings | Plugins | Marketplace** and search for **Neon Glow**.
+2. Check the listing's vendor **Jakub Chrzanowski**, plugin ID `info.chrzanowski.neonglow`, compatible
    version and linked installation destination before installing.
 3. Install and follow the IDE's prompts, including a restart if requested. Restart-free *settings changes*
    do not imply restart-free plugin installation.
@@ -104,13 +105,13 @@ third-party archive. Developers can follow the repository's build instructions t
 
 ### 2. Keep or choose your theme
 
-Keep your current IDE theme, or open **Settings | Appearance & Behavior | Appearance** and choose **SynthWave '84**,
-**SynthWave Midnight** or **SynthWave Accessible**, then Apply. Bundled themes load their paired editor scheme;
+Keep your current IDE theme, or open **Settings | Appearance & Behavior | Appearance** and choose **Neon Glow** (Classic),
+**Neon Glow Midnight** or **Neon Glow Accessible**, then Apply. Bundled themes load their paired editor scheme;
 glow preferences remain independent. You can use the themes with glow disabled.
 
 ### 3. Choose and apply glow
 
-For SynthWave-style text with your current theme, open **Settings | Appearance & Behavior | Synthwave**, enable
+For SynthWave-style text with your current theme, open **Settings | Appearance & Behavior | Neon Glow**, enable
 **Enable glow** and **Editor text**, expand **Fine-Tune Glow**, check **SynthWave '84-style text**, then **Apply** or
 **OK**. Recommended: **45% brightness**, **100% intensity**, **6 px radius**. No preset is needed; existing settings
 and presets are unchanged.
@@ -120,12 +121,12 @@ immediately; Reset discards unapplied changes.
 
 | Starting point | Theme selected separately | Glow preset | Expected effect |
 |---|---|---|---|
-| Classic neon | SynthWave '84 | Classic | Upstream-inspired editor text, restrained UI and icon strengths |
-| Quieter focus | SynthWave Midnight | Focus | Editor-only glow; UI text/icons off; performance mode on |
-| Flat option | SynthWave Accessible | Accessible | Master glow off; selecting the theme alone does not turn glow off |
+| Classic neon | Neon Glow (Classic) | Classic | Upstream-inspired editor text, restrained UI and icon strengths |
+| Quieter focus | Neon Glow Midnight | Focus | Editor-only glow; UI text/icons off; performance mode on |
+| Flat option | Neon Glow Accessible | Accessible | Master glow off; selecting the theme alone does not turn glow off |
 
 Use the **Editor text**, **UI text** and **Icons** switches and their strength controls independently. To
-remove all effects, uncheck **Enable glow** and Apply, or toggle **View | Appearance | Synthwave Glow**.
+remove all effects, uncheck **Enable glow** and Apply, or toggle **View | Appearance | Neon Glow**.
 The switch preserves target choices for later. Applied glow settings do not need an IDE restart.
 
 Adaptive text needs a known dark background (luminance <=0.12), saturation >=0.35, value >=0.5 and original flat
@@ -142,15 +143,16 @@ upstream styling is not contrast certification, especially hotpink. No preset au
   halos and is not a total repaint-time guarantee. Switch glow off if it affects readability or responsiveness.
 - Native/browser/custom-painted exclusions are expected, not proof of a broken installation. Terminal palette
   support is separate from terminal glow coverage.
-- Use **View | Appearance | Synthwave Tools | Reset Synthwave Glow Caches** if a halo appears stale.
-- For a report, use **Copy Synthwave Diagnostics**, review clipboard text and submit voluntarily to the verified
+- Use **View | Appearance | Neon Glow Tools | Reset Neon Glow Caches** if a halo appears stale.
+- For a report, use **Copy Neon Glow Diagnostics**, review clipboard text and submit voluntarily to the verified
   `[FEEDBACK_URL]`. Avoid project code, paths, credentials and personal data in added screenshots or text.
 
 ## FAQ draft
 
 **Which IDE versions have evidence?**
-The quality checklist records the 2026-10-04 matrix: 176 tests passed on IntelliJ IDEA 2025.3.6.1, 2026.1.5
-and 2026.2.3; Plugin Verifier passed on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. The minimum platform is 2025.3, with no upper installation
+The quality checklist records 177 passing tests on IntelliJ IDEA 2025.3.6.1 for Neon Glow, and historical pre-rename
+results of 176 tests on 2026.1.5 and 2026.2.3. Plugin Verifier passed for the renamed artifact on 2025.3.6.1, 2026.1,
+2026.1.5 and 2026.2.3. The minimum platform is 2025.3, with no upper installation
 bound. That does not certify every newer build, other JetBrains products or all visual/display-scale states.
 
 **Does it glow everywhere?**

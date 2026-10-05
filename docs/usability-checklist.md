@@ -1,4 +1,4 @@
-# Simple, powerful Synthwave: usability gate
+# Simple, powerful Neon Glow: usability gate
 
 **Status: trial not run.** Automated checks establish specific behavior, not product demand, ease of use,
 retention, accessibility certification or zero performance cost. This is a small formative trial, not a survey
@@ -33,7 +33,7 @@ No plugin telemetry, fingerprints or new analytics are needed. Any session recor
 
 Give each task without naming the exact controls; observe before coaching:
 
-1. Choose a quiet SynthWave workspace and apply editor-only glow. Measure time from opening Settings, excluding
+1. Choose a quiet Neon Glow workspace and apply editor-only glow. Measure time from opening Settings, excluding
    download/restart time. Ask which operations change the live IDE and which only change the draft.
 2. Try a stronger preset, customize it, then abandon the draft. Confirm the original settings and live rendering
    remain intact. Check that expanded fine-tuning is discoverable without being needed for initial setup.

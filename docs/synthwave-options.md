@@ -79,7 +79,7 @@ The base theme's UI color entries are theme data, not additional `synthwave84.*`
 
 ### Implemented equivalents
 
-IDE Synthwave now exposes independent editor-text, UI-text and icon switches, plus a 0–100% brightness slider
+Neon Glow now exposes independent editor-text, UI-text and icon switches, plus a 0–100% brightness slider
 separate from radius and intensity. In the default same-colour mode, brightness multiplies each cached halo's
 alpha after intensity saturation, without changing originals. The optional style mode below has fixed-alpha
 exceptions. Unlike upstream, brightness defaults to 100% and style defaults to off to preserve this plugin's

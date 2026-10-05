@@ -1,4 +1,4 @@
-# IDE Synthwave pilot scorecard and decision runbook
+# Neon Glow pilot scorecard and decision runbook
 
 **Template, not campaign results.** No publication, ad delivery, paid placement or spending has occurred as part
 of this work. Use `PENDING` for missing setup and `N/A` for unavailable metrics, not invented zeroes. This pilot
@@ -32,7 +32,7 @@ or export identifiers to reconstruct individuals. Keep only aggregate reports an
 ## Campaign-link conventions
 
 Use lower-case, stable values; no names, emails, licence IDs, project paths or per-person identifiers in tags.
-Campaign: `utm_campaign=synthwave_launch`. Maintain a link ledger and actual published URL for each placement.
+Campaign: `utm_campaign=neon_glow_launch`. Maintain a link ledger and actual published URL for each placement.
 
 | Placement | `utm_source` | `utm_medium` | `utm_content` |
 |---|---|---|---|
@@ -46,7 +46,7 @@ Campaign: `utm_campaign=synthwave_launch`. Maintain a link ledger and actual pub
 Syntax illustration only, **not a live destination**:
 
 ```text
-[VERIFIED_DESTINATION]?utm_source=reddit&utm_medium=paid_social&utm_campaign=synthwave_launch&utm_content=control_b
+[VERIFIED_DESTINATION]?utm_source=reddit&utm_medium=paid_social&utm_campaign=neon_glow_launch&utm_content=control_b
 ```
 
 Append `?` only when no query exists; otherwise append `&`. Preserve existing parameters, add before any URL
