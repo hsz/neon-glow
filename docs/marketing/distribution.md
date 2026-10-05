@@ -66,8 +66,8 @@ of an uncommercialized plugin.
 **Short founder demo post (existing owned account):**
 
 > Your IDE. After dark. I've built three SynthWave-inspired IntelliJ IDEA themes with optional glow for code,
-> UI text and standard icons. This live demo shows independent controls—and Midnight/Focus versus Accessible
-> with glow off. Glow is experimental; native, browser and custom-painted exclusions apply.
+> UI text and standard icons. This live demo shows independent controls—and Midnight with editor glow on and
+> UI/icons off versus Accessible with master glow off. Glow is experimental; native, browser and custom-painted exclusions apply.
 > `[APPROVED_CTA]`: `[APPROVED_DESTINATION]`
 
 Replace the final line using the registry, not a new promise. Attach approved hero footage. A longer founder
@@ -78,9 +78,9 @@ announcement and installation guide are in the copy pack. Do not create accounts
 1. Same-code before/after, with baseline named and genuine screenshot.
 2. Install from the verified listing (or honestly explain prelaunch local-build status).
 3. Keep your theme; in Neon Glow settings enable glow and Editor text, expand Fine-Tune Glow, enable Neon text styling,
-   then Apply/OK. Recommend brightness 45%, intensity 100%, radius 6 px; no preset needed. Explain that eligible colours
+   then Apply/OK. Recommend brightness 45%, intensity 100%, radius 6 px. Explain that eligible colours
    get layered halos; light backgrounds keep original letter colours, while unknown backgrounds follow Regular text glow.
-4. Show Midnight/Focus and Accessible/master-off; explain why theme choice alone does not disable effects.
+4. Show Midnight with editor glow on and UI/icons off, and Accessible/master-off; explain why theme choice alone does not disable effects.
 5. Explain Power Save, performance-mode costs and expected excluded surfaces.
 6. One verified installation/demo CTA; voluntary specific feedback invitation.
 
@@ -94,8 +94,8 @@ no permission means no post. Record the rule URL/date and approved format. Do no
 **IntelliJ customization / feedback post:**
 
 > I'm the author of Neon Glow and would like feedback on this live IntelliJ IDEA theme demo, if permitted
-> here. It pairs dark themes with optional independent editor, UI-text and standard icon glow. Midnight/Focus
-> lights only code; Accessible with the master switch off is flat. Which selected-tab or Project-tree state
+> here. It pairs dark themes with optional independent editor, UI-text and standard icon glow. Midnight with editor glow on
+> and UI/icons off lights only code; Accessible with the master switch off is flat. Which selected-tab or Project-tree state
 > is hardest to read? Glow is experimental and does not cover every native/browser/custom-painted surface.
 > `[APPROVED_CTA]`: `[APPROVED_DESTINATION]`
 
@@ -112,8 +112,9 @@ Only use this variant after an authentic **Java** capture exists; do not label K
 **Kotlin workspace/configuration post:**
 
 > I built Neon Glow for an after-dark IntelliJ IDEA look. This Kotlin demo keeps the same code while
-> switching Classic glow to Midnight/Focus, then Accessible with glow explicitly off. Theme selection and glow
-> are independent: selecting a glow preset fills the settings; Apply or OK changes the IDE. Was that separation clear in the guide?
+> switching the Classic palette with manually configured neon to Midnight with editor glow on and UI/icons off,
+> then Accessible with master glow explicitly off. Theme selection and glow
+> are independent: glow controls edit the draft; Apply or OK changes the IDE. Was that separation clear in the guide?
 > I'm the author; glow remains experimental with native/browser/custom-painted exclusions.
 > `[APPROVED_CTA]`: `[APPROVED_DESTINATION]`
 

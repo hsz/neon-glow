@@ -93,7 +93,7 @@ All controls take effect on **Apply**, without installation-file edits or restar
 
 **Neon text styling** is a checkbox persisted as `State.synthwaveStyle = true` by default.
 It works with your current IDE theme on enabled editor-text and UI-text targets; no theme installation or
-new preset is required. Explicit saved choices and named presets stay unchanged. Fresh installs use
+theme change is required. Explicit saved choices stay unchanged. Fresh installs use
 **50% brightness**, **200% intensity**, **6 px radius**, **75% editor strength** and **50% UI/icon strength**.
 For an upstream-inspired alternative, use **45% brightness** and **100% intensity**.
 

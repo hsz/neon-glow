@@ -4,7 +4,6 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import info.chrzanowski.neonglow.NeonGlowBundle
 import java.awt.Component
 import java.awt.Container
-import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -45,13 +44,10 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals(NeonGlowBundle.message("settings.displayName"), configurable.displayName)
         assertEquals(NeonGlowBundle.message("settings.displayName"), GlowConfigurable().displayName)
 
-        assertNull("opening settings must not imply a preset was chosen", presets().selectedItem)
-
         val labels = descendants(component).filterIsInstance<JLabel>().map { it.text }.toList()
         assertTrue(NeonGlowBundle.message("settings.radius") in labels)
         assertTrue(NeonGlowBundle.message("settings.intensity") in labels)
         assertTrue(NeonGlowBundle.message("settings.brightness") in labels)
-        assertTrue(NeonGlowBundle.message("settings.preset.label") in labels)
         for (key in listOf("settings.strength.editor", "settings.strength.ui", "settings.strength.icons")) {
             assertTrue(NeonGlowBundle.message(key) in labels)
         }
@@ -59,11 +55,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals(NeonGlowBundle.message("settings.regularText"), checkBox("regularText").text)
         assertEquals(NeonGlowBundle.message("settings.synthwaveStyle"), checkBox("synthwaveStyle").text)
         assertEquals(NeonGlowBundle.message("settings.performanceMode"), checkBox("performanceMode").text)
-        assertFalse(descendants(component).any { it is JButton && it.name == "usePreset" })
-        assertEquals(NeonGlowBundle.message("settings.preset.label"), presets().accessibleContext.accessibleName)
-        val placeholder = presets().renderer.getListCellRendererComponent(javax.swing.JList(), null, -1, false, false)
-        assertEquals(NeonGlowBundle.message("settings.preset.choose"), (placeholder as JLabel).text)
-        assertEquals(listOf("preset", "enabled", "editorText", "uiText", "regularText", "icons", "brightness",
+        assertEquals(listOf("enabled", "editorText", "uiText", "regularText", "icons", "brightness",
             "editorGlowStrength", "uiGlowStrength", "iconGlowStrength", "synthwaveStyle",
             "radiusPx", "intensity", "performanceMode"), descendants(component).filter {
             it is JCheckBox || it is JSlider || it is JComboBox<*>
@@ -122,7 +114,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified())
     }
 
-    fun `test every slider exposes its name and numeric value through edits presets and reset`() {
+    fun `test every slider exposes its name and numeric value through edits and reset`() {
         val labels = mapOf("brightness" to "settings.brightness", "radiusPx" to "settings.radius",
             "intensity" to "settings.intensity", "editorGlowStrength" to "settings.strength.editor",
             "uiGlowStrength" to "settings.strength.ui", "iconGlowStrength" to "settings.strength.icons")
@@ -134,7 +126,9 @@ class GlowConfigurableTest : BasePlatformTestCase() {
             control.value = control.minimum
             assertEquals("${control.value}${if (name == "radiusPx") " px" else "%"}", readout.text)
         }
-        presets().selectedItem = GlowPreset.CLASSIC
+        slider("radiusPx").value = 6
+        slider("intensity").value = 100
+        slider("brightness").value = 45
         assertEquals("6 px", strengthReadout("radiusPx").text)
         assertEquals("100%", strengthReadout("intensity").text)
         assertEquals("45%", strengthReadout("brightness").text)
@@ -358,99 +352,6 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals(2, applied.size)
     }
 
-    fun `test choosing a preset immediately updates the draft without changing live settings`() {
-        assertEquals(GlowPreset.entries.toList(), (0 until presets().itemCount).map { presets().getItemAt(it) })
-        for (preset in GlowPreset.entries) {
-            presets().selectedItem = preset
-            assertControlsMatch(preset.createState())
-            assertEquals(GlowSettings.State(), settings.state)
-            assertEquals(preset.createState() != settings.state, configurable.isModified())
-            assertTrue(applied.isEmpty())
-        }
-    }
-
-    fun `test clearing the preset selection leaves settings unchanged`() {
-        presets().selectedIndex = -1
-        assertControlsMatch(GlowSettings.State())
-        assertEquals(GlowSettings.State(), settings.state)
-        assertFalse(configurable.isModified())
-        assertTrue(applied.isEmpty())
-    }
-
-    fun `test reselecting the same preset restores its values after customization`() {
-        presets().selectedItem = GlowPreset.FOCUS
-        slider("brightness").value = 37
-        checkBox("uiText").isSelected = true
-        assertControlsMatch(GlowPreset.FOCUS.createState().copy(brightness = 0.37f, uiText = true))
-        presets().selectedItem = GlowPreset.FOCUS
-        assertControlsMatch(GlowPreset.FOCUS.createState())
-        assertEquals("45%", strengthReadout("brightness").text)
-        assertFalse(checkBox("uiText").isSelected)
-        assertEquals(GlowSettings.State(), settings.state)
-        assertTrue(configurable.isModified())
-        assertTrue(applied.isEmpty())
-    }
-
-    fun `test every selected preset applies once and selecting the live preset is unmodified`() {
-        for (preset in GlowPreset.entries) {
-            presets().selectedItem = preset
-            assertControlsMatch(preset.createState())
-            configurable.apply()
-            assertEquals(preset.createState(), settings.state)
-            assertEquals(preset.createState(), applied.last())
-            assertNull(presets().selectedItem)
-            assertFalse(configurable.isModified())
-            presets().selectedItem = preset
-            assertControlsMatch(preset.createState())
-            assertFalse(configurable.isModified())
-        }
-        assertEquals(GlowPreset.entries.map { it.createState() }, applied)
-    }
-
-    fun `test preset selection replaces only the draft and reset restores live defaults`() {
-        for (preset in GlowPreset.entries) {
-            slider("radiusPx").value = 16
-            presets().selectedItem = preset
-            assertControlsMatch(preset.createState())
-            assertEquals(GlowSettings.State(), settings.state)
-            assertTrue(configurable.isModified())
-            assertTrue(applied.isEmpty())
-            configurable.reset()
-            assertNull(presets().selectedItem)
-            assertControlsMatch(GlowSettings.State())
-            assertFalse(configurable.isModified())
-        }
-    }
-
-    fun `test customized preset applies once without saving preset identity and discards later presets`() {
-        presets().selectedItem = GlowPreset.FOCUS
-        slider("brightness").value = 37
-        slider("uiGlowStrength").value = 20
-        checkBox("uiText").isSelected = true
-        val customized = GlowPreset.FOCUS.createState().copy(brightness = 0.37f, uiGlowStrength = 0.2f, uiText = true)
-        assertControlsMatch(customized)
-        configurable.apply()
-        assertEquals(listOf(customized), applied)
-        assertEquals(customized, settings.state)
-        assertNull(presets().selectedItem)
-        assertFalse(configurable.isModified())
-
-        presets().selectedItem = GlowPreset.NEON
-        assertControlsMatch(GlowPreset.NEON.createState())
-        configurable.reset()
-        assertControlsMatch(customized)
-        assertNull(presets().selectedItem)
-        assertFalse(configurable.isModified())
-        presets().selectedItem = GlowPreset.NEON
-        assertControlsMatch(GlowPreset.NEON.createState())
-        configurable.disposeUIResources()
-        component = configurable.createComponent()
-        assertControlsMatch(customized)
-        assertNull(presets().selectedItem)
-        assertEquals(listOf(customized), applied)
-        assertFalse(configurable.isModified())
-    }
-
     fun `test all control edits remain isolated until apply and reset discards later edits`() {
         assertControlsMatch(GlowSettings.State())
         assertFalse(configurable.isModified())
@@ -500,7 +401,6 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals("12%", strengthReadout("editorGlowStrength").text)
         assertEquals("34%", strengthReadout("uiGlowStrength").text)
         assertEquals("56%", strengthReadout("iconGlowStrength").text)
-        assertNull(presets().selectedItem)
         assertFalse(configurable.isModified())
         assertTrue(applied.isEmpty())
     }
@@ -546,6 +446,35 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         }
     }
 
+    fun `test page has no glow preset selector and preserves saved settings after reset and reopening`() {
+        val live = GlowSettings.State(enabled = false, uiText = false, icons = false, radiusPx = 6.4f,
+            intensity = 1.234f, brightness = 0.456f, editorGlowStrength = 0.789f, uiGlowStrength = 0.234f,
+            iconGlowStrength = 0.567f, performanceMode = true, regularText = true)
+        settings.loadState(live)
+        configurable.reset()
+        repeat(2) {
+            assertFalse(descendants(component).any { it.name in listOf("preset", "usePreset") })
+            assertFalse(descendants(component).any { it is JComboBox<*> })
+            assertControlsMatch(live)
+            assertEquals(live, settings.state)
+            assertFalse(configurable.isModified())
+            assertTrue(applied.isEmpty())
+            slider("brightness").value = 37
+            checkBox("enabled").isSelected = true
+            assertTrue(configurable.isModified())
+            assertEquals(live, settings.state)
+            configurable.reset()
+            assertControlsMatch(live)
+            configurable.disposeUIResources()
+            component = configurable.createComponent()
+        }
+        configurable.apply()
+        assertEquals(listOf(live), applied)
+        assertEquals(live, settings.state)
+        assertControlsMatch(live)
+        assertFalse(configurable.isModified())
+    }
+
     private fun assertControlsMatch(expected: GlowSettings.State) {
         for ((name, selected) in mapOf("enabled" to expected.enabled, "editorText" to expected.editorText,
             "uiText" to expected.uiText, "regularText" to expected.regularText, "icons" to expected.icons,
@@ -558,8 +487,6 @@ class GlowConfigurableTest : BasePlatformTestCase() {
             assertEquals(name, value.roundToInt(), slider(name).value)
         }
     }
-
-    private fun presets(): JComboBox<*> = descendants(component).filterIsInstance<JComboBox<*>>().single { it.name == "preset" }
 
     private fun strengthReadout(name: String): JLabel =
         descendants(component).filterIsInstance<JLabel>().single { it.name == "${name}Value" }

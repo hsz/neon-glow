@@ -57,7 +57,8 @@ class GlowSettingsTest : BasePlatformTestCase() {
 
     fun `test missing XML options use the current defaults`() {
         val settings = GlowSettings()
-        settings.loadState(GlowPreset.ACCESSIBLE.createState())
+        settings.loadState(GlowSettings.State(enabled = false, brightness = 1f, intensity = 3f, synthwaveStyle = false,
+            editorGlowStrength = 1f, uiGlowStrength = 1f, iconGlowStrength = 1f, regularText = true))
         settings.loadState(XmlSerializer.deserialize(Element("state"), GlowSettings.State::class.java))
         assertEquals(GlowSettings.State(), settings.state)
         assertFalse(settings.state.regularText)
@@ -105,7 +106,9 @@ class GlowSettingsTest : BasePlatformTestCase() {
             .addContent(Element("option").setAttribute("name", "editorText").setAttribute("value", "false"))
             .addContent(Element("option").setAttribute("name", "icons").setAttribute("value", "false"))
         val settings = GlowSettings()
-        settings.loadState(GlowPreset.FOCUS.createState())
+        settings.loadState(GlowSettings.State(uiText = false, icons = false, brightness = 0.45f, intensity = 1f,
+            editorGlowStrength = 1f, uiGlowStrength = 0f, iconGlowStrength = 0f, performanceMode = true,
+            regularText = true))
         settings.loadState(XmlSerializer.deserialize(xml, GlowSettings.State::class.java))
 
         assertEquals(GlowSettings.State(enabled = false, radiusPx = 9f, intensity = 1.5f, brightness = 0.45f,

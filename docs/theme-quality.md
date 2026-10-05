@@ -14,8 +14,7 @@
 
 ## New features and safety boundaries
 
-- Four glow presets and independent target strengths make code brighter than dense UI controls if desired.
-  Presets are suggestions, not locked modes; old XML loads retain the prior defaults.
+- Independent target switches and strengths make code brighter than dense UI controls if desired.
 - Target/strength-only settings changes preserve warm live masks.
 - Performance mode shares 24 glyph / 4 image cold-mask admissions and a 2 ms deadline across graphics copies.
   Cache hits do not consume the budget. The deadline is checked **before** work: a single render or total IDE
@@ -34,7 +33,7 @@
 - Resource parsing, named-colour references, provider/scheme linkage and platform scheme loading.
 - Palette contrast against editor/chrome/control surfaces and focused/unfocused selections; semantic diagnostic
   distinctions and representative syntax/console/terminal attributes.
-- Legacy XML, normalization, fresh preset instances and transactional draft settings.
+- Legacy XML, normalization and transactional draft settings.
 - Original rendering on disabled/zero-strength/Power Save paths, mapped cores, all drawing overloads,
   target scopes/copies, clipped content, budget sharing, warm-cache use and oversized glyph transforms.
 - Existing editor lifecycle, root restoration, mutable icons and 1×/2× raster tests.
@@ -42,7 +41,8 @@
 
 ## Manual release matrix
 
-Check each theme with glow off, Classic/Neon/Focus presets, maximum settings, Power Save and performance mode:
+Check each theme with master glow off, manually configured editor-only glow (editor on, UI/icons off),
+all-target glow, maximum settings, Power Save and performance mode:
 
 1. Main toolbar/status bar, selected/unselected editor tabs, tool-window buttons and headers.
 2. Project tree, lists/tables: focused/unfocused selections, hover, disabled rows and VCS statuses.
@@ -69,6 +69,9 @@ Theme keys must be checked against the installed target's resources/schema; live
 proof for older builds. Preserve `LICENSE.synthwave84` for adapted upstream material, including packaged notices.
 
 ## Implementation review
+
+The dated records below describe historical checkpoints. Glow presets and their selector/renderer have since
+been removed; recorded test counts and preset-related fixes/warnings are not claims about the current release.
 
 ### Standards
 
@@ -182,12 +185,13 @@ The tests capture real repaint requests and require their inflated bounds to rea
 Two regression tests reproduced fractional-value loss in Apply and the draft preview (since removed): integer
 sliders rounded untouched saved values. Bindings were fixed to preserve raw values unless their displayed slider
 tick changes.
-Presets still deliberately replace only the draft; Apply/Reset/discard semantics and saved defaults are unchanged.
+At this checkpoint, presets (since removed) deliberately replaced only the draft; Apply/Reset/discard semantics
+and saved defaults were unchanged.
 
-The initial page keeps presets, master/target switches, brightness and performance mode visible. Independent
-strengths, mapped style, radius and intensity remain available in collapsed **Fine-Tune Glow**. Every slider
-has a localized accessible name and numeric readout. Tests verify initial visibility, readouts after edits,
-presets and Reset, precise values and unchanged transactional behavior even for collapsed controls.
+The initial page kept the then-available presets, master/target switches, brightness and performance mode visible.
+Independent strengths, mapped style, radius and intensity remained available in collapsed **Fine-Tune Glow**.
+Every slider had a localized accessible name and numeric readout. Tests verified initial visibility, readouts
+after edits, the since-removed presets and Reset, precise values and unchanged transactional behavior even for collapsed controls.
 
 Review totals: one actionable Standards lifecycle finding and one actionable Spec repaint finding, both
 reproduced and fixed; the parent audit additionally fixed fractional settings and simplified the page.
@@ -225,19 +229,21 @@ zero. Existing mapped-core/layer, restoration, icon and numeric-readout tests re
 
 All **151 tests** pass with zero failures, errors or skips on **2025.3.6.1**, **2026.1.5** and **2026.2.3**.
 IDE compilation and baseline plugin packaging pass. The settings page already has numeric readouts for every
-slider: brightness/intensity/strengths in percent and radius in pixels, verified through edits, presets and Reset.
+slider: brightness/intensity/strengths in percent and radius in pixels, verified through edits, the then-available presets and Reset.
 The readouts absent from the supplied screenshot are present in the current implementation; running IDEs need
 the rebuilt plugin to display code changes. No new live visual comparison was performed; the manual matrix remains open.
 
 ## Preset selection usability fix (2026-10-04)
 
-Selecting a glow preset now fills the draft controls immediately. The extra Use Preset button is
-removed; Apply or OK is the only live confirmation. Opening the page, Reset, Apply and reopening show a
-neutral “Choose a preset...” prompt instead of implying that saved settings match Classic. No theme, font,
-layout or saved settings change just from opening the page. Reset and disposal still discard unapplied presets.
+**Historical fix for the since-removed glow preset feature.** The test results below apply to that checkpoint.
 
-Regression tests first reproduced the inert selector and misleading initial selection. The settings tests now
-cover all four immediate selections, numeric readouts, same-preset reselection after customization, exactly one
+Selecting a glow preset filled the draft controls immediately. The extra Use Preset button was
+removed; Apply or OK was the only live confirmation. Opening the page, Reset, Apply and reopening showed a
+neutral “Choose a preset...” prompt instead of implying that saved settings match Classic. No theme, font,
+layout or saved settings changed just from opening the page. Reset and disposal still discarded unapplied presets.
+
+Regression tests first reproduced the inert selector and misleading initial selection. The settings tests then
+covered all four immediate selections, numeric readouts, same-preset reselection after customization, exactly one
 apply per preset, selecting the already-live preset, and Reset/disposal/reopening isolation.
 
 - All **153 tests** pass on **2025.3.6.1**, with zero failures, errors or skips.
@@ -247,7 +253,7 @@ apply per preset, selecting the already-live preset, and Reset/disposal/reopenin
 ## Theme-adaptive SynthWave text (2026-10-04)
 
 The existing opt-in style now works with ordinary dark IDE themes without changing their scheme, fonts, layout,
-saved preferences or presets. Exact upstream colours retain their established layers on dark surfaces; eligible
+saved preferences or the then-available presets. Exact upstream colours retain their established layers on dark surfaces; eligible
 nonexact vivid colours get pale tinted cores and separate, same-hue neon layers. Neutral, muted and low-contrast
 colours retain original cores and same-colour halos. Colour eligibility cannot identify semantic comments.
 Light or unknown backgrounds keep original cores and same-colour glow, including exact upstream colours.
@@ -274,9 +280,9 @@ cores do not certify complete themes or rendered text including alpha, antialias
 | 2026.2.3 | 164 passed, zero failures/skips | Compatible |
 
 IDE compilation and release packaging pass on the Java 21/2025.3 baseline. Verifier results retain the three
-experimental highlighter-order usages and additionally report the existing preset renderer's
+experimental highlighter-order usages and additionally reported the since-removed preset renderer's
 `SimpleListCellRenderer.create(String, Function)` as deprecated/scheduled for removal on 2026.2.3; there are no
-binary compatibility failures. Migration of that renderer remains a future-compatibility follow-up, not an
+binary compatibility failures. Migration of that renderer was a future-compatibility follow-up at this checkpoint, not an
 adaptive-rendering failure. The successful baseline suite also logged a bundled Grazie coroutine shutdown
 warning, without a failed/skipped test. No new live visual comparison, user trial or performance claim is made;
 the manual matrix remains open.
@@ -320,7 +326,7 @@ Clean test runs were used after constructor changes to avoid stale instrumented 
 `clean test buildPlugin verifyPlugin` succeeded on the default 2025.3.6.1/Java 21 baseline. Separate clean full-suite
 runs succeeded with `-PplatformVersion=2026.1.5` and `-PplatformVersion=2026.2.3`.
 
-Verifier warnings remain: three experimental editor-fallback API usages on each target, and the preset renderer's
+Verifier warnings at this checkpoint included three experimental editor-fallback API usages on each target, and the since-removed preset renderer's
 `SimpleListCellRenderer.create(String, Function)` deprecation/scheduled removal on 2026.2.3. No API compatibility
 failures were reported. The manual visual matrix and user trial remain unperformed; no public upload was made.
 
@@ -335,7 +341,8 @@ licence notices are unchanged. Older development settings are not migrated to th
 - All **177 tests** passed with zero failures, errors or skips, including a new plugin/settings/theme identity test.
   The 2026.1.5 and 2026.2.3 test suites were not rerun for this rename; their earlier results above remain historical.
 - Plugin Verifier reports Compatible for the renamed artifact on **2025.3.6.1**, **2026.1**, **2026.1.5** and
-  **2026.2.3**. The same three experimental editor-fallback API usages and 2026.2.3 preset-renderer deprecation remain.
+  **2026.2.3**. At this checkpoint, the same three experimental editor-fallback API usages and 2026.2.3 deprecation
+  of the since-removed preset renderer remained.
 - `build/distributions/neon-glow-0.1.0.zip` contains the new descriptor, namespace, message bundle, all six renamed
   theme/scheme resources and `META-INF/LICENSE.synthwave84`, with no old plugin namespace or theme-resource paths.
 
@@ -343,11 +350,23 @@ No live visual matrix, usability trial or public upload was performed for this r
 
 ## Default-settings verification (2026-10-05)
 
-Fresh-install defaults now use regular text glow off, SynthWave-style text on, brightness 50%, editor strength
-75%, UI/icon strength 50%, radius 6 px and intensity 200%. Explicit saved choices and named presets are retained;
-missing settings and non-finite numeric values use the new defaults.
+At this checkpoint, fresh-install defaults used regular text glow off, SynthWave-style text on, brightness 50%,
+editor strength 75%, UI/icon strength 50%, radius 6 px and intensity 200%. Explicit saved choices and the
+then-available named presets were retained; missing settings and non-finite numeric values used the new defaults.
 
 `./gradlew test --console=plain` passes all **178 tests** on 2025.3.6.1 with zero failures or skips. Settings tests
 cover defaults, missing XML options, explicit saved choices, normalization and draft controls. Rendering tests
 use explicit settings for the mode they exercise rather than relying on fresh-install defaults. Plugin Verifier,
 newer-platform test suites and live visual checks were not rerun for this change.
+
+## Glow preset removal (2026-10-05)
+
+Removed the glow preset selector, configurations, listener and localized strings. Bundled themes, fresh-install
+defaults and saved preferences are unchanged; manual controls retain transactional Apply/Reset behavior.
+
+The removal regression first failed against the selector, then passed after its removal. It verifies no selector
+is present and saved fractional values survive Reset, disposal, reopening and an untouched Apply. Obsolete
+preset-only tests were removed; numeric readout and legacy XML tests now use explicit manual settings.
+
+All **173 tests** pass on **2025.3.6.1**, including **20 settings-page tests**, with no failures, errors or skips.
+Baseline plugin packaging passes. Plugin Verifier and the live visual matrix were not rerun for this removal.

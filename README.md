@@ -17,8 +17,8 @@ and terminal palettes.
 - Bundles **Neon Glow** (Classic), **Neon Glow Midnight** and **Neon Glow Accessible**, with matching editor schemes,
   familiar recoloured SVG icons, dark-purple surfaces, clear keyboard focus and distinct selection states.
   Amber warnings remain distinguishable from mint success/additions. Accessible colours are tested without glow.
-- Offers **Classic**, **Neon**, **Focus** and **Accessible** glow presets and independent target strengths.
-  Existing saved settings are not silently replaced by a preset.
+- Offers independent editor/UI/icon switches and strengths, plus manual brightness, radius and intensity controls.
+  Existing saved settings are retained.
 - Optional **Performance mode** bounds new masks per paint; clipping and raster-size guards avoid unnecessary
   or excessive allocations. Recovery tools reset caches and copy a project-content-free diagnostic report.
 - Paints a Gaussian-blurred copy of text throughout Swing IDE windows, including console/diff editors and the
@@ -45,14 +45,13 @@ and terminal palettes.
    and **Editor text**.
 2. Fresh installs already enable **Neon text styling** and leave **Regular text glow** off. Defaults are
    **50% brightness**, **75% editor strength**, **50% UI/icon strength**, **200% intensity** and **6 px radius**.
-   Adjust the controls if needed, then **Apply** or **OK**. No preset is required.
-3. Optional: choose **Neon Glow Midnight** or **Neon Glow** under `Settings | Appearance & Behavior | Appearance`,
-   or try **Focus** (editor-only) or **Classic** glow presets. Selecting a preset fills the draft controls immediately;
-   Apply/OK commits them. Every slider shows its numeric value.
+   Adjust the controls if needed, then **Apply** or **OK**. Every slider shows its numeric value.
+3. Optional: choose **Neon Glow Midnight**, **Neon Glow** or **Neon Glow Accessible** under
+   `Settings | Appearance & Behavior | Appearance`. For editor-only glow, turn off **UI text** and **Icons**.
 
-Use **Accessible** as a glow preset, or turn off **Enable glow**, for flat rendering. The similarly named theme
+Turn off **Enable glow** for flat rendering. The Accessible theme
 does not disable glow automatically. `View | Appearance | Neon Glow` is the quick on/off switch.
-Presets and edits remain drafts until Apply; Reset discards them. Existing preferences are never replaced just
+Edits remain drafts until Apply; Reset discards them. Existing preferences are never replaced just
 by opening this page, and untouched fractional values remain precise even though sliders use whole ticks.
 
 The defaults keep ordinary text crisp while coloured text gets layered neon: **Regular text glow** is off and
@@ -62,7 +61,7 @@ icons remain independent. With Neon text styling off, disabling Regular text glo
 ## Settings
 
 Choose the IDE theme under `Settings | Appearance & Behavior | Appearance`; its paired editor scheme loads with it.
-Themes do not enable glow or overwrite glow preferences. Choose the Accessible glow preset (or disable glow) for
+Themes do not enable glow or overwrite glow preferences. Disable glow for
 an entirely flat experience; choosing the Accessible **theme** alone does not override an existing enabled effect.
 
 `Settings | Appearance & Behavior | Neon Glow`
@@ -84,9 +83,7 @@ an entirely flat experience; choosing the Accessible **theme** alone does not ov
 Settings are stored in `neon-glow.xml`. Target choices are independent; turning the master switch off and
 back on preserves them. Changes take effect on **Apply**, without an IDE restart.
 
-Choosing a preset changes the draft immediately, not the live IDE. Classic uses upstream-inspired editor glow and restrained UI
-glow; Neon increases saturation; Focus lights only editor text and enables performance mode; Accessible disables
-glow. Customize any preset, then Apply/OK or Reset. The IDE always respects Power Save.
+Adjust switches and sliders, then Apply/OK to commit or Reset to discard changes. The IDE always respects Power Save.
 No theme, font or layout is automatically changed.
 
 `View | Appearance | Neon Glow Tools` and Find Action expose **Neon Glow Settings**, **Reset Neon Glow Caches**
@@ -104,7 +101,7 @@ and remaining visual checks, and [the usability trial](docs/usability-checklist.
 The [original extension](https://marketplace.visualstudio.com/items?itemName=RobbOwen.synthwave-vscode) exposes
 brightness (0–1, default 0.45) and editor glow disablement, plus commands to install/remove Neon Dreams styling.
 For an upstream-inspired look, enable **Neon text styling** and use **45% brightness**, **100% intensity**
-and the default **6 px radius**; no preset or theme change is required. The five exact upstream rules below remain
+and the default **6 px radius**; no theme change is required. The five exact upstream rules below remain
 on known dark backgrounds. They are historical styling, not contrast certification—especially the hotpink core.
 The Classic/Midnight schemes coordinate their token colours with those rules; Accessible intentionally uses brighter
 alternatives where needed. All shadows are centred; blur sizes below are at radius 6 px.
@@ -146,7 +143,7 @@ Without graphics interception the editor under-glow fallback uses the scheme bac
 halos or same-colour fallback; it cannot replace foreground cores. Core replacement requires graphics interception.
 
 All options work with your current theme, with no restart or changes to IDE installation files. Changing defaults
-does not overwrite explicit saved settings or change named presets. See
+does not overwrite explicit saved settings. See
 [`docs/synthwave-options.md`](docs/synthwave-options.md) for the source-backed comparison and rendering differences.
 
 ## Development
@@ -173,7 +170,7 @@ no upper bound). Release artifacts are built against the default **2025.3.6.1** 
 backward compatibility. Use `platformVersion` for additional test/sandbox targets; build release packages without
 that override. Building/testing against 2026.2 requires a Java 25 toolchain; Gradle selects the target's runtime.
 
-Neon Glow passes all **180 tests** on 2025.3.6.1, including identity, default-settings and settings-page regression checks.
+Neon Glow passes all **173 tests** on 2025.3.6.1, including identity, default-settings and settings-page regression checks.
 The rename artifact passed Plugin Verifier on all four versions above; verification was not rerun for subsequent settings changes.
 Pre-rename verification recorded 176 passing tests
 on 2025.3.6.1, 2026.1.5 and 2026.2.3; the newer-platform test suites were not rerun for the rename.
@@ -181,7 +178,7 @@ Tests use platform APIs without unrelated bundled plugin jars on their shared te
 obfuscated-class collisions in 2026.2, without disabling tests
 or changing the production plugin. Plugin Verifier checks the baseline-built artifact against the four versions
 above. An open upper bound allows future installation, not a guarantee about untested releases or IDE products.
-The three experimental editor-fallback API usages, a 2026.2 preset-renderer deprecation and manual visual checks are documented in
+The three experimental editor-fallback API usages and manual visual checks are documented in
 [`docs/theme-quality.md`](docs/theme-quality.md).
 
 The commit sequence was reconstructed from an existing AI-assisted implementation. Its assigned dates are

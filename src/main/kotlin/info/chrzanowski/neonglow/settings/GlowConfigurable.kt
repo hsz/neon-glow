@@ -1,9 +1,7 @@
 package info.chrzanowski.neonglow.settings
 
 import com.intellij.openapi.options.Configurable
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindSelected
@@ -33,7 +31,6 @@ class GlowConfigurable internal constructor(
 
     private var panel: DialogPanel? = null
     private var draft: GlowSettings.State? = null
-    private var presetSelector: ComboBox<GlowPreset>? = null
 
     private fun currentDraft(): GlowSettings.State = checkNotNull(draft)
 
@@ -42,22 +39,7 @@ class GlowConfigurable internal constructor(
     override fun createComponent(): JComponent {
         panel?.let { return it }
         draft = settings.state.normalized()
-        val presets = ComboBox(GlowPreset.entries.toTypedArray()).apply {
-            selectedIndex = -1
-            renderer = SimpleListCellRenderer.create(NeonGlowBundle.message("settings.preset.choose")) { it.toString() }
-            accessibleContext.accessibleName = NeonGlowBundle.message("settings.preset.label")
-        }
-        presetSelector = presets
         panel = panel {
-            row(NeonGlowBundle.message("settings.preset.label")) {
-                cell(presets).applyToComponent { name = "preset" }
-            }
-            row {
-                comment(NeonGlowBundle.message("settings.preset.comment"))
-            }
-            row {
-                comment(NeonGlowBundle.message("settings.preset.theme.comment"))
-            }
             row {
                 checkBox(NeonGlowBundle.message("settings.enabled"))
                     .bindSelected({ currentDraft().enabled }, { currentDraft().enabled = it })
@@ -150,11 +132,6 @@ class GlowConfigurable internal constructor(
                 comment(NeonGlowBundle.message("settings.powerSave.comment"))
             }
         }
-        presets.addActionListener {
-            val selected = presets.selectedItem as? GlowPreset ?: return@addActionListener
-            draft = selected.createState()
-            panel?.reset()
-        }
         return panel!!
     }
 
@@ -200,13 +177,11 @@ class GlowConfigurable internal constructor(
         val currentPanel = panel ?: return
         draft = settings.state.normalized()
         currentPanel.reset()
-        presetSelector?.selectedIndex = -1
     }
 
     override fun disposeUIResources() {
         panel = null
         draft = null
-        presetSelector = null
     }
 
     private companion object {

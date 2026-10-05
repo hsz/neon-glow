@@ -16,7 +16,7 @@ organic-first pilot for IntelliJ IDEA; consider paid distribution only after the
 |---|---|---|
 | Primary: IntelliJ IDEA Java/Kotlin developers who customize their workspace | A coordinated appearance, not just syntax colours | Same-workspace before/after; editor, Project tree, tabs and standard icons |
 | Secondary: SynthWave enthusiasts moving from VS Code | Familiar inspiration with practical controls | Upstream-inspired palettes or keep your IDE theme with optional adaptive text glow; independent target switches |
-| Developers who find neon distracting | A restrained alternative | Midnight with Focus; Accessible with glow explicitly disabled |
+| Developers who find neon distracting | A restrained alternative | Midnight with editor glow on and UI/icon glow off; Accessible with master glow explicitly disabled |
 
 Do not broaden product-specific advertising to other JetBrains IDEs until genuine captures and installation
 checks exist for them. Do not imply an upstream affiliation or pixel-identical VS Code rendering.
@@ -78,14 +78,13 @@ Recheck these against the version actually distributed; historical results do no
 |---|---|---|
 | Three complete theme/scheme pairs | README “What it does”; three `themeProvider` entries | Display names: Neon Glow, Neon Glow Midnight, Neon Glow Accessible; the first is the Classic palette, and theme and glow are separate |
 | Coordinated editor, console and terminal palettes; recoloured standard SVG icons | Descriptor description; README; resource checks in quality checklist | Not every third-party painter or terminal engine shares glow coverage |
-| Classic, Neon, Focus and Accessible glow presets | README settings; quality checklist | Selecting a preset fills draft controls immediately; Apply/OK commits; no automatic theme/font/layout change |
 | Independent editor/UI/icon switches and strengths | README settings; automated target tests documented in quality checklist | UI/icon glow is experimental; standard images, not all custom vector icons |
 | Optional SynthWave-style text with your current IDE theme | README; implemented equivalents in `docs/synthwave-options.md` | Eligible colours get layered halos; dark backgrounds can get tinted cores, light backgrounds retain original cores, and unknown backgrounds use regular glow; historical upstream hotpink is not contrast-certified |
 | Glow settings apply without restarting | README settings | Applies to settings changes, not a guarantee that plugin installation needs no restart |
 | Static glow respects Power Save | README; quality checklist | Actual live rendering is evidence |
 | Performance mode limits new mask work | README; quality checklist | Best-effort admission limit, not zero overhead or a total repaint-time bound |
-| Named compatibility evidence | Quality checklist rename verification | 177 tests on 2025.3.6.1; historical pre-rename results of 176 tests on 2026.1.5 and 2026.2.3, not rerun after rename; renamed artifact Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; no universal visual certification |
-| Accessible is a brighter, flat-readable theme option | Quality checklist contrast checks | Name is not accessibility certification; select Accessible glow preset or disable glow separately |
+| Named historical compatibility evidence | Quality checklist rename verification | 177 tests on 2025.3.6.1 at the rename checkpoint; historical pre-rename results of 176 tests on 2026.1.5 and 2026.2.3, not rerun after rename; renamed artifact Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; recheck the advertised release after settings changes; no universal visual certification |
+| Accessible is a brighter, flat-readable theme option | Quality checklist contrast checks | Name is not accessibility certification; disable the master glow switch separately |
 
 Forbidden shortcuts: “all IDE surfaces/icons,” “zero overhead,” “certified accessible,” “boosts productivity,”
 “guaranteed future compatibility,” fabricated reviews/downloads/ROI, or unverified availability/prices.

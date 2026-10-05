@@ -49,7 +49,7 @@ object SynthwaveTextStyle {
             return Rule(rgb, listOf(Shadow(halo, 3f), Shadow(halo, 7f), Shadow(halo, 12f)))
         }
         rule(rgb)?.let { exact ->
-            // Retain upstream's hot-pink core on its original dark palette; it is not an accessibility preset.
+            // Retain upstream's hot-pink core on its original dark palette; it is not contrast-certified.
             return if (contrast(exact.foregroundRgb, backgroundRgb) >= 3.0) exact
             else exact.copy(foregroundRgb = rgb)
         }

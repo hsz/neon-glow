@@ -14,8 +14,8 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
         Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.<br><br>
-        Add text and icon halos with Classic, Neon, Focus and Accessible presets, independent editor/UI/icon
-        strengths, a draft preview and bounded cold-cache work in performance mode.<br><br>
+        Add text and icon halos with independent editor/UI/icon switches and strengths,
+        manual glow controls and bounded cold-cache work in performance mode.<br><br>
         Optional SynthWave-inspired dark themes coordinate editor, console and terminal palettes and recolour
         standard icons. Choose Neon Glow, Neon Glow Midnight or Neon Glow Accessible under
         <b>Settings | Appearance &amp; Behavior | Appearance</b>.<br><br>

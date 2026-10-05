@@ -6,23 +6,22 @@ that can predict adoption. Do not describe proposed targets below as measured ou
 
 ## Keep the first experience small
 
-The primary path is **choose theme → choose glow preset → Apply**. Themes remain usable with effects off.
-Settings initially show presets, master/target switches, brightness and performance mode; **Fine-Tune Glow**
+The primary path is **choose theme → configure glow targets → Apply**. Themes remain usable with effects off.
+Settings initially show master/target switches, brightness and performance mode; **Fine-Tune Glow**
 holds independent strengths, mapped style, radius and intensity. Numeric readouts make custom settings
 reproducible. Do not add more features or a first-run wizard merely to compensate for confusing labels.
 
 | Feature | User job | Validation boundary |
 |---|---|---|
 | Three themes and matching schemes | Make editor and IDE surfaces coherent | Resource/contrast tests plus the live [visual matrix](theme-quality.md#manual-release-matrix) |
-| Four presets | Get a useful configuration without tuning | Draft/Apply/Reset tests; novice trial must verify discovery |
 | Independent switches and strengths | Reduce visual noise selectively | Rendering/zero-strength tests; live screenshots and user comprehension still required |
 | Brightness, radius, intensity and mapped style | Reproduce a preferred appearance | Numeric readouts and precise saved values; advanced controls stay optional |
 | Performance mode and Power Save | Control optional work | Budget/original-rendering tests; real typing/scrolling responsiveness still requires observation |
 | Toggle, cache reset and diagnostics | Recover or report without reinstalling | Lifecycle/action tests; reports are reviewed and shared voluntarily |
 
-No preset silently changes the theme, fonts, layout or keymap. Keep those guarantees when simplifying settings.
+Glow settings do not change the theme, fonts, layout or keymap. Keep those guarantees when simplifying settings.
 All three targets are enabled by default, with **Neon text styling** on and regular text glow off.
-Explicit saved preferences are retained; recommending Focus in onboarding is not silently migrating preferences.
+Explicit saved preferences are retained; recommending editor-only glow in onboarding is not silently migrating preferences.
 
 ## Five-developer formative trial
 
@@ -35,10 +34,10 @@ Give each task without naming the exact controls; observe before coaching:
 
 1. Choose a quiet Neon Glow workspace and apply editor-only glow. Measure time from opening Settings, excluding
    download/restart time. Ask which operations change the live IDE and which only change the draft.
-2. Try a stronger preset, customize it, then abandon the draft. Confirm the original settings and live rendering
+2. Increase glow brightness or strengths, then abandon the draft. Confirm the original settings and live rendering
    remain intact. Check that expanded fine-tuning is discoverable without being needed for initial setup.
 3. Disable all glow without losing the selected theme or target preferences, then restore it. Ask what selecting
-   the Accessible *theme* alone does; record confusion with the Accessible *glow preset* explicitly.
+   the Accessible *theme* alone does; record confusion between theme selection and the master glow switch explicitly.
 4. Find one exact slider value, change only that control and Apply. Check that untouched values survive. Inspect
    actual editor/UI/icons; confirm ordinary white UI-label glow follows **Regular text glow**.
 5. Do normal work: type/delete on wrapped lines, scroll, use completion, navigate settings, change theme and
@@ -53,7 +52,7 @@ Use this worksheet per participant; identify people with consented study IDs, no
 | Setup time, unassisted success and prompts needed | NOT RUN |
 | Draft/Apply and theme/effect distinction understood | NOT RUN |
 | Successful disable/restore and preserved preferences | NOT RUN |
-| Chosen theme/preset, advanced controls used and reason | NOT RUN |
+| Chosen theme/glow targets, advanced controls used and reason | NOT RUN |
 | Readability or responsiveness issue, reproduction | NOT RUN |
 | Would use during normal work; why or why not | NOT RUN |
 | Voluntary follow-up after 3–7 days: still using? Changed/disabled? Why? | NOT RUN |

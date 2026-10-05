@@ -7,15 +7,15 @@
 ### Changed
 
 - Set fresh-install defaults to regular text glow off, SynthWave-style text on, 50% brightness, 75% editor
-  strength, 50% UI/icon strength, 6 px radius and 200% intensity. Retain explicit saved choices and named presets;
+  strength, 50% UI/icon strength, 6 px radius and 200% intensity. Retain explicit saved choices;
   missing settings and non-finite numeric values use the new defaults.
 - Rename the project to Neon Glow before publication, including plugin ID and namespace
   `info.chrzanowski.neonglow`, bundled themes, actions, settings storage and the `neon-glow` build artifact.
   Retain SynthWave '84 inspiration and upstream licence notices. Older development settings are not migrated.
 - Extend the existing opt-in SynthWave '84-style text to regular IDE themes: eligible vivid colours on dark
   backgrounds get pale same-hue cores and layered neon. Preserve the five upstream rules on known dark backgrounds,
-  original alpha, saved settings and presets. No theme change or preset is required.
-- Keep presets, glow switches, brightness and performance mode visible; put strengths, mapped text style,
+  original alpha and saved settings. No theme change is required.
+- Keep glow switches, brightness and performance mode visible; put strengths, mapped text style,
   radius and intensity in a collapsed Fine-Tune Glow section. Give every slider a numeric readout and accessible name.
 - Allow installation on IntelliJ 2026.1 and newer by removing the 253.* upper bound, retaining the 2025.3
   API/Java 21 release baseline. Verify the packaged plugin on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3.
@@ -24,6 +24,8 @@
 
 ### Removed
 
+- Glow preset selector and Classic, Neon, Focus and Accessible configurations. Manual controls, saved preferences,
+  bundled themes and transactional Apply/Reset behavior remain unchanged.
 - Show draft preview and its isolated sample renderer. Apply/OK still commits draft settings; Reset discards them.
 
 ### Fixed
@@ -31,8 +33,6 @@
 - Restore SynthWave-style glow for eligible coloured syntax on light backgrounds even with Regular text glow off.
   Keep original readable foregrounds and use background-aware coloured layers, including for dark syntax colours;
   neutral/muted/low-contrast text remains independently controlled. Shared policy covers graphics and editor fallback.
-- Selecting a glow preset immediately fills the draft controls; removed the redundant Use Preset button.
-  Apply/OK remains the only live confirmation. Opening, Reset and reopening no longer imply Classic is selected.
 - Keep original cores and same-colour glow for neutral, muted and low-contrast text when SynthWave '84 style
   is enabled, rather than removing unmatched halos. Unknown backgrounds retain this rendering even for exact
   upstream colours; light backgrounds now support eligible layered halos without core replacement.
@@ -51,7 +51,7 @@
   initially all-on default (now off) and follows the existing Apply/Reset workflow. With text style off, it controls all text glow.
 - Complete Classic, Midnight and Accessible IDE themes with paired syntax, console and terminal schemes,
   semantic SVG palette patching, consistent dark-purple surfaces and readable interaction states.
-- Classic, Neon, Focus and Accessible glow presets and independent editor/UI/icon strengths,
+- Independent editor/UI/icon strengths,
   preserving existing settings and transactional Apply/Reset behavior.
 - Optional bounded cold-mask work in performance mode, fully clipped painting exclusion and oversized-raster
   protection. Cache invalidation and settings updates are serialized on the UI thread.

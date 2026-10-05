@@ -25,8 +25,8 @@ SynthWave-inspired dark themes with matching editor, console and terminal palett
 
 Choose your theme in **Settings | Appearance & Behavior | Appearance**. Then configure effects separately in
 **Settings | Appearance & Behavior | Neon Glow**: enable editor text, UI text and standard icon glow independently,
-tune their strengths, or start with Classic, Neon, Focus or Accessible glow presets. Selecting a preset fills the
-draft controls immediately; **Apply** or **OK** updates the live IDE without restarting. Theme selection does not replace your glow preferences.
+tune their strengths, then use **Apply** or **OK** to update the live IDE without restarting.
+Theme selection does not replace your glow preferences.
 
 Keep your current IDE theme if you prefer: optional **Neon text styling** adapts eligible vivid colours on
 dark backgrounds with pale tinted cores and layered neon, while preserving five upstream colour rules. Neutral,
@@ -37,10 +37,11 @@ This is an adaptation, not pixel-identical CSS rendering, contrast certification
 Glow is static and respects Power Save mode. Performance mode limits new mask work, but does not eliminate
 overhead or guarantee total repaint time.
 
-**Compatibility evidence:** Neon Glow passes 177 tests on IntelliJ IDEA 2025.3.6.1. The pre-rename implementation
-passed 176 tests on 2026.1.5 and 2026.2.3; those test suites were not rerun for the rename. Plugin Verifier reports
+**Historical compatibility evidence:** At the rename checkpoint, Neon Glow passed 177 tests on IntelliJ IDEA 2025.3.6.1. The pre-rename implementation
+passed 176 tests on 2026.1.5 and 2026.2.3; those test suites were not rerun for the rename. Plugin Verifier reported
 Compatible for the renamed artifact on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3. This is binary/automated evidence,
-not complete visual certification. The plugin declares a 2025.3 minimum and no upper bound; untested future
+not complete visual certification; recheck the advertised release after subsequent settings changes.
+The plugin declares a 2025.3 minimum and no upper bound; untested future
 releases and other IDE products are not guaranteed.
 
 **Rendering limits:** glow remains experimental. OS-native menu/title text, browser-rendered panels, custom
@@ -67,8 +68,8 @@ I've been building Neon Glow for IntelliJ IDEA: three SynthWave-inspired dark th
 console and terminal palettes, and optional glow for code, UI text and standard icons.
 
 The part I most want to show is control. You can tune each glow target independently, choose Midnight with
-Focus for editor-only glow, or select Accessible and explicitly switch effects off. Themes and glow settings
-are separate—nothing automatically changes your font or layout.
+editor glow on and UI/icon glow off, or select Accessible and explicitly switch the master glow off. Themes and
+glow settings are separate—nothing automatically changes your font or layout.
 
 The attached demo shows the same workspace with settings applied live. Glow is
 experimental: native/browser-rendered surfaces and custom shape-only icons are outside universal coverage,
@@ -79,7 +80,7 @@ and performance mode is a best-effort work limit, not a zero-overhead claim.
 - Before listing: **See the demo and installation guide:** `[DEMO_GUIDE_URL]`.
 - Verified listing: **Install Neon Glow:** `[LISTING_URL]`.
 
-I'm the author. If you try it, which looks better to you: Classic glow or Midnight with Focus? I'd also welcome
+I'm the author. If you try it, which looks better to you: the Classic palette or Midnight with editor-only glow? I'd also welcome
 specific reports of hard-to-read selections, installation friction or rendering problems at `[FEEDBACK_URL]`.
 
 Publication condition: attach the authentic captioned demo, replace links and obtain owner/channel approval.
@@ -113,17 +114,15 @@ glow preferences remain independent. You can use the themes with glow disabled.
 
 For neon-styled text with your current theme, open **Settings | Appearance & Behavior | Neon Glow**, enable
 **Enable glow** and **Editor text**, expand **Fine-Tune Glow**, check **Neon text styling**, then **Apply** or
-**OK**. Recommended: **45% brightness**, **100% intensity**, **6 px radius**. No preset is needed; existing settings
-and presets are unchanged.
+**OK**. Recommended: **45% brightness**, **100% intensity**, **6 px radius**. Other settings remain unchanged.
 
-Alternatively, choose a glow preset and customize before Apply/OK. Selecting a preset fills only the draft controls
-immediately; Reset discards unapplied changes.
+Configure target switches and strengths before Apply/OK. Reset discards unapplied changes.
 
-| Starting point | Theme selected separately | Glow preset | Expected effect |
+| Starting point | Theme selected separately | Manual glow controls | Expected effect |
 |---|---|---|---|
-| Classic neon | Neon Glow (Classic) | Classic | Upstream-inspired editor text, restrained UI and icon strengths |
-| Quieter focus | Neon Glow Midnight | Focus | Editor-only glow; UI text/icons off; performance mode on |
-| Flat option | Neon Glow Accessible | Accessible | Master glow off; selecting the theme alone does not turn glow off |
+| Classic neon | Neon Glow (Classic) | Master/editor/UI/icons on; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; Neon text styling on; performance off | Upstream-inspired editor text, restrained UI and icon strengths |
+| Quieter focus | Neon Glow Midnight | Master/editor on; UI text/icons off; editor strength 100%; brightness 45%; intensity 100%; radius 6 px; Neon text styling on; performance on | Editor-only glow |
+| Flat option | Neon Glow Accessible | Master glow off | Selecting the theme alone does not turn glow off |
 
 Use the **Editor text**, **UI text** and **Icons** switches and their strength controls independently. To
 remove all effects, uncheck **Enable glow** and Apply, or toggle **View | Appearance | Neon Glow**.
@@ -131,14 +130,14 @@ The switch preserves target choices for later. Applied glow settings do not need
 
 Adaptive text needs a known dark background (luminance <=0.12), saturation >=0.35, value >=0.5 and original flat
 contrast >=3:1. It is colour-based, so vivid comments may qualify; not every token changes. Historical exact
-upstream styling is not contrast certification, especially hotpink. No preset automatically chooses your IDE theme.
+upstream styling is not contrast certification, especially hotpink. Glow controls do not choose your IDE theme.
 
 ### 4. If the effect is missing or too strong
 
 - Check master enablement, target switches, strengths and brightness; zero strength/brightness restores original
   rendering. Check Power Save mode, which suppresses live glow.
 - Apply settings before inspecting the actual workspace.
-- Reduce UI/icon strengths or use Focus. Try performance mode for bounded new-mask work; it may delay uncached
+- Reduce UI/icon strengths or turn UI/icon glow off for editor-only glow. Try performance mode for bounded new-mask work; it may delay uncached
   halos and is not a total repaint-time guarantee. Switch glow off if it affects readability or responsiveness.
 - Native/browser/custom-painted exclusions are expected, not proof of a broken installation. Terminal palette
   support is separate from terminal glow coverage.
@@ -161,7 +160,7 @@ Large images are excluded. Graphics interception enables styled text cores; edit
 
 **Is glow required? Does Accessible automatically disable it?**
 No and no. The themes work without effects. Theme selection does not change existing glow preferences; use
-the Accessible *glow preset* or disable the master switch and Apply for a genuinely flat configuration.
+the master switch to disable glow and Apply for a genuinely flat configuration.
 Accessible is a theme name, not a claim of certified accessibility.
 
 **Are there performance costs?**

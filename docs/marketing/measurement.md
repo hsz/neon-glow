@@ -165,7 +165,7 @@ hours. If launch was delayed, record actual live windows rather than forcing cal
 | Low/no delivery | Check moderation/format/audience/minimums without raising ceiling; stay organic if constraints cannot be met |
 | Sparse or unmatched A/B exposure | Report raw counts, conditions and uncertainty; “inconclusive,” not a forced winner |
 | Comparable A/B exposure, relevant visits and useful feedback | Prefer promising wording directionally; keep spend bounded; no significance or ROI claim |
-| Requests for quieter visuals | Use C organically; demonstrate Midnight/Focus or Accessible/glow-off; don't split tiny paid budget three ways |
+| Requests for quieter visuals | Use C organically; demonstrate Midnight with editor glow on and UI/icons off, or Accessible/master-glow-off; don't split tiny paid budget three ways |
 | Healthy destinations/controls, budget available and no material issues | Continue only within existing approved window/cap; new scope/budget needs explicit approval |
 | Weak evidence at day 30 | Retain organic distribution; change guide/creative or stop paid rather than scale |
 

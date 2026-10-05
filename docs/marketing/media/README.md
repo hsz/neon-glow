@@ -14,8 +14,8 @@ reference. Preserve upstream notices for adapted material; no endorsement is imp
 
 | Asset ID / planned file | Status | Blocking evidence |
 |---|---|---|
-| `classic.png` | MISSING | Neon Glow (Classic) + applied Classic screenshot, privacy and legibility checks |
-| `midnight-focus.png` | MISSING | Neon Glow Midnight + applied Focus; UI/icons off |
+| `classic.png` | MISSING | Neon Glow (Classic) + manually configured neon glow screenshot, privacy and legibility checks |
+| `midnight-focus.png` | MISSING | Neon Glow Midnight + editor glow on; UI/icons off |
 | `accessible-flat.png` | MISSING | Neon Glow Accessible + master glow explicitly off |
 | `hero-20s.mp4` | MISSING | Genuine 20-second storyboard, captions, settings paths and verified destination |
 | `hero-20s.vtt` | MISSING | Timed captions reviewed against final footage; no fake caption export before recording |
@@ -33,7 +33,7 @@ if the owner keeps the campaign organic; genuine screenshots and demo are still 
 | Capture owner; private raw-source reference (no personal filesystem paths) | PENDING |
 | IDE product, version and full build; plugin version/archive reference | PENDING |
 | OS/runtime; display scale; font family/size; zoom; window/crop dimensions | PENDING |
-| Theme; selected glow preset; overrides; Apply confirmed | PENDING |
+| Theme; manually configured glow values; Apply confirmed | PENDING |
 | Master enablement, target switches and three strengths | PENDING |
 | Brightness, intensity, radius, mapped style, performance mode, Power Save | PENDING |
 | Non-sensitive sample and matching before/after layout check | PENDING |

@@ -40,16 +40,16 @@ fun main() {
 
 ## Reproducible configurations
 
-Select themes separately under **Settings | Appearance & Behavior | Appearance**. Select glow under
-**Settings | Appearance & Behavior | Neon Glow** by choosing a preset, then **Apply** or **OK**. Record all overrides.
-Preset values are grounded in `settings/GlowPreset.kt` and README; do not capture preserved unknown settings.
+Select themes separately under **Settings | Appearance & Behavior | Appearance**. Configure glow under
+**Settings | Appearance & Behavior | Neon Glow** using the manual controls below, then **Apply** or **OK**.
+Record all applied values; do not capture preserved unknown settings.
 
 | Capture ID | Theme | Applied glow | Values to record/check |
 |---|---|---|---|
-| `classic` | Neon Glow (Classic) | Classic preset | Enabled; editor/UI/icons on; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance off |
-| `midnight-focus` | Neon Glow Midnight | Focus preset | Enabled; editor on at 100%; UI/icons off at 0%; brightness 45%; intensity 100%; radius 6 px; mapped text on; performance on |
-| `accessible-flat` | Neon Glow Accessible | Accessible preset | **Master glow off**; verify live editor/UI/icons are flat; other saved values do not imply enabled glow |
-| `control-demo` | Neon Glow (Classic) | Classic, then explicit override | Mapped text **off** (same-colour mode), target strengths 100/25/35%, other Classic values; show supported UI text/icon target control live |
+| `classic` | Neon Glow (Classic) | Manually configured neon | Enabled; editor/UI/icons on; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; mapped text and regular text glow on; performance off |
+| `midnight-focus` | Neon Glow Midnight | Manually configured editor-only glow | Enabled; editor on at 100%; UI/icons off at 0%; brightness 45%; intensity 100%; radius 6 px; mapped text and regular text glow on; performance on |
+| `accessible-flat` | Neon Glow Accessible | Master glow off | **Master glow off**; verify live editor/UI/icons are flat; other saved values do not imply enabled glow |
+| `control-demo` | Neon Glow (Classic) | Manually configured same-colour glow | Enabled; editor/UI/icons on; mapped text **off**, regular text glow **on**; strengths 100/25/35%; brightness 45%; intensity 100%; radius 6 px; performance off; show supported UI text/icon target control live |
 | `before` | Owner-selected built-in dark theme, named in manifest | Master glow off | Same content/layout/font/zoom; label baseline theme and glow state |
 
 Style mode preserves five upstream rules on known dark backgrounds and adapts other eligible vivid colours;
@@ -70,7 +70,7 @@ captioned export and editable caption text. Timecodes below are edit segments, n
 | 0–3 s | Same workspace: labelled built-in dark baseline/glow off → Neon Glow (Classic)/control-demo applied | Your IDE. After dark. |
 | 3–8 s | Steady editor + Project tree + selected tabs + standard icons, control-demo configuration | More than syntax colours. |
 | 8–13 s | Brief controls close-up; three matched live cuts isolate editor, UI text and icons by changing only the named target, Apply between raw takes | Glow where you want it. |
-| 13–17 s | 2 s Midnight/Focus → 2 s Accessible/master off; exact same workspace | Go neon. Or keep it quiet. |
+| 13–17 s | 2 s Midnight/editor on, UI/icons off → 2 s Accessible/master off; exact same workspace | Go neon. Or keep it quiet. |
 | 17–20 s | Legible settings-path card and the verified primary destination; retain genuine workspace thumbnail | Make it yours. |
 
 For target-control takes, start with all targets off; enable editor only, then UI only, then icons only. Restore
@@ -85,7 +85,8 @@ put its full wording in the post and retain one short destination on the card. N
 Caption/narration text (also suitable as descriptive post text):
 
 > Your IDE. After dark. SynthWave-inspired themes, beyond syntax colours. Control code, UI text and standard
-> icon glow separately. Choose Midnight with Focus, or Accessible with glow off. Select your theme in Appearance;
+> icon glow separately. Choose Midnight with editor glow on and UI/icon glow off, or Accessible with master glow off.
+> Select your theme in Appearance;
 > tune glow in Neon Glow settings. Experimental glow; some native, browser and custom-painted surfaces are excluded.
 
 Keep captions outside important code/control areas; use an opaque readable backing and check at actual player
@@ -101,8 +102,8 @@ raw capture; any title band is visibly editorial and must not cover meaningful l
 
 | Export name | Visible configuration | Title / caption | Alt text draft |
 |---|---|---|---|
-| `classic.png` | `classic` | Classic palette. Optional neon. | IntelliJ IDEA with Neon Glow (Classic) and applied Classic glow; Kotlin code, Project tree, tabs and standard icons. |
-| `midnight-focus.png` | `midnight-focus` | Midnight. Focus on code. | Same IntelliJ IDEA workspace with Neon Glow Midnight and Focus; editor glow enabled, UI text and icon glow disabled. |
+| `classic.png` | `classic` | Classic palette. Optional neon. | IntelliJ IDEA with Neon Glow (Classic) and manually configured neon glow; Kotlin code, Project tree, tabs and standard icons. |
+| `midnight-focus.png` | `midnight-focus` | Midnight. Focus on code. | Same IntelliJ IDEA workspace with Neon Glow Midnight; editor glow enabled, UI text and icon glow disabled. |
 | `accessible-flat.png` | `accessible-flat` | Accessible palette. Glow off. | Same IntelliJ IDEA workspace with Neon Glow Accessible and the master glow switch disabled. |
 
 Alt text must be revised to match actual capture content, not copied blindly. “Accessible” is the theme name,
@@ -118,7 +119,7 @@ Use one CTA from the registry per asset. Start with A and B in the same eligible
 |---|---|---|---|
 | A / transformation | Your IDE. After dark. | Deep-purple themes. Optional neon text and icon glow. | Matched baseline/after cut or one legible Classic live screenshot; consistent baseline labelling |
 | B / personal control | Neon where you want it. | Tune code, UI text and icon glow independently. | Control-demo target montage with settings applied, not a UI mockup |
-| C / restrained | Neon Glow, without the overload. | Choose Midnight, use Focus glow, or switch effects off. | Midnight/Focus and Accessible/master-off matched cuts, settings explicitly labelled |
+| C / restrained | Neon Glow, without the overload. | Choose Midnight, keep only editor glow on, or switch effects off. | Midnight/editor-only and Accessible/master-off matched cuts, settings explicitly labelled |
 
 For each: product name, one headline, genuine capture, one CTA. Keep limitations in nearby supporting copy and
 the destination; if platform format cannot support an honest explanation, do not use that placement.
@@ -148,7 +149,7 @@ select Shop Now for an unimplemented paid offering. Do not claim hard-coded spec
 - [ ] Capture legible at listing, feed and mobile player sizes; no clipped text, unreadable controls or flash cuts.
 - [ ] Actual width/height, aspect ratio, bytes, codec/duration (video) and upload preview match destination limits.
 - [ ] Captions, alt text and text-only description match actual visuals; sound-off comprehension checked.
-- [ ] Accessible is explicitly master-off; Focus UI/icons are off; effect settings are applied, not draft-only.
+- [ ] Accessible capture is explicitly master-off; Midnight capture has editor glow on and UI/icons off; effect settings are applied, not draft-only.
 - [ ] No personal paths, code, accounts, secrets, notifications or third-party assets with unclear rights.
 - [ ] One verified CTA/destination; no placeholders, price/trial offer, endorsement implication or inflated claim.
 - [ ] Full experimental/coverage limits linked; owner approval recorded before upload/publication.
