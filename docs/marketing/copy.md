@@ -35,7 +35,7 @@ keep their original cores with layered halos; unknown backgrounds use regular gl
 This is an adaptation, not pixel-identical CSS rendering, contrast certification or an endorsed official port.
 
 Glow is static and respects Power Save mode. Performance mode limits new mask work, but does not eliminate
-overhead or guarantee total repaint time. The isolated draft preview is not proof of live IDE rendering.
+overhead or guarantee total repaint time.
 
 **Compatibility evidence:** Neon Glow passes 177 tests on IntelliJ IDEA 2025.3.6.1. The pre-rename implementation
 passed 176 tests on 2026.1.5 and 2026.2.3; those test suites were not rerun for the rename. Plugin Verifier reports
@@ -70,7 +70,7 @@ The part I most want to show is control. You can tune each glow target independe
 Focus for editor-only glow, or select Accessible and explicitly switch effects off. Themes and glow settings
 are separate—nothing automatically changes your font or layout.
 
-The attached demo shows the same workspace with settings applied live, not just the draft preview. Glow is
+The attached demo shows the same workspace with settings applied live. Glow is
 experimental: native/browser-rendered surfaces and custom shape-only icons are outside universal coverage,
 and performance mode is a best-effort work limit, not a zero-overhead claim.
 
@@ -137,8 +137,7 @@ upstream styling is not contrast certification, especially hotpink. No preset au
 
 - Check master enablement, target switches, strengths and brightness; zero strength/brightness restores original
   rendering. Check Power Save mode, which suppresses live glow.
-- Apply settings before inspecting the actual workspace. **Show draft preview** is isolated and ignores live
-  Power Save/performance limits; it can look different from the live IDE.
+- Apply settings before inspecting the actual workspace.
 - Reduce UI/icon strengths or use Focus. Try performance mode for bounded new-mask work; it may delay uncached
   halos and is not a total repaint-time guarantee. Switch glow off if it affects readability or responsiveness.
 - Native/browser/custom-painted exclusions are expected, not proof of a broken installation. Terminal palette
@@ -171,10 +170,6 @@ mode admits at most 24 new glyph masks and 4 icon masks per graphics paint tree 
 deadline; one admitted operation or total repaint can take longer. Original text/icons remain visible.
 The effect is static, with no animation or forced warming timer, and live glow stops in Power Save mode.
 
-**Why does the draft preview differ from my IDE?**
-It uses isolated caches and ignores live Power Save and cold-work limits to show the intended appearance.
-Apply, then inspect real editor and UI surfaces; the preview alone cannot verify live rendering.
-
 **Is this the same as the VS Code extension?**
 It is inspired by Robb Owen's SynthWave '84, not affiliated with or endorsed by its author. Swing Gaussian
 blurs are not pixel-identical CSS shadows. The optional text style preserves five upstream rules on known dark
@@ -195,7 +190,7 @@ available aggregate Marketplace analytics and voluntary feedback, not measured a
 
 - Resolve links and choose one CTA; delete internal instructions/placeholders from the approved public variant.
 - Recheck claims against the advertised release and its quality evidence; disclose experimental rendering.
-- Attach authentic media where referenced; do not use mockups, draft preview or borrowed upstream screenshots
+- Attach authentic media where referenced; do not use mockups or borrowed upstream screenshots
   as proof of live IntelliJ IDEA rendering.
 - Confirm local promotion rules, author/sponsor disclosure, privacy and explicit owner authorization.
 - Never publish an availability, performance, accessibility or compatibility claim broader than the evidence.

@@ -16,9 +16,7 @@
 
 - Four glow presets and independent target strengths make code brighter than dense UI controls if desired.
   Presets are suggestions, not locked modes; old XML loads retain the prior defaults.
-- Draft preview uses its own bounded caches and retains the finished raster instead of reallocating on every
-  repaint. It ignores actual Power Save and cold-work limits to show the intended appearance; real IDE painting
-  obeys both. Target/strength-only settings changes preserve warm live masks.
+- Target/strength-only settings changes preserve warm live masks.
 - Performance mode shares 24 glyph / 4 image cold-mask admissions and a 2 ms deadline across graphics copies.
   Cache hits do not consume the budget. The deadline is checked **before** work: a single render or total IDE
   repaint can take longer. Skipped halos await natural repaints; there is no artificial warming loop.
@@ -36,7 +34,7 @@
 - Resource parsing, named-colour references, provider/scheme linkage and platform scheme loading.
 - Palette contrast against editor/chrome/control surfaces and focused/unfocused selections; semantic diagnostic
   distinctions and representative syntax/console/terminal attributes.
-- Legacy XML, normalization, fresh preset instances, transactional draft settings and isolated preview.
+- Legacy XML, normalization, fresh preset instances and transactional draft settings.
 - Original rendering on disabled/zero-strength/Power Save paths, mapped cores, all drawing overloads,
   target scopes/copies, clipped content, budget sharing, warm-cache use and oversized glyph transforms.
 - Existing editor lifecycle, root restoration, mutable icons and 1×/2× raster tests.
@@ -82,7 +80,7 @@ that cannot draw underneath the original text.
 
 ### Spec
 
-The independent spec review found the selected theme, settings, preview, rendering-safety, diagnostics and
+The independent spec review found the selected theme, settings, rendering-safety, diagnostics and
 packaging requirements implemented. Decorative artwork/gradient painters and exhaustive cross-product visual
 certification remain explicitly outside this release. The review is static evidence, not a performance or
 accessibility certification; the experimental fallback and manual matrix above still apply.
@@ -181,8 +179,9 @@ The tests capture real repaint requests and require their inflated bounds to rea
 
 ### Settings and first-use path
 
-Two regression tests reproduced fractional-value loss in preview/Apply: integer sliders rounded untouched
-saved values. Bindings and preview now preserve raw values unless their displayed slider tick changes.
+Two regression tests reproduced fractional-value loss in Apply and the draft preview (since removed): integer
+sliders rounded untouched saved values. Bindings were fixed to preserve raw values unless their displayed slider
+tick changes.
 Presets still deliberately replace only the draft; Apply/Reset/discard semantics and saved defaults are unchanged.
 
 The initial page keeps presets, master/target switches, brightness and performance mode visible. Independent
@@ -232,7 +231,7 @@ the rebuilt plugin to display code changes. No new live visual comparison was pe
 
 ## Preset selection usability fix (2026-10-04)
 
-Selecting a glow preset now fills the draft controls and preview immediately. The extra Use Preset button is
+Selecting a glow preset now fills the draft controls immediately. The extra Use Preset button is
 removed; Apply or OK is the only live confirmation. Opening the page, Reset, Apply and reopening show a
 neutral “Choose a preset...” prompt instead of implying that saved settings match Classic. No theme, font,
 layout or saved settings change just from opening the page. Reset and disposal still discard unapplied presets.

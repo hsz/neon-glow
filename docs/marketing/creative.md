@@ -2,7 +2,7 @@
 
 **Production specifications, not finished captures.** No approved screenshots or recordings are available in
 the repository inventory. See [media status](media/README.md). Missing captures block visual launch; never
-substitute synthetic IDE images, borrowed upstream screenshots or the draft preview.
+substitute synthetic IDE images or borrowed upstream screenshots.
 
 ## Capture contract
 
@@ -10,7 +10,7 @@ substitute synthetic IDE images, borrowed upstream screenshots or the draft prev
    editor size, Project tree, tab order and window layout across comparisons. Do not alter viewers' settings
    automatically or imply the plugin changes spacing/fonts. Use an owner-selected tested version; record the
    exact IDE build, plugin release/archive, runtime, OS and display scale in the media manifest.
-2. Capture applied **live** editor, Project tree, tabs and standard icons. Keep draft preview out of proof shots.
+2. Capture applied **live** editor, Project tree, tabs and standard icons.
    Use Settings only to show controls, then Apply and return to the workspace. Wait for normal rendering to
    settle; do not postprocess halos or claim every surface glows.
 3. For reproducibility, use 100% display scale on the selected capture machine where possible and record
@@ -75,7 +75,7 @@ captioned export and editable caption text. Timecodes below are edit segments, n
 
 For target-control takes, start with all targets off; enable editor only, then UI only, then icons only. Restore
 control-demo settings for other shots. The edited montage needs small persistent labels (“Editor,” “UI text,”
-“Icons”); keep the raw Apply takes. Never use settings-preview painting as the after frame.
+“Icons”); keep the raw Apply takes.
 
 Final card: show **Appearance: choose theme / Neon Glow: tune glow**; the guide supplies full paths. Use one CTA
 from [campaign.md](campaign.md): prelisting “See the demo and installation guide” only when that destination

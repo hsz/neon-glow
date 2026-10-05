@@ -22,6 +22,10 @@
 - Add a `platformVersion` test/sandbox override and keep unrelated bundled plugin jars off the shared test
   classpath to avoid obfuscated-class collisions in 2026.2. All tests and assertions remain enabled.
 
+### Removed
+
+- Show draft preview and its isolated sample renderer. Apply/OK still commits draft settings; Reset discards them.
+
 ### Fixed
 
 - Restore SynthWave-style glow for eligible coloured syntax on light backgrounds even with Regular text glow off.
@@ -35,7 +39,7 @@
   Darker intermediate backgrounds keep source cores when mapped cores fall below 3:1 contrast.
 - Resolve layered-mask cache entries by backdrop-aware rule to avoid light/dark mixing. UI backdrop detection
   uses component opacity and known solid fills on a best-effort basis, not a universal custom-painter guarantee.
-- Preserve untouched fractional settings during Apply and preview instead of rounding every saved value to slider ticks.
+- Preserve untouched fractional settings during Apply instead of rounding every saved value to slider ticks.
 - Repaint all affected soft-wrapped visual lines, including the old tail after deletion, to clear glow bleed.
 - Remove the Neon Glow root wrapper when nested in another layered pane on unload, preserving foreign panes,
   popup layers, bounds and component order.
@@ -43,12 +47,12 @@
 ### Added
 
 - Regular text glow switch: independently disable same-colour text halos while retaining eligible SynthWave-style
-  layered text and icon glow. Applies to both enabled text targets, preview and editor fallback; persists with an
+  layered text and icon glow. Applies to both enabled text targets and editor fallback; persists with an
   initially all-on default (now off) and follows the existing Apply/Reset workflow. With text style off, it controls all text glow.
 - Complete Classic, Midnight and Accessible IDE themes with paired syntax, console and terminal schemes,
   semantic SVG palette patching, consistent dark-purple surfaces and readable interaction states.
-- Classic, Neon, Focus and Accessible glow presets; independent editor/UI/icon strengths and isolated draft
-  preview, preserving existing settings and transactional Apply/Reset behavior.
+- Classic, Neon, Focus and Accessible glow presets and independent editor/UI/icon strengths,
+  preserving existing settings and transactional Apply/Reset behavior.
 - Optional bounded cold-mask work in performance mode, fully clipped painting exclusion and oversized-raster
   protection. Cache invalidation and settings updates are serialized on the UI thread.
 - Thread-safe editor registration and complete unload cleanup of highlighters, document listeners and editor

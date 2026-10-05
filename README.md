@@ -17,8 +17,8 @@ and terminal palettes.
 - Bundles **Neon Glow** (Classic), **Neon Glow Midnight** and **Neon Glow Accessible**, with matching editor schemes,
   familiar recoloured SVG icons, dark-purple surfaces, clear keyboard focus and distinct selection states.
   Amber warnings remain distinguishable from mint success/additions. Accessible colours are tested without glow.
-- Offers **Classic**, **Neon**, **Focus** and **Accessible** glow presets, independent target strengths and an
-  isolated optional draft preview. Existing saved settings are not silently replaced by a preset.
+- Offers **Classic**, **Neon**, **Focus** and **Accessible** glow presets and independent target strengths.
+  Existing saved settings are not silently replaced by a preset.
 - Optional **Performance mode** bounds new masks per paint; clipping and raster-size guards avoid unnecessary
   or excessive allocations. Recovery tools reset caches and copy a project-content-free diagnostic report.
 - Paints a Gaussian-blurred copy of text throughout Swing IDE windows, including console/diff editors and the
@@ -86,9 +86,8 @@ back on preserves them. Changes take effect on **Apply**, without an IDE restart
 
 Choosing a preset changes the draft immediately, not the live IDE. Classic uses upstream-inspired editor glow and restrained UI
 glow; Neon increases saturation; Focus lights only editor text and enables performance mode; Accessible disables
-glow. Customize any preset, use the optional **Show draft preview**, then Apply/OK or Reset. Preview ignores live
-Power Save and cold-work limits so you can inspect the intended appearance; the actual IDE always respects
-Power Save. No theme, font or layout is automatically changed.
+glow. Customize any preset, then Apply/OK or Reset. The IDE always respects Power Save.
+No theme, font or layout is automatically changed.
 
 `View | Appearance | Neon Glow Tools` and Find Action expose **Neon Glow Settings**, **Reset Neon Glow Caches**
 and **Copy Neon Glow Diagnostics**. Diagnostics include IDE/runtime versions, rendering status, settings, scheme
@@ -174,8 +173,8 @@ no upper bound). Release artifacts are built against the default **2025.3.6.1** 
 backward compatibility. Use `platformVersion` for additional test/sandbox targets; build release packages without
 that override. Building/testing against 2026.2 requires a Java 25 toolchain; Gradle selects the target's runtime.
 
-Neon Glow passes all **178 tests** on 2025.3.6.1, including identity and default-settings regression checks.
-The rename artifact passed Plugin Verifier on all four versions above; verification was not rerun for the default-settings change.
+Neon Glow passes all **180 tests** on 2025.3.6.1, including identity, default-settings and settings-page regression checks.
+The rename artifact passed Plugin Verifier on all four versions above; verification was not rerun for subsequent settings changes.
 Pre-rename verification recorded 176 passing tests
 on 2025.3.6.1, 2026.1.5 and 2026.2.3; the newer-platform test suites were not rerun for the rename.
 Tests use platform APIs without unrelated bundled plugin jars on their shared test classpath; this avoids

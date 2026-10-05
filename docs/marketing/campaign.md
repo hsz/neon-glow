@@ -82,7 +82,7 @@ Recheck these against the version actually distributed; historical results do no
 | Independent editor/UI/icon switches and strengths | README settings; automated target tests documented in quality checklist | UI/icon glow is experimental; standard images, not all custom vector icons |
 | Optional SynthWave-style text with your current IDE theme | README; implemented equivalents in `docs/synthwave-options.md` | Eligible colours get layered halos; dark backgrounds can get tinted cores, light backgrounds retain original cores, and unknown backgrounds use regular glow; historical upstream hotpink is not contrast-certified |
 | Glow settings apply without restarting | README settings | Applies to settings changes, not a guarantee that plugin installation needs no restart |
-| Static glow respects Power Save | README; quality checklist | Actual live rendering, not isolated draft preview, is evidence |
+| Static glow respects Power Save | README; quality checklist | Actual live rendering is evidence |
 | Performance mode limits new mask work | README; quality checklist | Best-effort admission limit, not zero overhead or a total repaint-time bound |
 | Named compatibility evidence | Quality checklist rename verification | 177 tests on 2025.3.6.1; historical pre-rename results of 176 tests on 2026.1.5 and 2026.2.3, not rerun after rename; renamed artifact Plugin Verifier on 2025.3.6.1, 2026.1, 2026.1.5 and 2026.2.3; no universal visual certification |
 | Accessible is a brighter, flat-readable theme option | Quality checklist contrast checks | Name is not accessibility certification; select Accessible glow preset or disable glow separately |
