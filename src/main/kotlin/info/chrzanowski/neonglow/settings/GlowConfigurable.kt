@@ -91,12 +91,14 @@ class GlowConfigurable internal constructor(
                         .bindSelected({ currentDraft().editorText }, { currentDraft().editorText = it })
                         .previewCheckBox("editorText")
                         .applyToComponent { editorText = this }
+                        .comment(NeonGlowBundle.message("settings.editorText.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.uiText"))
                         .bindSelected({ currentDraft().uiText }, { currentDraft().uiText = it })
                         .previewCheckBox("uiText")
                         .applyToComponent { uiText = this }
+                        .comment(NeonGlowBundle.message("settings.uiText.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.regularText"))
@@ -110,6 +112,7 @@ class GlowConfigurable internal constructor(
                         .bindSelected({ currentDraft().icons }, { currentDraft().icons = it })
                         .previewCheckBox("icons")
                         .applyToComponent { icons = this }
+                        .comment(NeonGlowBundle.message("settings.icons.comment"))
                 }
             }
             row(NeonGlowBundle.message("settings.brightness")) {

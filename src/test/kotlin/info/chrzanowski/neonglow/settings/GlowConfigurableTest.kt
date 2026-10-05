@@ -11,6 +11,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSlider
+import javax.swing.text.JTextComponent
 
 class GlowConfigurableTest : BasePlatformTestCase() {
 
@@ -72,6 +73,24 @@ class GlowConfigurableTest : BasePlatformTestCase() {
             "radiusPx", "intensity", "showPreview"), descendants(component).filter {
             it is JCheckBox || it is JSlider || it is JComboBox<*>
         }.mapNotNull { it.name }.toList())
+    }
+
+    fun `test every glow target has a separate visible description`() {
+        val descriptions = descendants(component).mapNotNull {
+            when (it) {
+                is JLabel -> it.text
+                is JTextComponent -> it.document.getText(0, it.document.length)
+                else -> null
+            }
+        }.map { it.replace(Regex("\\s+"), " ").trim() }.toList()
+        for (target in listOf("editorText", "uiText", "regularText", "icons")) {
+            assertEquals(NeonGlowBundle.message("settings.$target"), checkBox(target).text)
+            val description = NeonGlowBundle.message("settings.$target.comment")
+            assertTrue("$target must have a separate description", descriptions.any { description in it })
+        }
+        assertEquals("Editor text", checkBox("editorText").text)
+        assertEquals("UI text", checkBox("uiText").text)
+        assertFalse(configurable.isModified())
     }
 
     fun `test everyday controls are visible and fine tuning is initially collapsed`() {
