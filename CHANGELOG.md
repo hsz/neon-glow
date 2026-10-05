@@ -6,12 +6,15 @@
 
 ### Changed
 
+- Set fresh-install defaults to regular text glow off, SynthWave-style text on, 50% brightness, 75% editor
+  strength, 50% UI/icon strength, 6 px radius and 200% intensity. Retain explicit saved choices and named presets;
+  missing settings and non-finite numeric values use the new defaults.
 - Rename the project to Neon Glow before publication, including plugin ID and namespace
   `info.chrzanowski.neonglow`, bundled themes, actions, settings storage and the `neon-glow` build artifact.
   Retain SynthWave '84 inspiration and upstream licence notices. Older development settings are not migrated.
 - Extend the existing opt-in SynthWave '84-style text to regular IDE themes: eligible vivid colours on dark
   backgrounds get pale same-hue cores and layered neon. Preserve the five upstream rules on known dark backgrounds,
-  original alpha, saved settings and presets; style remains off by default. No theme change or preset is required.
+  original alpha, saved settings and presets. No theme change or preset is required.
 - Keep presets, glow switches, brightness and performance mode visible; put strengths, mapped text style,
   radius and intensity in a collapsed Fine-Tune Glow section. Give every slider a numeric readout and accessible name.
 - Allow installation on IntelliJ 2026.1 and newer by removing the 253.* upper bound, retaining the 2025.3
@@ -41,7 +44,7 @@
 
 - Regular text glow switch: independently disable same-colour text halos while retaining eligible SynthWave-style
   layered text and icon glow. Applies to both enabled text targets, preview and editor fallback; persists with an
-  all-on legacy default and follows the existing Apply/Reset workflow. With text style off, it controls all text glow.
+  initially all-on default (now off) and follows the existing Apply/Reset workflow. With text style off, it controls all text glow.
 - Complete Classic, Midnight and Accessible IDE themes with paired syntax, console and terminal schemes,
   semantic SVG palette patching, consistent dark-purple surfaces and readable interaction states.
 - Classic, Neon, Focus and Accessible glow presets; independent editor/UI/icon strengths and isolated draft
@@ -53,7 +56,8 @@
 - Settings, cache-reset and project-content-free diagnostic-copy actions under Neon Glow Tools; upstream MIT
   notices included in the distributable plugin.
 - Optional SynthWave '84-style text colour mapping and layered glow, disabled by default to preserve same-colour
-  rendering. Beyond the five upstream rules, near/nonexact colours qualify at saturation >=0.35, value >=0.5,
+  rendering when first introduced; now enabled by default. Beyond the five upstream rules, near/nonexact colours
+  qualify at saturation >=0.35, value >=0.5,
   original flat contrast >=3:1 and background luminance <=0.12. Adaptive layers use a 2 px dark base and 3/7/12 px
   same-hue neon at radius 6 px; icons are unchanged. Eligibility is colour-based, so vivid comments may qualify.
   Settings persist and apply/reset with the page's draft. Radius scales all layers; intensity remains a coverage

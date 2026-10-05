@@ -84,6 +84,7 @@ class ToggleGlowActionAndListenersTest : BasePlatformTestCase() {
     }
 
     fun `test power save mode paints nothing and repaints on toggle`() {
+        GlowSettings.getInstance().loadState(GlowSettings.State(synthwaveStyle = false, regularText = true))
         val factory = EditorFactory.getInstance()
         val editor = factory.createEditor(factory.createDocument("glow"), project, EditorKind.MAIN_EDITOR) as EditorEx
         try {

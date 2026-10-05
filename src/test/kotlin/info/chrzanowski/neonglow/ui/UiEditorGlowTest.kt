@@ -17,7 +17,7 @@ class UiEditorGlowTest : BasePlatformTestCase() {
     fun `test actual editor text receives exactly one glow through the UI hook`() {
         val settings = GlowSettings.getInstance()
         val manager = GlowManager.getInstance()
-        settings.loadState(GlowSettings.State(enabled = false))
+        settings.loadState(GlowSettings.State(enabled = false, synthwaveStyle = false, regularText = true))
         val factory = EditorFactory.getInstance()
         val editor =
             factory.createEditor(factory.createDocument("Editor glow"), project, EditorKind.MAIN_EDITOR) as EditorEx
@@ -48,7 +48,7 @@ class UiEditorGlowTest : BasePlatformTestCase() {
     fun `test auxiliary editors receive UI glow without a main editor highlighter`() {
         val settings = GlowSettings.getInstance()
         val manager = GlowManager.getInstance()
-        settings.loadState(GlowSettings.State())
+        settings.loadState(GlowSettings.State(synthwaveStyle = false, regularText = true))
         val factory = EditorFactory.getInstance()
         val editor =
             factory.createEditor(factory.createDocument("Console glow"), project, EditorKind.CONSOLE) as EditorEx
@@ -83,11 +83,13 @@ class UiEditorGlowTest : BasePlatformTestCase() {
                     glow.installRoot(root)
                     settings.loadState(GlowSettings.State(enabled = false))
                     val plain = paint(root)
-                    settings.loadState(GlowSettings.State(editorText = false, icons = false))
+                    settings.loadState(GlowSettings.State(editorText = false, icons = false,
+                        synthwaveStyle = false, regularText = true))
                     atlas.clear()
                     assertTrue(pixels(plain).contentEquals(pixels(paint(root))))
                     assertEquals(0, atlas.size)
-                    settings.loadState(GlowSettings.State(uiText = false, icons = false))
+                    settings.loadState(GlowSettings.State(uiText = false, icons = false,
+                        synthwaveStyle = false, regularText = true))
                     assertFalse(pixels(plain).contentEquals(pixels(paint(root))))
                     assertTrue(atlas.size > 0)
                     assertNull(EditorGlow.of(editor))

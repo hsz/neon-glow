@@ -104,29 +104,30 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals("45%", strengthReadout("brightness").text)
         configurable.reset()
         assertEquals("6 px", strengthReadout("radiusPx").text)
-        assertEquals("300%", strengthReadout("intensity").text)
-        assertEquals("100%", strengthReadout("brightness").text)
+        assertEquals("200%", strengthReadout("intensity").text)
+        assertEquals("50%", strengthReadout("brightness").text)
         assertFalse(configurable.isModified())
     }
 
     fun `test controls show the current settings`() {
         assertTrue(checkBox().isSelected)
         for (target in listOf("editorText", "uiText", "icons")) assertTrue(checkBox(target).isSelected)
-        assertFalse(checkBox("synthwaveStyle").isSelected)
+        assertTrue(checkBox("synthwaveStyle").isSelected)
+        assertFalse(checkBox("regularText").isSelected)
         assertEquals(GlowSettings.DEFAULT_RADIUS.toInt(), slider("radiusPx").value)
         assertEquals((GlowSettings.DEFAULT_INTENSITY * 100).toInt(), slider("intensity").value)
         assertEquals(GlowSettings.RADIUS_RANGE.start.toInt(), slider("radiusPx").minimum)
         assertEquals(GlowSettings.RADIUS_RANGE.endInclusive.toInt(), slider("radiusPx").maximum)
         assertEquals(25, slider("intensity").minimum)
         assertEquals(400, slider("intensity").maximum)
-        assertEquals(100, slider("brightness").value)
+        assertEquals(50, slider("brightness").value)
         assertEquals(0, slider("brightness").minimum)
         assertEquals(100, slider("brightness").maximum)
-        for (name in listOf("editorGlowStrength", "uiGlowStrength", "iconGlowStrength")) {
-            assertEquals(100, slider(name).value)
+        for ((name, percent) in mapOf("editorGlowStrength" to 75, "uiGlowStrength" to 50, "iconGlowStrength" to 50)) {
+            assertEquals(percent, slider(name).value)
             assertEquals(0, slider(name).minimum)
             assertEquals(100, slider(name).maximum)
-            assertEquals("100%", strengthReadout(name).text)
+            assertEquals("$percent%", strengthReadout(name).text)
         }
         assertFalse(checkBox("performanceMode").isSelected)
         assertEquals(GlowSettings.State(), previewState())
@@ -205,9 +206,11 @@ class GlowConfigurableTest : BasePlatformTestCase() {
     }
 
     fun `test style is an independent draft and survives apply reset and reopening`() {
+        settings.loadState(GlowSettings.State(synthwaveStyle = false))
+        configurable.reset()
         checkBox("synthwaveStyle").isSelected = true
         assertTrue(configurable.isModified())
-        assertEquals(GlowSettings.State(), settings.state)
+        assertEquals(GlowSettings.State(synthwaveStyle = false), settings.state)
         assertTrue(applied.isEmpty())
         configurable.disposeUIResources()
         component = configurable.createComponent()
@@ -235,8 +238,8 @@ class GlowConfigurableTest : BasePlatformTestCase() {
 
         checkBox("synthwaveStyle").isSelected = false
         configurable.apply()
-        assertEquals(listOf(styled, GlowSettings.State()), applied)
-        assertEquals(GlowSettings.State(), settings.state)
+        assertEquals(listOf(styled, GlowSettings.State(synthwaveStyle = false)), applied)
+        assertEquals(GlowSettings.State(synthwaveStyle = false), settings.state)
         assertFalse(configurable.isModified())
     }
 
@@ -473,29 +476,29 @@ class GlowConfigurableTest : BasePlatformTestCase() {
     }
 
     fun `test regular text switch previews drafts applies resets and discards without changing other targets`() {
-        assertTrue(checkBox("regularText").isSelected)
-        checkBox("regularText").isSelected = false
-        assertEquals(GlowSettings.State(regularText = false), previewState())
+        assertFalse(checkBox("regularText").isSelected)
+        checkBox("regularText").isSelected = true
+        assertEquals(GlowSettings.State(regularText = true), previewState())
         assertTrue(configurable.isModified())
         assertEquals(GlowSettings.State(), settings.state)
         assertTrue(applied.isEmpty())
         configurable.reset()
-        assertTrue(checkBox("regularText").isSelected)
+        assertFalse(checkBox("regularText").isSelected)
         assertFalse(configurable.isModified())
 
         checkBox("synthwaveStyle").isSelected = true
-        checkBox("regularText").isSelected = false
-        val expected = GlowSettings.State(synthwaveStyle = true, regularText = false)
+        checkBox("regularText").isSelected = true
+        val expected = GlowSettings.State(synthwaveStyle = true, regularText = true)
         configurable.apply()
         assertEquals(listOf(expected), applied)
         assertEquals(expected, settings.state)
         assertEquals(expected, previewState())
         assertFalse(configurable.isModified())
 
-        checkBox("regularText").isSelected = true
+        checkBox("regularText").isSelected = false
         configurable.disposeUIResources()
         component = configurable.createComponent()
-        assertFalse(checkBox("regularText").isSelected)
+        assertTrue(checkBox("regularText").isSelected)
         assertEquals(expected, previewState())
         assertFalse(configurable.isModified())
     }

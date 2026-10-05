@@ -80,10 +80,10 @@ The base theme's UI color entries are theme data, not additional `synthwave84.*`
 ### Implemented equivalents
 
 Neon Glow now exposes independent editor-text, UI-text and icon switches, plus a 0–100% brightness slider
-separate from radius and intensity. In the default same-colour mode, brightness multiplies each cached halo's
+separate from radius and intensity. In same-colour mode, brightness multiplies each cached halo's
 alpha after intensity saturation, without changing originals. The optional style mode below has fixed-alpha
-exceptions. Unlike upstream, brightness defaults to 100% and style defaults to off to preserve this plugin's
-existing appearance. Disable editor text for editor-only suppression, or use the master toggle for all-target
+exceptions. Brightness defaults to 50% and style defaults to on, with regular text glow off.
+Disable editor text for editor-only suppression, or use the master toggle for all-target
 suppression. Brightness zero, master off, target off, target strength zero and Power Save mode all restore original
 rendering, including any mapped foreground cores, for the affected targets. This also suppresses fixed-alpha layers;
 brightness zero intentionally differs from upstream's pink-shadow behavior and malformed zero-alpha CSS.
@@ -91,11 +91,11 @@ All controls take effect on **Apply**, without installation-file edits or restar
 
 ### Optional SynthWave '84 style
 
-**SynthWave '84-style text** is an explicit opt-in checkbox persisted as `State.synthwaveStyle = false` by
-default. It works with your current IDE theme on enabled editor-text and UI-text targets; no theme installation,
-automatic opt-in or new preset is required. Existing saved settings and presets stay unchanged. Keep your theme,
-enable **Enable glow** and **Editor text**, expand **Fine-Tune Glow**, check **SynthWave '84-style text**, then
-**Apply** or **OK**. Recommended values are **45% brightness**, **100% intensity** and **6 px radius**.
+**SynthWave '84-style text** is a checkbox persisted as `State.synthwaveStyle = true` by default.
+It works with your current IDE theme on enabled editor-text and UI-text targets; no theme installation or
+new preset is required. Explicit saved choices and named presets stay unchanged. Fresh installs use
+**50% brightness**, **200% intensity**, **6 px radius**, **75% editor strength** and **50% UI/icon strength**.
+For an upstream-inspired alternative, use **45% brightness** and **100% intensity**.
 
 The five exact RGB rules from the [upstream token template][template] remain on known dark backgrounds. These
 preserve historical styling, not contrast certification; the hotpink core in particular is not certified contrast.
@@ -145,8 +145,7 @@ layers: for example, radius 12 px doubles the 2/3/5/8 px cyan sizes to 4/6/10/16
 layers or foreground mapping are applied, even for pink; disabling the master or relevant text target, setting
 target strength to zero or entering Power Save likewise restores the complete original rendering.
 
-Defaults remain brightness 100% and intensity 300% for backward compatibility; opting into
-style does not silently change those values. Swing's Gaussian rasterization and CSS text shadows are not
+Changing the style checkbox does not silently change brightness or intensity. Swing's Gaussian rasterization and CSS text shadows are not
 pixel-exact equivalents, and this mode does not reproduce upstream's theme/chrome or installation patching.
 
 **Fallback limitation:** without graphics interception, the editor under-glow fallback uses the scheme backdrop

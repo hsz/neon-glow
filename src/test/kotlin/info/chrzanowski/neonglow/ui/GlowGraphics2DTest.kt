@@ -14,7 +14,8 @@ import java.text.AttributedString
 
 class GlowGraphics2DTest {
 
-    private val state = GlowSettings.State()
+    private val state = GlowSettings.State(synthwaveStyle = false, regularText = true,
+        brightness = 1f, intensity = 3f, uiGlowStrength = 1f)
     private val atlas = GlyphGlowAtlas()
     private var powerSave = false
 

@@ -341,3 +341,14 @@ licence notices are unchanged. Older development settings are not migrated to th
   theme/scheme resources and `META-INF/LICENSE.synthwave84`, with no old plugin namespace or theme-resource paths.
 
 No live visual matrix, usability trial or public upload was performed for this rename.
+
+## Default-settings verification (2026-10-05)
+
+Fresh-install defaults now use regular text glow off, SynthWave-style text on, brightness 50%, editor strength
+75%, UI/icon strength 50%, radius 6 px and intensity 200%. Explicit saved choices and named presets are retained;
+missing settings and non-finite numeric values use the new defaults.
+
+`./gradlew test --console=plain` passes all **178 tests** on 2025.3.6.1 with zero failures or skips. Settings tests
+cover defaults, missing XML options, explicit saved choices, normalization and draft controls. Rendering tests
+use explicit settings for the mode they exercise rather than relying on fresh-install defaults. Plugin Verifier,
+newer-platform test suites and live visual checks were not rerun for this change.

@@ -24,22 +24,22 @@ class GlowSettings : PersistentStateComponent<GlowSettings.State> {
         var icons: Boolean = true,
         /** Opacity of variable-colour halo layers after intensity saturation; zero restores original rendering. */
         var brightness: Float = DEFAULT_BRIGHTNESS,
-        /** Opt-in exact SynthWave '84 text colour mapping and layered glow; icons keep their own colours. */
-        var synthwaveStyle: Boolean = false,
-        var editorGlowStrength: Float = DEFAULT_STRENGTH,
+        /** SynthWave '84 text colour mapping and layered glow; icons keep their own colours. */
+        var synthwaveStyle: Boolean = true,
+        var editorGlowStrength: Float = DEFAULT_EDITOR_STRENGTH,
         var uiGlowStrength: Float = DEFAULT_STRENGTH,
         var iconGlowStrength: Float = DEFAULT_STRENGTH,
         /** Limits new masks generated during each paint without disabling already cached glow. */
         var performanceMode: Boolean = false,
         /** Same-colour glow for text without an eligible SynthWave-style rule, in either text target. */
-        var regularText: Boolean = true,
+        var regularText: Boolean = false,
     ) {
         /** Clamps the numbers into their supported ranges and replaces non-finite values with the defaults. */
         fun normalized(): State = copy(
             radiusPx = radiusPx.takeIf { it.isFinite() }?.coerceIn(RADIUS_RANGE) ?: DEFAULT_RADIUS,
             intensity = intensity.takeIf { it.isFinite() }?.coerceIn(INTENSITY_RANGE) ?: DEFAULT_INTENSITY,
             brightness = brightness.takeIf { it.isFinite() }?.coerceIn(BRIGHTNESS_RANGE) ?: DEFAULT_BRIGHTNESS,
-            editorGlowStrength = editorGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_STRENGTH,
+            editorGlowStrength = editorGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_EDITOR_STRENGTH,
             uiGlowStrength = uiGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_STRENGTH,
             iconGlowStrength = iconGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_STRENGTH,
         )
@@ -55,9 +55,10 @@ class GlowSettings : PersistentStateComponent<GlowSettings.State> {
 
     companion object {
         const val DEFAULT_RADIUS: Float = 6f
-        const val DEFAULT_INTENSITY: Float = 3f
-        const val DEFAULT_BRIGHTNESS: Float = 1f
-        const val DEFAULT_STRENGTH: Float = 1f
+        const val DEFAULT_INTENSITY: Float = 2f
+        const val DEFAULT_BRIGHTNESS: Float = 0.5f
+        const val DEFAULT_EDITOR_STRENGTH: Float = 0.75f
+        const val DEFAULT_STRENGTH: Float = 0.5f
 
         val RADIUS_RANGE: ClosedFloatingPointRange<Float> = 1f..16f
         val INTENSITY_RANGE: ClosedFloatingPointRange<Float> = 0.25f..4f

@@ -17,7 +17,7 @@ class GlowPaintSafetyTest {
     fun `fully clipped glyphs and icons do not generate masks`() {
         val glyphs = GlyphGlowAtlas()
         val images = ImageGlowAtlas()
-        val state = GlowSettings.State()
+        val state = GlowSettings.State(synthwaveStyle = false, regularText = true)
         val raw = BufferedImage(200, 100, BufferedImage.TYPE_INT_ARGB).createGraphics()
         raw.setClip(0, 0, 20, 20)
         val g = GlowGraphics2D(raw, glyphs, { state }, { false }, imageAtlas = images)
@@ -53,7 +53,7 @@ class GlowPaintSafetyTest {
 
     @Test
     fun `graphics copies share cold mask limits but retain original painting and cached masks`() {
-        val state = GlowSettings.State(performanceMode = true)
+        val state = GlowSettings.State(performanceMode = true, synthwaveStyle = false, regularText = true)
         val atlas = GlyphGlowAtlas()
         val image = BufferedImage(2000, 100, BufferedImage.TYPE_INT_ARGB)
         val g = GlowGraphics2D(image.createGraphics(), atlas, { state }, { false }, budget = GlowWorkBudget { 0L })
@@ -75,7 +75,7 @@ class GlowPaintSafetyTest {
     @Test
     fun `reduced strengths change only halos without changing mask keys`() {
         val atlas = GlyphGlowAtlas()
-        val state = GlowSettings.State()
+        val state = GlowSettings.State(synthwaveStyle = false, regularText = true, uiGlowStrength = 1f)
         fun render(): BufferedImage {
             val image = BufferedImage(200, 100, BufferedImage.TYPE_INT_ARGB)
             val g = GlowGraphics2D(image.createGraphics(), atlas, { state }, { false })
@@ -102,7 +102,7 @@ class GlowPaintSafetyTest {
     @Test
     fun `unreasonable glyph transforms skip halo allocation`() {
         val atlas = GlyphGlowAtlas()
-        val state = GlowSettings.State()
+        val state = GlowSettings.State(synthwaveStyle = false, regularText = true)
         val g = GlowGraphics2D(BufferedImage(200, 100, BufferedImage.TYPE_INT_ARGB).createGraphics(), atlas,
             { state }, { false })
         try {

@@ -30,29 +30,38 @@ class GlowSettingsTest : BasePlatformTestCase() {
         assertTrue(state.editorText)
         assertTrue(state.uiText)
         assertTrue(state.icons)
-        assertTrue(state.regularText)
-        assertFalse(state.synthwaveStyle)
-        assertEquals(GlowSettings.DEFAULT_RADIUS, state.radiusPx)
-        assertEquals(GlowSettings.DEFAULT_INTENSITY, state.intensity)
-        assertEquals(GlowSettings.DEFAULT_BRIGHTNESS, state.brightness)
-        assertEquals(1f, state.editorGlowStrength)
-        assertEquals(1f, state.uiGlowStrength)
-        assertEquals(1f, state.iconGlowStrength)
+        assertFalse(state.regularText)
+        assertTrue(state.synthwaveStyle)
+        assertEquals(6f, state.radiusPx)
+        assertEquals(2f, state.intensity)
+        assertEquals(0.5f, state.brightness)
+        assertEquals(0.75f, state.editorGlowStrength)
+        assertEquals(0.5f, state.uiGlowStrength)
+        assertEquals(0.5f, state.iconGlowStrength)
         assertFalse(state.performanceMode)
         assertEquals(state, state.normalized())
     }
 
     fun `test state round-trips through XML`() {
         val original = GlowSettings.State(enabled = false, radiusPx = 9f, intensity = 1.5f,
-            editorText = false, uiText = false, icons = false, brightness = 0.45f, synthwaveStyle = true,
+            editorText = false, uiText = false, icons = false, brightness = 0.45f, synthwaveStyle = false,
             editorGlowStrength = 0f, uiGlowStrength = 0.25f, iconGlowStrength = 0.65f, performanceMode = true,
-            regularText = false)
+            regularText = true)
         val restored = XmlSerializer.deserialize(XmlSerializer.serialize(original), GlowSettings.State::class.java)
         val settings = GlowSettings()
         settings.loadState(restored)
 
         assertEquals(original, restored)
         assertEquals(original, settings.state)
+    }
+
+    fun `test missing XML options use the current defaults`() {
+        val settings = GlowSettings()
+        settings.loadState(GlowPreset.ACCESSIBLE.createState())
+        settings.loadState(XmlSerializer.deserialize(Element("state"), GlowSettings.State::class.java))
+        assertEquals(GlowSettings.State(), settings.state)
+        assertFalse(settings.state.regularText)
+        assertTrue(settings.state.synthwaveStyle)
     }
 
     fun `test existing XML without target choices preserves all-on behaviour`() {
@@ -74,14 +83,15 @@ class GlowSettingsTest : BasePlatformTestCase() {
         }
     }
 
-    fun `test existing XML without style choice keeps same-colour behaviour`() {
+    fun `test existing XML preserves an explicit same-colour choice`() {
         val xml = Element("state")
             .addContent(Element("option").setAttribute("name", "brightness").setAttribute("value", "0.45"))
             .addContent(Element("option").setAttribute("name", "editorText").setAttribute("value", "false"))
+            .addContent(Element("option").setAttribute("name", "synthwaveStyle").setAttribute("value", "false"))
         val settings = GlowSettings()
         settings.loadState(GlowSettings.State(synthwaveStyle = true))
         settings.loadState(XmlSerializer.deserialize(xml, GlowSettings.State::class.java))
-        assertEquals(GlowSettings.State(editorText = false, brightness = 0.45f), settings.state)
+        assertEquals(GlowSettings.State(editorText = false, brightness = 0.45f, synthwaveStyle = false), settings.state)
         assertFalse(settings.state.synthwaveStyle)
     }
 
@@ -100,9 +110,9 @@ class GlowSettingsTest : BasePlatformTestCase() {
 
         assertEquals(GlowSettings.State(enabled = false, radiusPx = 9f, intensity = 1.5f, brightness = 0.45f,
             synthwaveStyle = true, editorText = false, icons = false), settings.state)
-        assertEquals(1f, settings.state.editorGlowStrength)
-        assertEquals(1f, settings.state.uiGlowStrength)
-        assertEquals(1f, settings.state.iconGlowStrength)
+        assertEquals(0.75f, settings.state.editorGlowStrength)
+        assertEquals(0.5f, settings.state.uiGlowStrength)
+        assertEquals(0.5f, settings.state.iconGlowStrength)
         assertFalse(settings.state.performanceMode)
     }
 
@@ -129,13 +139,20 @@ class GlowSettingsTest : BasePlatformTestCase() {
         assertEquals(2f, original.iconGlowStrength)
         assertNotSame(original, settings.state)
 
-        for ((value, expected) in listOf(-1f to 0f, 2f to 1f, 0f to 0f, 0.45f to 0.45f, 1f to 1f,
-            Float.NaN to 1f, Float.POSITIVE_INFINITY to 1f, Float.NEGATIVE_INFINITY to 1f)) {
+        for ((value, expected) in listOf(-1f to 0f, 2f to 1f, 0f to 0f, 0.45f to 0.45f, 1f to 1f)) {
             settings.loadState(GlowSettings.State(editorGlowStrength = value, uiGlowStrength = value,
                 iconGlowStrength = value, performanceMode = true))
             assertEquals(expected, settings.state.editorGlowStrength)
             assertEquals(expected, settings.state.uiGlowStrength)
             assertEquals(expected, settings.state.iconGlowStrength)
+            assertTrue(settings.state.performanceMode)
+        }
+        for (value in listOf(Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY)) {
+            settings.loadState(GlowSettings.State(editorGlowStrength = value, uiGlowStrength = value,
+                iconGlowStrength = value, performanceMode = true))
+            assertEquals(0.75f, settings.state.editorGlowStrength)
+            assertEquals(0.5f, settings.state.uiGlowStrength)
+            assertEquals(0.5f, settings.state.iconGlowStrength)
             assertTrue(settings.state.performanceMode)
         }
     }

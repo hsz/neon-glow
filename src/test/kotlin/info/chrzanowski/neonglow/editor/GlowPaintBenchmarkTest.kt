@@ -23,7 +23,16 @@ class GlowPaintBenchmarkTest : BasePlatformTestCase() {
 
     override fun setUp() {
         super.setUp()
-        GlowSettings.getInstance().loadState(GlowSettings.State())
+        GlowSettings.getInstance().loadState(GlowSettings.State(
+            radiusPx = 6f,
+            intensity = 3f,
+            brightness = 1f,
+            synthwaveStyle = false,
+            editorGlowStrength = 1f,
+            uiGlowStrength = 1f,
+            iconGlowStrength = 1f,
+            regularText = true,
+        ))
         GlowManager.getInstance().atlas.clear()
     }
 

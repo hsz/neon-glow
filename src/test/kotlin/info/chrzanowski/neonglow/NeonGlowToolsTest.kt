@@ -77,10 +77,11 @@ class NeonGlowToolsTest : BasePlatformTestCase() {
 
     fun `test target strength and same colour opacity edits preserve warm masks`() {
         val manager = GlowManager.getInstance()
-        manager.applySettings(GlowSettings.State())
+        manager.applySettings(GlowSettings.State(synthwaveStyle = false, regularText = true))
         val key = GlyphKey(1, "Dialog", 0, 14f, 0x36f9f6, 1f, 6f)
         val mask = manager.atlas.get(key) { Rectangle(0, -8, 6, 8) }
-        manager.applySettings(GlowSettings.State(brightness = 0.45f, uiGlowStrength = 0.25f, icons = false))
+        manager.applySettings(GlowSettings.State(brightness = 0.45f, uiGlowStrength = 0.25f, icons = false,
+            synthwaveStyle = false, regularText = true))
         assertSame(mask, manager.atlas.find(key))
         manager.applySettings(GlowSettings.State(radiusPx = 9f))
         assertEquals(0, manager.atlas.size)

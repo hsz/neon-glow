@@ -22,7 +22,8 @@ reproducible. Do not add more features or a first-run wizard merely to compensat
 | Toggle, cache reset and diagnostics | Recover or report without reinstalling | Lifecycle/action tests; reports are reviewed and shared voluntarily |
 
 No preset silently changes the theme, fonts, layout or keymap. Keep those guarantees when simplifying settings.
-Existing all-on defaults are preserved; recommending Focus in onboarding is not silently migrating preferences.
+All three targets are enabled by default, with SynthWave-style text on and regular text glow off.
+Explicit saved preferences are retained; recommending Focus in onboarding is not silently migrating preferences.
 
 ## Five-developer formative trial
 
@@ -40,7 +41,7 @@ Give each task without naming the exact controls; observe before coaching:
 3. Disable all glow without losing the selected theme or target preferences, then restore it. Ask what selecting
    the Accessible *theme* alone does; record confusion with the Accessible *glow preset* explicitly.
 4. Find one exact slider value, change only that control and Apply. Check that untouched values survive. Inspect
-   actual editor/UI/icons, not only preview; confirm mapped style retains ordinary white UI-label glow.
+   actual editor/UI/icons, not only preview; confirm ordinary white UI-label glow follows **Regular text glow**.
 5. Do normal work: type/delete on wrapped lines, scroll, use completion, navigate settings, change theme and
    move between available display scales. Record readability, stale pixels and perceived responsiveness. Request
    a diagnostic report only if needed; let the participant review it before voluntarily sharing it.

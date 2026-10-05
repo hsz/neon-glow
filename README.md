@@ -22,9 +22,9 @@ and terminal palettes.
 - Optional **Performance mode** bounds new masks per paint; clipping and raster-size guards avoid unnecessary
   or excessive allocations. Recovery tools reset caches and copy a project-content-free diagnostic report.
 - Paints a Gaussian-blurred copy of text throughout Swing IDE windows, including console/diff editors and the
-  welcome screen. By default the halo uses the actual text drawing colour, including coloured tree/table cells
-  and styled text. Optional SynthWave '84 style preserves five upstream colour rules on known dark backgrounds
-  and adapts other eligible vivid colours; neutral, muted and low-contrast text retains its core and same-colour glow.
+  welcome screen. SynthWave '84 style is enabled by default: it preserves five upstream colour rules on known dark
+  backgrounds and adapts other eligible vivid colours. Neutral, muted and low-contrast text stays crisp by default;
+  enable **Regular text glow** to give it same-colour halos too.
 - Adds multicolour halos to standard SVG and raster icons, preserving transparency and crisp original pixels.
   Image halos use a separate LRU cache capped at 256 entries / 16 MiB and follow the same glow settings; the
   optional text style never maps icon colours or gives icons layered text glow.
@@ -43,8 +43,9 @@ and terminal palettes.
 
 1. Keep your current IDE theme. Open `Settings | Appearance & Behavior | Neon Glow` and enable **Enable glow**
    and **Editor text**.
-2. Expand **Fine-Tune Glow**, enable **SynthWave '84-style text**, then **Apply** or **OK**. No preset is needed.
-   For the recommended look, use **45% brightness**, **100% intensity** and **6 px radius**.
+2. Fresh installs already enable **SynthWave '84-style text** and leave **Regular text glow** off. Defaults are
+   **50% brightness**, **75% editor strength**, **50% UI/icon strength**, **200% intensity** and **6 px radius**.
+   Adjust the controls if needed, then **Apply** or **OK**. No preset is required.
 3. Optional: choose **Neon Glow Midnight** or **Neon Glow** under `Settings | Appearance & Behavior | Appearance`,
    or try **Focus** (editor-only) or **Classic** glow presets. Selecting a preset fills the draft controls immediately;
    Apply/OK commits them. Every slider shows its numeric value.
@@ -54,8 +55,8 @@ does not disable glow automatically. `View | Appearance | Neon Glow` is the quic
 Presets and edits remain drafts until Apply; Reset discards them. Existing preferences are never replaced just
 by opening this page, and untouched fractional values remain precise even though sliders use whole ticks.
 
-To keep ordinary text crisp while coloured text gets layered neon, uncheck **Regular text glow**, leave
-**SynthWave '84-style text** enabled, then **Apply** or **OK**. This works in both enabled text targets;
+The defaults keep ordinary text crisp while coloured text gets layered neon: **Regular text glow** is off and
+**SynthWave '84-style text** is on. This works in both enabled text targets;
 icons remain independent. With SynthWave styling off, disabling Regular text glow disables all text glow.
 
 ## Settings
@@ -71,14 +72,14 @@ an entirely flat experience; choosing the Accessible **theme** alone does not ov
 | Enable glow | on | Also toggled by `View | Appearance | Neon Glow`. |
 | Editor text | on | Code, console/diff text and editor gutters. |
 | UI text | on | Tool windows, tabs, menus, popups, dialogs and other Swing UI text. |
-| Regular text glow | on | Same-colour halos for text without an eligible SynthWave-style rule, in both enabled text targets. Off leaves original cores with no halos; eligible layered text and icons are unaffected. With style off, this controls all text glow. |
+| Regular text glow | off | Same-colour halos for text without an eligible SynthWave-style rule, in both enabled text targets. Off leaves original cores with no halos; eligible layered text and icons are unaffected. With style off, this controls all text glow. |
 | Icons | on | Standard SVG and raster icons, independently of text. |
-| Editor / UI / Icon strength | 100 % each | Separate 0–100% halo multipliers; zero also disables styled-core replacement for that target. |
+| Editor / UI / Icon strength | 75 % / 50 % / 50 % | Separate 0–100% halo multipliers; zero also disables styled-core replacement for that target. |
 | Performance mode | off | At most 24 new glyph masks and 4 new icon masks per graphics paint tree, with a shared 2 ms admission deadline. Cached masks remain available. |
-| SynthWave '84-style text | off | Opt-in layered halos for eligible coloured text. Dark backgrounds get tinted cores; light backgrounds keep original cores with coloured halos, even when Regular text glow is off. Unknown backgrounds use regular glow. Icons are unchanged. |
-| Brightness | 100 % | Halo opacity, from 0–100%, applied after intensity. In style mode it controls variable coloured layers, including adaptive layers, not fixed upstream pink/dark layers. Zero restores all original rendering, including text cores. |
+| SynthWave '84-style text | on | Layered halos for eligible coloured text. Dark backgrounds get tinted cores; light backgrounds keep original cores with coloured halos, even when Regular text glow is off. Unknown backgrounds use regular glow. Icons are unchanged. |
+| Brightness | 50 % | Halo opacity, from 0–100%, applied after intensity. In style mode it controls variable coloured layers, including adaptive layers, not fixed upstream pink/dark layers. Zero restores all original rendering, including text cores. |
 | Radius | 6 px | Same-colour halo reach in user-space pixels. In style mode, 6 px uses reference layer blur sizes; other values scale all layers proportionally. |
-| Intensity | 300 % | Coverage multiplier before brightness; thin fonts need more than bold ones. |
+| Intensity | 200 % | Coverage multiplier before brightness; thin fonts need more than bold ones. |
 
 Settings are stored in `neon-glow.xml`. Target choices are independent; turning the master switch off and
 back on preserves them. Changes take effect on **Apply**, without an IDE restart.
@@ -123,7 +124,7 @@ luminance at most 0.12. Neutral, muted and low-contrast colours keep original co
 is colour-based, not semantic: vivid comments can qualify. Icons are unchanged.
 
 Same-colour glow in these cases follows **Regular text glow**; turn it off to retain original text without halos.
-The setting defaults to on, including when loading older preferences, preserving the existing appearance.
+The setting defaults to off. Explicit saved choices are retained; missing settings use the current defaults.
 
 On light backgrounds (luminance above 0.12), saturated text with original flat contrast at least 3:1 keeps its
 original core and gets three same-hue coloured halos at 3/7/12 px. Dark syntax colours qualify too: there is no
@@ -145,8 +146,8 @@ rendering, including foreground cores, for the affected targets. Uncheck **Edito
 Without graphics interception the editor under-glow fallback uses the scheme backdrop for upstream/adaptive layered
 halos or same-colour fallback; it cannot replace foreground cores. Core replacement requires graphics interception.
 
-The default same-colour mode and 100% brightness preserve this plugin's previous look. All options work with
-your current theme, with no restart or changes to IDE installation files. Saved settings and presets are unchanged. See
+All options work with your current theme, with no restart or changes to IDE installation files. Changing defaults
+does not overwrite explicit saved settings or change named presets. See
 [`docs/synthwave-options.md`](docs/synthwave-options.md) for the source-backed comparison and rendering differences.
 
 ## Development
@@ -173,8 +174,9 @@ no upper bound). Release artifacts are built against the default **2025.3.6.1** 
 backward compatibility. Use `platformVersion` for additional test/sandbox targets; build release packages without
 that override. Building/testing against 2026.2 requires a Java 25 toolchain; Gradle selects the target's runtime.
 
-Neon Glow passes all **177 tests** on 2025.3.6.1, including the new identity regression check. Its baseline-built
-artifact passes Plugin Verifier on all four versions above. Pre-rename verification recorded 176 passing tests
+Neon Glow passes all **178 tests** on 2025.3.6.1, including identity and default-settings regression checks.
+The rename artifact passed Plugin Verifier on all four versions above; verification was not rerun for the default-settings change.
+Pre-rename verification recorded 176 passing tests
 on 2025.3.6.1, 2026.1.5 and 2026.2.3; the newer-platform test suites were not rerun for the rename.
 Tests use platform APIs without unrelated bundled plugin jars on their shared test classpath; this avoids
 obfuscated-class collisions in 2026.2, without disabling tests

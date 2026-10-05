@@ -139,7 +139,7 @@ class UiGlowTest {
 
     @Test
     fun `settings and power save apply to an already installed root`() = onEdt {
-        val state = GlowSettings.State(enabled = false)
+        val state = GlowSettings.State(enabled = false, synthwaveStyle = false, regularText = true)
         var powerSave = false
         val root = JRootPane()
         root.contentPane = JLabel("Settings text")

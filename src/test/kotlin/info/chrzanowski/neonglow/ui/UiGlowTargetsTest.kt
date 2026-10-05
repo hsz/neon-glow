@@ -43,7 +43,8 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
             glow.installRoot(root)
             val plain = paint(root)
             for (editorText in listOf(false, true)) for (uiText in listOf(false, true)) {
-                settings.loadState(GlowSettings.State(editorText = editorText, uiText = uiText, icons = false))
+                settings.loadState(GlowSettings.State(editorText = editorText, uiText = uiText, icons = false,
+                    synthwaveStyle = false, regularText = true))
                 val image = paint(root)
                 assertEquals("UI text selection", uiText, differs(plain, image, 0, 60))
                 assertEquals("editor text selection", editorText, differs(plain, image, 60, 400))

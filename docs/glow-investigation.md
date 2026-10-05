@@ -257,7 +257,7 @@ accumulate, so the total alpha of a complete text run does not scale linearly. T
 the caller's graphics state are unchanged. Brightness zero skips all halo work, including mask cache lookups and
 editor bleed repaints. Masks do not depend on brightness; direct opacity changes can reuse them.
 
-The default is 100% to preserve earlier rendering. SynthWave '84's brightness default is 45%; our slider exposes
+The current brightness default is 50%. SynthWave '84's brightness default is 45%; our slider exposes
 that same opacity fraction, but not its hard-coded colours, selective shadows or injection mechanism. Disabling
 editor text while keeping UI/icon switches on is the closest runtime counterpart of upstream `disableGlow`.
 See [the cited upstream investigation](synthwave-options.md) for exact option/command semantics and differences.

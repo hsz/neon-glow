@@ -16,7 +16,8 @@ class GlowTargetsTest {
     @Test
     fun `each combination selects only its text and image caches`() {
         for (editor in listOf(false, true)) for (ui in listOf(false, true)) for (icons in listOf(false, true)) {
-            val state = GlowSettings.State(editorText = editor, uiText = ui, icons = icons)
+            val state = GlowSettings.State(editorText = editor, uiText = ui, icons = icons,
+                synthwaveStyle = false, regularText = true)
             val glyphs = GlyphGlowAtlas()
             val images = ImageGlowAtlas()
             val raw = BufferedImage(160, 120, BufferedImage.TYPE_INT_ARGB).createGraphics()
@@ -41,7 +42,7 @@ class GlowTargetsTest {
 
     @Test
     fun `scope copies and all text overloads honour the outermost component target`() {
-        val state = GlowSettings.State(uiText = false)
+        val state = GlowSettings.State(uiText = false, synthwaveStyle = false, regularText = true)
         val atlas = GlyphGlowAtlas()
         val raw = BufferedImage(200, 120, BufferedImage.TYPE_INT_ARGB).createGraphics()
         val g = GlowGraphics2D(raw, atlas, { state }, { false })

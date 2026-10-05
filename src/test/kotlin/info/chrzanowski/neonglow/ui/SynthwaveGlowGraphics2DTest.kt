@@ -51,6 +51,7 @@ class SynthwaveGlowGraphics2DTest {
 
     @Test
     fun `SynthWave mode preserves same colour glow for ordinary editor and UI text`() {
+        state.regularText = true
         for (scale in listOf(1.0, 2.0)) for (editor in listOf(false, true)) {
             for (colour in listOf(Color(0xf0eaf7), Color(0x9876aa), Color(0xabcdef))) {
                 state.editorGlowStrength = 0.65f

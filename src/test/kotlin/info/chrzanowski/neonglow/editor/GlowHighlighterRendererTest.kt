@@ -32,7 +32,16 @@ class GlowHighlighterRendererTest : BasePlatformTestCase() {
         super.setUp()
         settings = GlowSettings.getInstance()
         manager = GlowManager.getInstance()
-        settings.loadState(GlowSettings.State())
+        settings.loadState(GlowSettings.State(
+            radiusPx = 6f,
+            intensity = 3f,
+            brightness = 1f,
+            synthwaveStyle = false,
+            editorGlowStrength = 1f,
+            uiGlowStrength = 1f,
+            iconGlowStrength = 1f,
+            regularText = true,
+        ))
         manager.atlas.clear()
     }
 
