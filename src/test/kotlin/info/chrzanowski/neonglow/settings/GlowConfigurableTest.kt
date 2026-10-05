@@ -69,8 +69,8 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         val placeholder = presets().renderer.getListCellRendererComponent(javax.swing.JList(), null, -1, false, false)
         assertEquals(NeonGlowBundle.message("settings.preset.choose"), (placeholder as JLabel).text)
         assertEquals(listOf("preset", "enabled", "editorText", "uiText", "regularText", "icons", "brightness",
-            "performanceMode", "editorGlowStrength", "uiGlowStrength", "iconGlowStrength", "synthwaveStyle",
-            "radiusPx", "intensity", "showPreview"), descendants(component).filter {
+            "editorGlowStrength", "uiGlowStrength", "iconGlowStrength", "synthwaveStyle",
+            "radiusPx", "intensity", "performanceMode", "showPreview"), descendants(component).filter {
             it is JCheckBox || it is JSlider || it is JComboBox<*>
         }.mapNotNull { it.name }.toList())
     }

@@ -124,16 +124,6 @@ class GlowConfigurable internal constructor(
                 ).applyToComponent { brightness = this }
                     .comment(NeonGlowBundle.message("settings.brightness.comment"))
             }
-            row {
-                checkBox(NeonGlowBundle.message("settings.performanceMode"))
-                    .bindSelected({ currentDraft().performanceMode }, { currentDraft().performanceMode = it })
-                    .previewCheckBox("performanceMode")
-                    .applyToComponent { performanceMode = this }
-                    .comment(NeonGlowBundle.message("settings.performanceMode.comment"))
-            }
-            row {
-                comment(NeonGlowBundle.message("settings.powerSave.comment"))
-            }
             collapsibleGroup(NeonGlowBundle.message("settings.advanced")) {
                 row(NeonGlowBundle.message("settings.strength.editor")) {
                     strengthSlider("editorGlowStrength", { currentDraft().editorGlowStrength.toPercent() },
@@ -179,6 +169,16 @@ class GlowConfigurable internal constructor(
                         .comment(NeonGlowBundle.message("settings.intensity.comment"))
                 }
             }.apply { expanded = false }
+            row {
+                checkBox(NeonGlowBundle.message("settings.performanceMode"))
+                    .bindSelected({ currentDraft().performanceMode }, { currentDraft().performanceMode = it })
+                    .previewCheckBox("performanceMode")
+                    .applyToComponent { performanceMode = this }
+                    .comment(NeonGlowBundle.message("settings.performanceMode.comment"))
+            }
+            row {
+                comment(NeonGlowBundle.message("settings.powerSave.comment"))
+            }
             row {
                 checkBox(NeonGlowBundle.message("settings.preview.show"))
                     .applyToComponent {
