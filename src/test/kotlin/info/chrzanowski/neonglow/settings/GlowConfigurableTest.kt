@@ -4,6 +4,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import info.chrzanowski.neonglow.NeonGlowBundle
 import java.awt.Component
 import java.awt.Container
+import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JComponent
@@ -497,6 +498,80 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         val enabledIndex = allComponents.indexOfFirst { it is JCheckBox && it.name == "enabled" }
         assertTrue("Support section must appear before enabled checkbox", supportIndex != -1 && enabledIndex != -1 && supportIndex < enabledIndex)
     }
+
+    fun `test reset to defaults updates all controls and applies only when requested`() {
+        val live = GlowSettings.State(
+            enabled = false, radiusPx = 12f, intensity = 3f, editorText = false, uiText = false, icons = false,
+            brightness = 0.9f, synthwaveStyle = false, editorGlowStrength = 0.2f, uiGlowStrength = 0.3f,
+            iconGlowStrength = 0.4f, performanceMode = true, regularText = true, initialThemePreserved = true,
+        )
+        settings.loadState(live)
+        configurable.reset()
+        slider("brightness").value = 17
+        checkBox("enabled").isSelected = true
+
+        val button = resetDefaultsButton()
+        assertEquals(NeonGlowBundle.message("settings.resetToDefaults"), button.text)
+        assertTrue(visibleWithinPage(button))
+        button.doClick()
+
+        val defaults = GlowSettings.State(initialThemePreserved = true)
+        assertControlsMatch(defaults)
+        assertEquals("50%", strengthReadout("brightness").text)
+        assertEquals("6 px", strengthReadout("radiusPx").text)
+        assertEquals("200%", strengthReadout("intensity").text)
+        assertEquals("75%", strengthReadout("editorGlowStrength").text)
+        assertEquals("50%", strengthReadout("uiGlowStrength").text)
+        assertEquals("50%", strengthReadout("iconGlowStrength").text)
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+        assertTrue(configurable.isModified())
+
+        configurable.apply()
+        assertEquals(listOf(defaults), applied)
+        assertEquals(defaults, settings.state)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test reset to defaults can be discarded by reset or disposal`() {
+        val live = GlowSettings.State(enabled = false, brightness = 0.8f, initialThemePreserved = true)
+        settings.loadState(live)
+        configurable.reset()
+
+        resetDefaultsButton().doClick()
+        configurable.reset()
+        assertControlsMatch(live)
+        assertFalse(configurable.isModified())
+
+        resetDefaultsButton().doClick()
+        configurable.disposeUIResources()
+        component = configurable.createComponent()
+        assertControlsMatch(live)
+        assertFalse(configurable.isModified())
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+    }
+
+    fun `test reset to defaults is unmodified when defaults are already saved`() {
+        for (initialThemePreserved in listOf(false, true)) {
+            val defaults = GlowSettings.State(initialThemePreserved = initialThemePreserved)
+            settings.loadState(defaults)
+            configurable.reset()
+            resetDefaultsButton().doClick()
+            assertFalse(configurable.isModified())
+
+            slider("brightness").value = 90
+            checkBox("icons").isSelected = false
+            resetDefaultsButton().doClick()
+            assertControlsMatch(defaults)
+            assertFalse(configurable.isModified())
+            assertEquals(defaults, settings.state)
+            assertTrue(applied.isEmpty())
+        }
+    }
+
+    private fun resetDefaultsButton(): JButton =
+        descendants(component).filterIsInstance<JButton>().single { it.name == "resetToDefaults" }
 
     private fun assertControlsMatch(expected: GlowSettings.State) {
         for ((name, selected) in mapOf("enabled" to expected.enabled, "editorText" to expected.editorText,

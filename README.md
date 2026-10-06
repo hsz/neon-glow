@@ -33,6 +33,8 @@ Three dark themes come bundled, but you don't need them. The glow works with wha
 | Regular text glow | off | Same-colour halos for everything Neon text styling leaves alone. Turn on to glow all text. |
 | Performance mode | off | Caps new glow masks per repaint. Some halos may show up one repaint late. |
 
+**Reset to Defaults** restores these glow settings without changing your theme or editor colours. Press **Apply** to save.
+
 For a look close to the VS Code extension: Neon text styling on, brightness 45 %, intensity 100 %, radius 6 px.
 Exact colour rules and how they differ from the CSS original: [docs/synthwave-options.md](docs/synthwave-options.md).
 

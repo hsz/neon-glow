@@ -21,6 +21,7 @@ import kotlin.math.roundToInt
  *
  * All edits go to an independent draft: Apply hands the draft to [GlowManager.applySettings] once, preserving warm
  * masks where possible and repainting every editor. Reset reloads live settings; disposal discards the draft.
+ * Reset to Defaults restores glow defaults in the draft without changing the theme or installation state.
  * The radius is edited in whole pixels, brightness, intensity and target strengths in whole percents.
  */
 class GlowConfigurable internal constructor(
@@ -138,6 +139,11 @@ class GlowConfigurable internal constructor(
             row {
                 comment(NeonGlowBundle.message("settings.powerSave.comment"))
             }
+            row {
+                button(NeonGlowBundle.message("settings.resetToDefaults")) { resetToDefaults() }
+                    .applyToComponent { name = "resetToDefaults" }
+                    .comment(NeonGlowBundle.message("settings.resetToDefaults.comment"))
+            }
         }
         return panel!!
     }
@@ -183,6 +189,12 @@ class GlowConfigurable internal constructor(
     override fun reset() {
         val currentPanel = panel ?: return
         draft = settings.state.normalized()
+        currentPanel.reset()
+    }
+
+    private fun resetToDefaults() {
+        val currentPanel = panel ?: return
+        draft = GlowSettings.State(initialThemePreserved = settings.state.initialThemePreserved)
         currentPanel.reset()
     }
 
