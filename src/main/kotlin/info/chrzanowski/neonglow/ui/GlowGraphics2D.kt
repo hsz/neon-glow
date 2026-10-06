@@ -389,6 +389,15 @@ class GlowGraphics2D(
         /** Nested IDE transforms must not add another halo to an already wrapped graphics. */
         fun isWrapped(graphics: Graphics2D): Boolean = find(graphics) != null
 
+        /** A local preview replaces inherited live glow rather than painting both policies. */
+        internal fun withoutGlow(graphics: Graphics2D): Graphics2D {
+            var current = graphics
+            while (current is GlowGraphics2D || current is TextTargetGraphics) {
+                current = current.delegate
+            }
+            return current
+        }
+
         fun isGlowing(graphics: Graphics2D): Boolean {
             val glow = find(graphics) ?: return false
             return glow.isTextEnabled(textTarget(graphics) ?: glow.editorText)

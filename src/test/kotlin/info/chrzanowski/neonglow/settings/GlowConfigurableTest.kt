@@ -1,8 +1,12 @@
 package info.chrzanowski.neonglow.settings
 
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.EditorKind
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import info.chrzanowski.neonglow.NeonGlowBundle
+import info.chrzanowski.neonglow.editor.EditorGlow
 import java.awt.Component
 import java.awt.Container
 import javax.swing.JButton
@@ -438,10 +442,12 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified())
     }
 
-    fun `test page contains no draft preview control or sample after reset and reopening`() {
+    fun `test page always shows a live preview without an extra toggle after reset and reopening`() {
         repeat(2) {
             assertFalse(descendants(component).any { it.name in listOf("showPreview", "glowPreview") })
             assertFalse(descendants(component).filterIsInstance<JCheckBox>().any { it.text == "Show draft preview" })
+            assertTrue(visibleWithinPage(editorPreview()))
+            assertEquals(settings.state, editorPreview().previewState)
             assertEquals(GlowSettings.State(), settings.state)
             assertTrue(applied.isEmpty())
             assertFalse(configurable.isModified())
@@ -681,6 +687,91 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertEquals(live.copy(brightness = 0.37f), settings.state)
         assertFalse(configurable.isModified())
     }
+
+    fun `test live preview follows sliders and checkboxes without changing saved settings`() {
+        val preview = editorPreview()
+        val saved = settings.state.copy()
+        val globalScheme = EditorColorsManager.getInstance().globalScheme
+        val values = mapOf("brightness" to 37, "radiusPx" to 9, "intensity" to 123,
+            "editorGlowStrength" to 61, "uiGlowStrength" to 28, "iconGlowStrength" to 84)
+        for ((name, value) in values) slider(name).value = value
+        for (name in listOf("enabled", "editorText", "uiText", "regularText", "icons", "synthwaveStyle", "performanceMode")) {
+            checkBox(name).isSelected = !checkBox(name).isSelected
+        }
+        val expected = saved.copy(enabled = false, editorText = false, uiText = false, regularText = true,
+            icons = false, synthwaveStyle = false, performanceMode = true, brightness = 0.37f, radiusPx = 9f,
+            intensity = 1.23f, editorGlowStrength = 0.61f, uiGlowStrength = 0.28f, iconGlowStrength = 0.84f)
+        assertEquals(expected, preview.previewState)
+        assertEquals(saved, settings.state)
+        assertTrue(applied.isEmpty())
+        assertTrue(configurable.isModified())
+        assertSame(globalScheme, EditorColorsManager.getInstance().globalScheme)
+        configurable.apply()
+        assertEquals(listOf(expected), applied)
+        assertEquals(expected, preview.previewState)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test live numeric preview retains valid values while input is incomplete or invalid`() {
+        numericInput("brightness").text = "37"
+        numericInput("radiusPx").text = "9"
+        val expected = GlowSettings.State(brightness = 0.37f, radiusPx = 9f)
+        assertEquals(expected, editorPreview().previewState)
+        for (text in listOf("", "abc", "999", "1.5")) {
+            numericInput("radiusPx").text = text
+            assertEquals(expected, editorPreview().previewState)
+        }
+        try {
+            configurable.apply()
+            fail("Invalid input must not apply the preview")
+        } catch (_: ConfigurationException) {
+            assertEquals(GlowSettings.State(), settings.state)
+            assertTrue(applied.isEmpty())
+        }
+        configurable.reset()
+        assertEquals(GlowSettings.State(), editorPreview().previewState)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test preview reset preserves fractions and defaults remain unsaved`() {
+        val live = GlowSettings.State(brightness = 0.456f, radiusPx = 6.4f, intensity = 1.234f,
+            editorGlowStrength = 0.789f, initialThemePreserved = true)
+        settings.loadState(live)
+        configurable.reset()
+        assertEquals(live, editorPreview().previewState)
+        numericInput("brightness").text = "37"
+        assertEquals(live.copy(brightness = 0.37f), editorPreview().previewState)
+        resetDefaultsButton().doClick()
+        assertEquals(GlowSettings.State(initialThemePreserved = true), editorPreview().previewState)
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+        configurable.reset()
+        assertEquals(live, editorPreview().previewState)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test closing releases the preview editor and reopening discards the draft`() {
+        val preview = editorPreview()
+        val editor = preview.editor
+        assertTrue(editor.isViewer)
+        assertEquals(EditorKind.PREVIEW, editor.editorKind)
+        assertTrue(visibleWithinPage(preview))
+        assertSame(preview, editorPreview())
+        assertSame(component, configurable.createComponent())
+        assertNull(EditorGlow.of(editor))
+        assertTrue(EditorFactory.getInstance().allEditors.contains(editor))
+        numericInput("brightness").text = "12"
+        configurable.disposeUIResources()
+        assertTrue(editor.isDisposed)
+        assertFalse(EditorFactory.getInstance().allEditors.contains(editor))
+        component = configurable.createComponent()
+        assertNotSame(preview, editorPreview())
+        assertEquals(settings.state, editorPreview().previewState)
+        assertFalse(configurable.isModified())
+        assertTrue(applied.isEmpty())
+    }
+
+    private fun editorPreview(): GlowEditorPreview = descendants(component).filterIsInstance<GlowEditorPreview>().single()
 
     private fun resetDefaultsButton(): JButton =
         descendants(component).filterIsInstance<JButton>().single { it.name == "resetToDefaults" }

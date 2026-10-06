@@ -4,7 +4,9 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.util.Disposer
 import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindIntText
@@ -28,6 +30,7 @@ import kotlin.math.roundToInt
  * masks where possible and repainting every editor. Reset reloads live settings; disposal discards the draft.
  * Reset to Defaults restores glow defaults in the draft without changing the theme or installation state.
  * Sliders and numeric inputs edit radius in whole pixels, brightness, intensity and target strengths in whole percents.
+ * The editor preview uses the draft immediately, without changing live editors or saved settings.
  */
 class GlowConfigurable internal constructor(
     private val settings: GlowSettings,
@@ -38,6 +41,8 @@ class GlowConfigurable internal constructor(
 
     private var panel: DialogPanel? = null
     private var draft: GlowSettings.State? = null
+    private var preview: GlowEditorPreview? = null
+    private var updatingControls = false
 
     private fun currentDraft(): GlowSettings.State = checkNotNull(draft)
 
@@ -46,6 +51,7 @@ class GlowConfigurable internal constructor(
     override fun createComponent(): JComponent {
         panel?.let { return it }
         draft = settings.state.normalized()
+        preview = GlowEditorPreview(currentDraft())
         panel = panel {
             group(NeonGlowBundle.message("settings.support.title")) {
                 row {
@@ -56,32 +62,47 @@ class GlowConfigurable internal constructor(
             row {
                 checkBox(NeonGlowBundle.message("settings.enabled"))
                     .bindSelected({ currentDraft().enabled }, { currentDraft().enabled = it })
-                    .applyToComponent { name = "enabled" }
+                    .applyToComponent {
+                        name = "enabled"
+                        addItemListener { editDraft { enabled = isSelected } }
+                    }
                     .comment(NeonGlowBundle.message("settings.enabled.comment"))
             }
             group(NeonGlowBundle.message("settings.targets")) {
                 row {
                     checkBox(NeonGlowBundle.message("settings.editorText"))
                         .bindSelected({ currentDraft().editorText }, { currentDraft().editorText = it })
-                        .applyToComponent { name = "editorText" }
+                        .applyToComponent {
+                            name = "editorText"
+                            addItemListener { editDraft { editorText = isSelected } }
+                        }
                         .comment(NeonGlowBundle.message("settings.editorText.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.uiText"))
                         .bindSelected({ currentDraft().uiText }, { currentDraft().uiText = it })
-                        .applyToComponent { name = "uiText" }
+                        .applyToComponent {
+                            name = "uiText"
+                            addItemListener { editDraft { uiText = isSelected } }
+                        }
                         .comment(NeonGlowBundle.message("settings.uiText.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.regularText"))
                         .bindSelected({ currentDraft().regularText }, { currentDraft().regularText = it })
-                        .applyToComponent { name = "regularText" }
+                        .applyToComponent {
+                            name = "regularText"
+                            addItemListener { editDraft { regularText = isSelected } }
+                        }
                         .comment(NeonGlowBundle.message("settings.regularText.comment"))
                 }
                 row {
                     checkBox(NeonGlowBundle.message("settings.icons"))
                         .bindSelected({ currentDraft().icons }, { currentDraft().icons = it })
-                        .applyToComponent { name = "icons" }
+                        .applyToComponent {
+                            name = "icons"
+                            addItemListener { editDraft { icons = isSelected } }
+                        }
                         .comment(NeonGlowBundle.message("settings.icons.comment"))
                 }
             }
@@ -93,6 +114,12 @@ class GlowConfigurable internal constructor(
                     labelKey = "settings.brightness",
                 )
                     .comment(NeonGlowBundle.message("settings.brightness.comment"))
+            }
+            group(NeonGlowBundle.message("settings.preview.title")) {
+                row {
+                    cell(checkNotNull(preview)).align(AlignX.FILL)
+                        .comment(NeonGlowBundle.message("settings.preview.comment"))
+                }
             }
             collapsibleGroup(NeonGlowBundle.message("settings.advanced")) {
                 row(NeonGlowBundle.message("settings.strength.editor")) {
@@ -113,7 +140,10 @@ class GlowConfigurable internal constructor(
                 row {
                     checkBox(NeonGlowBundle.message("settings.synthwaveStyle"))
                         .bindSelected({ currentDraft().synthwaveStyle }, { currentDraft().synthwaveStyle = it })
-                        .applyToComponent { name = "synthwaveStyle" }
+                        .applyToComponent {
+                            name = "synthwaveStyle"
+                            addItemListener { editDraft { synthwaveStyle = isSelected } }
+                        }
                         .comment(NeonGlowBundle.message("settings.synthwaveStyle.comment"))
                 }
                 row(NeonGlowBundle.message("settings.radius")) {
@@ -138,7 +168,10 @@ class GlowConfigurable internal constructor(
             row {
                 checkBox(NeonGlowBundle.message("settings.performanceMode"))
                     .bindSelected({ currentDraft().performanceMode }, { currentDraft().performanceMode = it })
-                    .applyToComponent { name = "performanceMode" }
+                    .applyToComponent {
+                        name = "performanceMode"
+                        addItemListener { editDraft { performanceMode = isSelected } }
+                    }
                     .comment(NeonGlowBundle.message("settings.performanceMode.comment"))
             }
             row {
@@ -151,6 +184,12 @@ class GlowConfigurable internal constructor(
             }
         }
         return panel!!
+    }
+
+    private fun editDraft(edit: GlowSettings.State.() -> Unit) {
+        if (updatingControls) return
+        currentDraft().edit()
+        preview?.update(currentDraft())
     }
 
     private fun Row.strengthSlider(id: String, read: () -> Int, write: (Int) -> Unit, labelKey: String): Cell<JSlider> =
@@ -201,6 +240,7 @@ class GlowConfigurable internal constructor(
                     syncing = false
                 }
             }
+            editDraft { if (control.component.value != read()) write(control.component.value) }
         }
         val unitLabel = JLabel(unit.trim()).apply {
             name = "${id}Unit"
@@ -226,16 +266,28 @@ class GlowConfigurable internal constructor(
     override fun reset() {
         val currentPanel = panel ?: return
         draft = settings.state.normalized()
-        currentPanel.reset()
+        resetControls(currentPanel)
     }
 
     private fun resetToDefaults() {
         val currentPanel = panel ?: return
         draft = GlowSettings.State(initialThemePreserved = settings.state.initialThemePreserved)
-        currentPanel.reset()
+        resetControls(currentPanel)
+    }
+
+    private fun resetControls(currentPanel: DialogPanel) {
+        updatingControls = true
+        try {
+            currentPanel.reset()
+        } finally {
+            updatingControls = false
+        }
+        preview?.update(currentDraft())
     }
 
     override fun disposeUIResources() {
+        preview?.let { Disposer.dispose(it) }
+        preview = null
         panel = null
         draft = null
     }

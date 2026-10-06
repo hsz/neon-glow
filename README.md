@@ -47,6 +47,10 @@ Three dark themes come bundled, but you don't need them. The glow works with wha
 
 Each slider has a numeric input beside it for entering an exact value in percent or pixels.
 
+The **Live Editor Preview** shows editor glow with your current editor colours as you adjust sliders, numeric inputs
+and text settings. Changes stay in the preview until **Apply**; cancelling leaves the IDE unchanged.
+UI text and icon controls do not affect the editor sample. Power Save mode disables preview glow too.
+
 **Reset to Defaults** restores these glow settings without changing your theme or editor colours. Press **Apply** to save.
 
 For a look close to the VS Code extension: Neon text styling on, brightness 45 %, intensity 100 %, radius 6 px.
