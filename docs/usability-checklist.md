@@ -73,5 +73,5 @@ retention. Installations, downloads and an enabled checkbox do not establish act
 - Report follow-up answers and reasons as raw small-sample observations. No usage feedback means adoption is
   **unknown**, not a successful launch. Do not infer a conversion rate or guarantee from this trial.
 
-Technical evidence: [quality checklist](theme-quality.md). First-run instructions: [README](../README.md#quick-start).
-Release promotion remains subject to [campaign launch gates](marketing/campaign.md), genuine media and owner approval.
+Technical evidence: [quality checklist](theme-quality.md). First-run instructions: [README](../README.md#install).
+Launch steps: [launch notes](marketing.md).

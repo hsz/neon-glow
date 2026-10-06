@@ -13,15 +13,28 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Configurable neon glow for JetBrains IDEs. Keep your theme, add some light.<br><br>
-        Add text and icon halos with independent editor/UI/icon switches and strengths,
-        manual glow controls and bounded cold-cache work in performance mode.<br><br>
-        Optional SynthWave-inspired dark themes coordinate editor, console and terminal palettes and recolour
-        standard icons. Choose Neon Glow, Neon Glow Midnight or Neon Glow Accessible under
-        <b>Settings | Appearance &amp; Behavior | Appearance</b>.<br><br>
-        The glow is static (no animation), respects Power Save mode, follows colour scheme changes and can be tuned or
-        switched off under <b>Settings | Appearance &amp; Behavior | Neon Glow</b> or via
-        <b>View | Appearance | Neon Glow</b>.
+        Neon glow for JetBrains IDEs. Keep your theme, add some light.<br><br>
+        Neon Glow paints a soft, blurred halo behind text and icons across the whole IDE: editor, tool windows,
+        tabs, menus, popups and dialogs. Coloured code gets layered neon in the style of SynthWave '84.
+        Plain text stays crisp unless you ask for it to glow too.<br><br>
+        <b>Settings</b> (<code>Settings | Appearance &amp; Behavior | Neon Glow</code>)
+        <ul>
+          <li>Separate switches and strengths for editor text, UI text and icons</li>
+          <li>Brightness, radius and intensity sliders</li>
+          <li>Neon text styling on or off, regular text glow on or off</li>
+          <li>Performance mode that caps new glow work per repaint</li>
+          <li>Quick toggle: <code>View | Appearance | Neon Glow</code></li>
+        </ul>
+        Changes apply without restarting the IDE. Glow is static (no animation) and switches itself off in Power Save mode.<br><br>
+        <b>Themes</b> (optional)<br>
+        Three dark themes with matching editor, console and terminal colours: Neon Glow, Neon Glow Midnight
+        and Neon Glow Accessible. Pick one under <code>Settings | Appearance &amp; Behavior | Appearance</code>, or keep
+        the theme you already use. Themes and glow are independent.<br><br>
+        <b>Good to know</b><br>
+        The glow is drawn with Java2D and covers Swing text and standard icons. Native menu bars, embedded browsers,
+        terminal panes that bypass Swing text drawing and icons painted from vector shapes are not covered.<br><br>
+        Inspired by Robb Owen's <a href="https://github.com/robb0wen/synthwave-vscode">SynthWave '84</a> for VS Code,
+        with no affiliation to its author. A personal project, not an official JetBrains product.
         ]]></description>
 
     <!-- Product and plugin compatibility requirements.
