@@ -1,5 +1,6 @@
 package info.chrzanowski.neonglow.settings
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.Cell
@@ -40,6 +41,12 @@ class GlowConfigurable internal constructor(
         panel?.let { return it }
         draft = settings.state.normalized()
         panel = panel {
+            group(NeonGlowBundle.message("settings.support.title")) {
+                row {
+                    icon(AllIcons.General.Information)
+                    text(NeonGlowBundle.message("settings.support.comment"))
+                }
+            }
             row {
                 checkBox(NeonGlowBundle.message("settings.enabled"))
                     .bindSelected({ currentDraft().enabled }, { currentDraft().enabled = it })

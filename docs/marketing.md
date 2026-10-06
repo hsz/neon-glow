@@ -69,4 +69,4 @@ Where to post: your own blog/social accounts, r/IntelliJIDEA, r/Kotlin, and the 
 3. Install the ZIP from disk into a clean IDE and walk through the README's Install steps.
 4. Create the GitHub repository as `neon-glow`, push `main` only, add the URL to `plugin.xml` as `<vendor url>`
    or a link in the description.
-5. Upload to the Marketplace, add screenshots, wait for approval, then post.
+5. Upload to the Marketplace, add screenshots, configure the Donation URL (https://github.com/sponsors/hsz or https://ko-fi.com/hszanowski), wait for approval, then post.

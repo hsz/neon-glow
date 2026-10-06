@@ -1,6 +1,6 @@
 # Neon Glow
 
-Neon glow for JetBrains IDEs. Keep your theme, add some light.
+Neon Glow is a free and open-source neon glow plugin for JetBrains IDEs. Keep your theme, add some light.
 
 Neon Glow paints a soft, blurred halo behind text and icons across the whole IDE: editor, tool windows, tabs,
 menus, popups and dialogs. Coloured code gets layered neon in the style of SynthWave '84. Plain text stays
@@ -73,6 +73,12 @@ line to `idea.log` every 10 seconds.
 
 The commit history was rebuilt from an AI-assisted implementation; dates are not the original timeline.
 See [docs/history-reconstruction.md](docs/history-reconstruction.md).
+
+## Support
+
+This plugin is free and open source. If you find it useful and would like to support its development, you can do so via [GitHub Sponsors](https://github.com/sponsors/hsz), [Ko-fi](https://ko-fi.com/hszanowski), or [PayPal](https://paypal.me/hsz).
+
+You can also find my other projects on [GitHub](https://github.com/hsz).
 
 ## License
 
