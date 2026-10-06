@@ -4,6 +4,7 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorColorsScheme
+import com.intellij.openapi.options.Scheme
 
 object NeonGlowThemes {
     const val PLUGIN_ID: String = "info.chrzanowski.neonglow"
@@ -22,11 +23,11 @@ object NeonGlowThemes {
 
     fun isDeliveredScheme(scheme: EditorColorsScheme?): Boolean {
         if (scheme == null) return false
-        return scheme.name in THEME_NAMES
+        return scheme.name.removePrefix(Scheme.EDITABLE_COPY_PREFIX) in THEME_NAMES
     }
 
     /**
-     * Restores the user's previous look and feel and editor color scheme if a delivered theme was automatically activated.
+     * Restores captured user choices if a delivered theme was automatically activated. Never guesses defaults.
      */
     fun restoreUserTheme(
         lafManager: LafManager = LafManager.getInstance(),
@@ -34,30 +35,18 @@ object NeonGlowThemes {
         previousScheme: EditorColorsScheme? = null,
     ) {
         val currentLaf = lafManager.currentUIThemeLookAndFeel
-        if (isDeliveredTheme(currentLaf)) {
-            val targetLaf = if (previousLaf != null && !isDeliveredTheme(previousLaf)) {
-                previousLaf
-            } else {
-                lafManager.defaultDarkLaf ?: lafManager.defaultLightLaf
-            }
-            if (targetLaf != null && !isDeliveredTheme(targetLaf)) {
-                lafManager.setCurrentLookAndFeel(targetLaf, false)
-            }
+        val restoreLaf = isDeliveredTheme(currentLaf) && previousLaf != null && currentLaf != previousLaf
+        if (restoreLaf) {
+            lafManager.setCurrentLookAndFeel(previousLaf, true)
         }
 
         val colorsManager = EditorColorsManager.getInstance()
         val currentScheme = colorsManager.globalScheme
-        if (isDeliveredScheme(currentScheme)) {
-            val targetScheme = if (previousScheme != null && !isDeliveredScheme(previousScheme)) {
-                previousScheme
-            } else {
-                val darkLaf = lafManager.currentUIThemeLookAndFeel?.isDark ?: true
-                val defaultSchemeName = if (darkLaf) "Darcula" else "Default"
-                colorsManager.getScheme(defaultSchemeName)
-            }
-            if (targetScheme != null && !isDeliveredScheme(targetScheme)) {
-                colorsManager.setGlobalScheme(targetScheme)
-            }
+        if (isDeliveredScheme(currentScheme) && previousScheme != null && currentScheme !== previousScheme) {
+            colorsManager.setGlobalScheme(previousScheme)
+        }
+        if (restoreLaf) {
+            lafManager.updateUI()
         }
     }
 }

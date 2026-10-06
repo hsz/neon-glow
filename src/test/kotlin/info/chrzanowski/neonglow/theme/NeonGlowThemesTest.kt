@@ -5,15 +5,21 @@ import com.intellij.ide.ui.LafManagerListener
 import com.intellij.ide.ui.LafReference
 import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.colors.impl.EditorColorsSchemeImpl
 import com.intellij.openapi.extensions.PluginId
+import com.intellij.openapi.options.Scheme
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.testFramework.replaceService
 import com.intellij.ui.CollectionComboBoxModel
+import com.intellij.util.ui.UIUtil
 import info.chrzanowski.neonglow.listeners.GlowApplicationListener
 import info.chrzanowski.neonglow.listeners.GlowDynamicPluginListener
 import info.chrzanowski.neonglow.settings.GlowSettings
+import info.chrzanowski.neonglow.ui.GlowStartupActivity
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.lang.reflect.Proxy
 import javax.swing.JComponent
@@ -71,6 +77,7 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
         assertTrue(NeonGlowThemes.isDeliveredScheme(classicScheme))
         assertTrue(NeonGlowThemes.isDeliveredScheme(midnightScheme))
         assertTrue(NeonGlowThemes.isDeliveredScheme(accessibleScheme))
+        assertTrue(NeonGlowThemes.isDeliveredScheme(mockScheme(Scheme.EDITABLE_COPY_PREFIX + "Neon Glow Accessible")))
 
         val darculaScheme = mockScheme("Darcula")
         val defaultScheme = mockScheme("Default")
@@ -90,7 +97,7 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
 
         val originalGlobalScheme = EditorColorsManager.getInstance().globalScheme
         try {
-            EditorColorsManager.getInstance().setGlobalScheme(userScheme)
+            EditorColorsManager.getInstance().setGlobalScheme(mockScheme("Neon Glow"))
 
             NeonGlowThemes.restoreUserTheme(testLafManager, userLaf, userScheme)
 
@@ -111,6 +118,84 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
     }
 
     @Test
+    fun `test restoreUserTheme leaves current theme and scheme alone without a captured choice`() {
+        val currentLaf = mockLaf(NeonGlowThemes.CLASSIC_ID, "Neon Glow")
+        val currentScheme = mockScheme("Neon Glow")
+        val testLafManager = TestLafManager(currentLaf)
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        try {
+            colorsManager.setGlobalScheme(currentScheme)
+
+            NeonGlowThemes.restoreUserTheme(testLafManager)
+
+            assertSame(currentLaf, testLafManager.currentUIThemeLookAndFeel)
+            assertSame(currentScheme, colorsManager.globalScheme)
+        } finally {
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    @Test
+    fun `test restoreUserTheme restores captured light and dark themes with custom schemes`() {
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        try {
+            for (isDark in listOf(false, true)) {
+                val userLaf = mockLaf("custom.user.theme", "User Custom Theme", isDark)
+                val userScheme = mockScheme("User Custom Scheme")
+                val testLafManager = TestLafManager(mockLaf(NeonGlowThemes.CLASSIC_ID, "Neon Glow"))
+                colorsManager.setGlobalScheme(mockScheme("Neon Glow"))
+
+                NeonGlowThemes.restoreUserTheme(testLafManager, userLaf, userScheme)
+
+                assertSame(userLaf, testLafManager.currentUIThemeLookAndFeel)
+                assertSame(userScheme, colorsManager.globalScheme)
+            }
+        } finally {
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    @Test
+    fun `test restoreUserTheme does not guess a scheme when only the previous theme is known`() {
+        val userLaf = mockLaf("custom.light.theme", "User Light Theme", false)
+        val currentScheme = mockScheme("Neon Glow")
+        val testLafManager = TestLafManager(mockLaf(NeonGlowThemes.CLASSIC_ID, "Neon Glow"))
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        try {
+            colorsManager.setGlobalScheme(currentScheme)
+
+            NeonGlowThemes.restoreUserTheme(testLafManager, userLaf)
+
+            assertSame(userLaf, testLafManager.currentUIThemeLookAndFeel)
+            assertSame(currentScheme, colorsManager.globalScheme)
+        } finally {
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    @Test
+    fun `test restoreUserTheme preserves deliberately selected bundled choices`() {
+        val userLaf = mockLaf(NeonGlowThemes.CLASSIC_ID, "Neon Glow")
+        val userScheme = mockScheme("Neon Glow Midnight")
+        val testLafManager = TestLafManager(mockLaf(NeonGlowThemes.ACCESSIBLE_ID, "Neon Glow Accessible"))
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        try {
+            colorsManager.setGlobalScheme(mockScheme("Neon Glow Accessible"))
+
+            NeonGlowThemes.restoreUserTheme(testLafManager, userLaf, userScheme)
+
+            assertSame(userLaf, testLafManager.currentUIThemeLookAndFeel)
+            assertSame(userScheme, colorsManager.globalScheme)
+        } finally {
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    @Test
     fun `test dynamic plugin listener captures and restores user theme on install`() {
         val listener = GlowDynamicPluginListener()
         val pluginDescriptor = mockDescriptor(NeonGlowThemes.PLUGIN_ID)
@@ -128,6 +213,38 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
     }
 
     @Test
+    fun `test first dynamic install preserves light and dark custom themes without a before load event`() {
+        val application = ApplicationManager.getApplication()
+        val testLafManager = TestLafManager(null)
+        application.replaceService(LafManager::class.java, testLafManager, testRootDisposable)
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        try {
+            for (isDark in listOf(false, true)) {
+                val userLaf = mockLaf("custom.user.theme", "User Custom Theme", isDark)
+                val userScheme = mockScheme("User Custom Scheme")
+                testLafManager.setCurrentLookAndFeel(userLaf, true)
+                colorsManager.setGlobalScheme(userScheme)
+
+                // The platform schedules theme activation before publishing pluginLoaded.
+                application.invokeLater {
+                    testLafManager.setCurrentLookAndFeel(mockLaf(NeonGlowThemes.ACCESSIBLE_ID, "Neon Glow Accessible"), false)
+                    val schemeName = if (isDark) Scheme.EDITABLE_COPY_PREFIX + "Neon Glow Accessible" else "Neon Glow Accessible"
+                    colorsManager.setGlobalScheme(mockScheme(schemeName))
+                }
+                GlowDynamicPluginListener().pluginLoaded(mockDescriptor(NeonGlowThemes.PLUGIN_ID))
+                UIUtil.dispatchAllInvocationEvents()
+
+                assertSame(userLaf, testLafManager.currentUIThemeLookAndFeel)
+                assertSame(userScheme, colorsManager.globalScheme)
+            }
+        } finally {
+            UIUtil.dispatchAllInvocationEvents()
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    @Test
     fun `test application listener preserves theme on first run and marks initial run handled`() {
         val settings = GlowSettings.getInstance()
         assertFalse(settings.state.initialThemePreserved)
@@ -142,7 +259,39 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
         assertTrue(settings.state.initialThemePreserved)
     }
 
-    private fun mockLaf(id: String, name: String): UIThemeLookAndFeelInfo {
+    @Test
+    fun `test initial startup and plugin load preserve the current editor scheme`() {
+        val colorsManager = EditorColorsManager.getInstance()
+        val originalGlobalScheme = colorsManager.globalScheme
+        val originalLaf = LafManager.getInstance().currentUIThemeLookAndFeel
+        val chosenScheme = mockScheme("Neon Glow Midnight")
+        try {
+            colorsManager.setGlobalScheme(chosenScheme)
+
+            GlowDynamicPluginListener().pluginLoaded(mockDescriptor(NeonGlowThemes.PLUGIN_ID))
+            assertSame(chosenScheme, colorsManager.globalScheme)
+            assertSame(originalLaf, LafManager.getInstance().currentUIThemeLookAndFeel)
+
+            GlowSettings.getInstance().loadState(GlowSettings.State())
+            GlowApplicationListener().appFrameCreated(emptyList())
+            assertSame(chosenScheme, colorsManager.globalScheme)
+            assertSame(originalLaf, LafManager.getInstance().currentUIThemeLookAndFeel)
+
+            GlowSettings.getInstance().loadState(GlowSettings.State())
+            GlowApplicationListener().welcomeScreenDisplayed()
+            assertSame(chosenScheme, colorsManager.globalScheme)
+            assertSame(originalLaf, LafManager.getInstance().currentUIThemeLookAndFeel)
+
+            GlowSettings.getInstance().loadState(GlowSettings.State())
+            runBlocking { GlowStartupActivity().execute(project) }
+            assertSame(chosenScheme, colorsManager.globalScheme)
+            assertSame(originalLaf, LafManager.getInstance().currentUIThemeLookAndFeel)
+        } finally {
+            colorsManager.setGlobalScheme(originalGlobalScheme)
+        }
+    }
+
+    private fun mockLaf(id: String, name: String, isDark: Boolean = true): UIThemeLookAndFeelInfo {
         var proxyInstance: UIThemeLookAndFeelInfo? = null
         val proxy = Proxy.newProxyInstance(
             UIThemeLookAndFeelInfo::class.java.classLoader,
@@ -151,7 +300,7 @@ class NeonGlowThemesTest : BasePlatformTestCase() {
             when (method.name) {
                 "getId" -> id
                 "getName" -> name
-                "isDark" -> true
+                "isDark" -> isDark
                 "toString" -> "UIThemeLookAndFeelInfo($id, $name)"
                 "equals" -> {
                     val other = args?.getOrNull(0)
