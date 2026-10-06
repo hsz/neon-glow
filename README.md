@@ -14,6 +14,12 @@ crisp unless you ask for it to glow too.
 
 Three dark themes come bundled, but you don't need them. The glow works with whatever theme you already use.
 
+## Screenshots
+
+![Neon Glow screenshot 1](docs/SCR-20261006-kgdv.png)
+
+![Neon Glow screenshot 2](docs/SCR-20261006-kgks.png)
+
 ## Install
 
 1. `Settings | Plugins | Marketplace`, search for **Neon Glow**, install.
