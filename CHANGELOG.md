@@ -7,6 +7,7 @@
 ### Changed
 
 - For light themes, use a maximum of 25% brightness by default.
+- Keep user's active theme enabled on first install and run without automatically activating bundled themes.
 
 ### Added
 

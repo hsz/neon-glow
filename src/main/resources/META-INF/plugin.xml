@@ -60,6 +60,8 @@
     </extensions>
 
     <applicationListeners>
+        <listener class="info.chrzanowski.neonglow.listeners.GlowDynamicPluginListener"
+                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
         <listener class="info.chrzanowski.neonglow.listeners.GlowApplicationListener"
                   topic="com.intellij.ide.AppLifecycleListener"/>
         <!-- Colour scheme switched or edited (a LaF change switches the scheme too): recolour the glow. -->
