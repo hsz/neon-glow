@@ -396,6 +396,34 @@ class SynthwaveGlowGraphics2DTest {
         }
     }
 
+    @Test
+    fun `default brightness uses 25 percent on light backgrounds and 50 percent on dark backgrounds`() {
+        val icon = BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB).apply {
+            createGraphics().let { g ->
+                try { g.color = Color.CYAN; g.fillRect(4, 4, 8, 8) } finally { g.dispose() }
+            }
+        }
+        val drawIcon: (Graphics2D) -> Unit = { g -> g.drawImage(icon, 50, 65, null) }
+        val drawText: (Graphics2D) -> Unit = { g -> g.color = Color(0x36f9f6); g.drawString("Neon", 50, 65) }
+
+        for (draw in listOf(drawIcon, drawText)) {
+            state.regularText = true
+            state.brightness = 0.5f
+
+            // Light background with default brightness (0.5f) matches explicit 0.25f
+            val lightDefault = paint(textBackground = Color.WHITE, draw = draw)
+            state.brightness = 0.25f
+            val lightExplicit25 = paint(textBackground = Color.WHITE, draw = draw)
+            assertArrayEquals(pixels(lightDefault), pixels(lightExplicit25))
+
+            // Dark background with default brightness (0.5f) matches explicit 0.50f
+            state.brightness = 0.5f
+            val darkDefault = paint(textBackground = Color(0x262335), draw = draw)
+            val darkExplicit50 = paint(textBackground = Color(0x262335), draw = draw)
+            assertArrayEquals(pixels(darkDefault), pixels(darkExplicit50))
+        }
+    }
+
     private fun pixels(image: BufferedImage): IntArray = image.getRGB(0, 0, image.width, image.height, null, 0, image.width)
 
     private fun paint(scale: Double = 1.0, textBackground: Color? = Color(0x262335), draw: (Graphics2D) -> Unit): BufferedImage {

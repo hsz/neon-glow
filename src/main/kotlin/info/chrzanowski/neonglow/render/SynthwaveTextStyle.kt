@@ -32,12 +32,15 @@ object SynthwaveTextStyle {
 
     fun rule(argb: Int): Rule? = rules[argb and 0xffffff]
 
+    fun isLight(backgroundRgb: Int?): Boolean = backgroundRgb != null && luminance(backgroundRgb) > 0.12
+    fun isLight(background: Color?): Boolean = background != null && isLight(background.rgb)
+
     /** Light surfaces retain original cores; unknown surfaces use regular glow. Eligibility is colour-based. */
     fun rule(argb: Int, backgroundRgb: Int?): Rule? {
         if (backgroundRgb == null) return null
         val rgb = argb and 0xffffff
         val hsb = Color.RGBtoHSB(rgb shr 16, (rgb shr 8) and 255, rgb and 255, null)
-        if (luminance(backgroundRgb) > 0.12) {
+        if (isLight(backgroundRgb)) {
             if (hsb[1] < 0.35f || contrast(rgb, backgroundRgb) < 3.0) return null
             // Light themes often use dark saturated syntax. Keep it intact and avoid a white core/dark outline.
             var value = minOf(hsb[2], 0.6f)

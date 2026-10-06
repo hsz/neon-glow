@@ -178,6 +178,20 @@ class SynthwaveTextStyleTest {
         }.image)))
     }
 
+    @Test
+    fun `isLight correctly identifies light and dark surfaces`() {
+        assertFalse(SynthwaveTextStyle.isLight(null as Int?))
+        assertFalse(SynthwaveTextStyle.isLight(null as Color?))
+        for (dark in listOf(0x000000, 0x100c0f, 0x262335, 0x2b2b2b, 0x555555)) {
+            assertFalse("dark $dark", SynthwaveTextStyle.isLight(dark))
+            assertFalse("dark Color $dark", SynthwaveTextStyle.isLight(Color(dark)))
+        }
+        for (light in listOf(0xffffff, 0xf2f2f2, 0x9a9a9a, 0xe0e0e0)) {
+            assertTrue("light $light", SynthwaveTextStyle.isLight(light))
+            assertTrue("light Color $light", SynthwaveTextStyle.isLight(Color(light)))
+        }
+    }
+
     private fun contrast(first: Int, second: Int): Double {
         fun luminance(rgb: Int): Double {
             fun channel(shift: Int): Double {

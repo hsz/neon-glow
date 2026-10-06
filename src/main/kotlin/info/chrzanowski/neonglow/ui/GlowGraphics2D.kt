@@ -1,6 +1,7 @@
 package info.chrzanowski.neonglow.ui
 
 import com.intellij.ui.Graphics2DDelegate
+import com.intellij.ui.JBColor
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.ImageUtil
 import info.chrzanowski.neonglow.render.*
@@ -201,6 +202,7 @@ class GlowGraphics2D(
         val local = AffineTransform.getTranslateInstance(-bounds.x.toDouble(), -bounds.y.toDouble())
         local.concatenate(device)
         val state = settings()
+        val effectiveBrightness = state.effectiveBrightness(currentTextBackground?.rgb, JBColor.isBright())
         val pad = kotlin.math.ceil(state.radiusPx * imageScale * 1.5).toInt()
         val visible = Rectangle(bounds)
         visible.grow(pad, pad)
@@ -214,7 +216,7 @@ class GlowGraphics2D(
         try {
             // Clip is already in device space; keep it while undoing any image-specific HiDPI unscaling.
             halo.transform = AffineTransform.getScaleInstance(1.0 / surfaceScale, 1.0 / surfaceScale)
-            halo.composite = alpha.derive(alpha.alpha * state.brightness * state.iconGlowStrength)
+            halo.composite = alpha.derive(alpha.alpha * effectiveBrightness * state.iconGlowStrength)
             halo.drawImage(mask.image, bounds.x + mask.offsetX, bounds.y + mask.offsetY, null)
         } finally {
             halo.dispose()
@@ -299,6 +301,7 @@ class GlowGraphics2D(
         val state = settings()
         val layered = rule != null
         if (!layered && !state.regularText) return 0
+        val effectiveBrightness = state.effectiveBrightness(glyphBackground(glyphs, x, y)?.rgb, JBColor.isBright())
         atlas.intensity = state.intensity
         val scale = JBUIScale.sysScale(myDelegate).takeIf { it > 0f } ?: 1f
         val glyphFont = glyphs.font
@@ -306,7 +309,7 @@ class GlowGraphics2D(
         var count = 0
         try {
             halo.composite = alpha.derive(alpha.alpha * foreground.alpha / 255f *
-                textStrength * if (layered) 1f else state.brightness)
+                textStrength * if (layered) 1f else effectiveBrightness)
             halo.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
             val blit = AffineTransform()
             for (i in 0 until glyphs.numGlyphs) {
@@ -321,7 +324,7 @@ class GlowGraphics2D(
                 val key = GlyphKey(
                     glyphs.getGlyphCode(i), glyphFont.family, glyphFont.style, glyphFont.size2D,
                     foreground.rgb, scale, state.radiusPx, glyphFont, glyphs.getGlyphTransform(i),
-                    layered, if (layered) state.brightness else 1f, rule,
+                    layered, if (layered) effectiveBrightness else 1f, rule,
                 )
                 var mask = atlas.find(key)
                 if (mask == null) {

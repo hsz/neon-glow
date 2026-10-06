@@ -26,7 +26,7 @@ Three dark themes come bundled, but you don't need them. The glow works with wha
 | UI text | on | Tool windows, tabs, menus, popups, dialogs. |
 | Icons | on | Standard SVG and raster icons. |
 | Editor / UI / Icon strength | 75 / 50 / 50 % | Halo opacity per target. 0 % restores original rendering for that target. |
-| Brightness | 50 % | Overall halo opacity. |
+| Brightness | 50 % | Overall halo opacity (maximum of 25 % by default on light themes). |
 | Radius | 6 px | How far the halo reaches. |
 | Intensity | 200 % | Boosts coverage before brightness. Thin fonts need more. |
 | Neon text styling | on | Layered neon for coloured text. Picks text by colour and contrast, so a colourful comment glows and a grey one doesn't. On dark backgrounds letters get a pale tint; on light backgrounds they keep their colour. |

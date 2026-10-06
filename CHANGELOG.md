@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+### Changed
+
+- For light themes, use a maximum of 25% brightness by default.
+
 ### Added
 
 - Glow behind text in editors, consoles, diffs, gutters and all Swing UI (tool windows, tabs, menus, popups,

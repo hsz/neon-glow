@@ -35,11 +35,40 @@ class GlowSettingsTest : BasePlatformTestCase() {
         assertEquals(6f, state.radiusPx)
         assertEquals(2f, state.intensity)
         assertEquals(0.5f, state.brightness)
+        assertEquals(0.25f, GlowSettings.DEFAULT_LIGHT_BRIGHTNESS)
         assertEquals(0.75f, state.editorGlowStrength)
         assertEquals(0.5f, state.uiGlowStrength)
         assertEquals(0.5f, state.iconGlowStrength)
         assertFalse(state.performanceMode)
         assertEquals(state, state.normalized())
+    }
+
+    fun `test effective brightness uses maximum of 25 percent on light surfaces by default`() {
+        val state = GlowSettings.State()
+        assertEquals(0.5f, state.brightness)
+        for (dark in listOf(0x000000, 0x262335, 0x2b2b2b, 0x555555)) {
+            assertEquals("dark background uses default 50% brightness", 0.5f, state.effectiveBrightness(dark))
+        }
+        for (light in listOf(0xffffff, 0xf2f2f2, 0x9a9a9a, 0xe0e0e0)) {
+            assertEquals("light background uses default 25% brightness", 0.25f, state.effectiveBrightness(light))
+        }
+        assertEquals(0.5f, state.effectiveBrightness(null, isBrightTheme = false))
+        assertEquals(0.25f, state.effectiveBrightness(null, isBrightTheme = true))
+
+        val customBright = state.copy(brightness = 0.8f)
+        assertEquals(0.8f, customBright.effectiveBrightness(0x262335))
+        assertEquals(0.8f, customBright.effectiveBrightness(0xffffff))
+        assertEquals(0.8f, customBright.effectiveBrightness(null, isBrightTheme = true))
+
+        val customDim = state.copy(brightness = 0.15f)
+        assertEquals(0.15f, customDim.effectiveBrightness(0x262335))
+        assertEquals(0.15f, customDim.effectiveBrightness(0xffffff))
+        assertEquals(0.15f, customDim.effectiveBrightness(null, isBrightTheme = true))
+
+        val zero = state.copy(brightness = 0f)
+        assertEquals(0f, zero.effectiveBrightness(0x262335))
+        assertEquals(0f, zero.effectiveBrightness(0xffffff))
+        assertEquals(0f, zero.effectiveBrightness(null, isBrightTheme = true))
     }
 
     fun `test state round-trips through XML`() {

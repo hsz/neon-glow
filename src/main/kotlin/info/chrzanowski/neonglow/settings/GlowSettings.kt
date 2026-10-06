@@ -5,6 +5,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import info.chrzanowski.neonglow.render.SynthwaveTextStyle
 
 /**
  * Persists the glow settings across IDE restarts.
@@ -43,6 +44,12 @@ class GlowSettings : PersistentStateComponent<GlowSettings.State> {
             uiGlowStrength = uiGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_STRENGTH,
             iconGlowStrength = iconGlowStrength.takeIf { it.isFinite() }?.coerceIn(STRENGTH_RANGE) ?: DEFAULT_STRENGTH,
         )
+
+        /** Resolves effective brightness for the given background or theme, capping at 25% by default on light surfaces. */
+        fun effectiveBrightness(backgroundRgb: Int?, isBrightTheme: Boolean = false): Float {
+            val isLight = SynthwaveTextStyle.isLight(backgroundRgb) || (backgroundRgb == null && isBrightTheme)
+            return if (isLight && brightness == DEFAULT_BRIGHTNESS) DEFAULT_LIGHT_BRIGHTNESS else brightness
+        }
     }
 
     private var myState = State()
@@ -57,6 +64,7 @@ class GlowSettings : PersistentStateComponent<GlowSettings.State> {
         const val DEFAULT_RADIUS: Float = 6f
         const val DEFAULT_INTENSITY: Float = 2f
         const val DEFAULT_BRIGHTNESS: Float = 0.5f
+        const val DEFAULT_LIGHT_BRIGHTNESS: Float = 0.25f
         const val DEFAULT_EDITOR_STRENGTH: Float = 0.75f
         const val DEFAULT_STRENGTH: Float = 0.5f
 

@@ -119,6 +119,8 @@ class GlowHighlighterRenderer(
 
         atlas.intensity = state.intensity
         val scheme = editor.colorsScheme
+        val backgroundRgb = scheme.defaultBackground.rgb
+        val effectiveBrightness = state.effectiveBrightness(backgroundRgb)
         val defaultForeground = scheme.defaultForeground.rgb
         val text = document.immutableCharSequence
         val frc = editorFontRenderContext(g2)
@@ -137,9 +139,9 @@ class GlowHighlighterRenderer(
                     val argb = (attributes?.foregroundColor?.rgb ?: defaultForeground) or ALPHA_MASK
                     val style = attributes?.fontType ?: Font.PLAIN
                     val font = scheme.getFont(EditorFontType.forJavaStyle(style))
-                    val layered = state.synthwaveStyle && SynthwaveTextStyle.rule(argb, scheme.defaultBackground.rgb) != null
+                    val layered = state.synthwaveStyle && SynthwaveTextStyle.rule(argb, backgroundRgb) != null
                     if (layered || state.regularText) {
-                        g2.composite = alpha.derive(alpha.alpha * if (layered) 1f else state.brightness)
+                        g2.composite = alpha.derive(alpha.alpha * if (layered) 1f else effectiveBrightness)
                         paintSegments(editor, text, tokenStart, tokenEnd, font, style, argb, frc, sysScale, radius, g2)
                     }
                 }
@@ -192,7 +194,9 @@ class GlowHighlighterRenderer(
         val fonts = layout.fonts
         val blank = layout.blank
         val state = settings.state
-        val rule = if (state.synthwaveStyle) SynthwaveTextStyle.rule(argb, editor.colorsScheme.defaultBackground.rgb) else null
+        val backgroundRgb = editor.colorsScheme.defaultBackground.rgb
+        val effectiveBrightness = state.effectiveBrightness(backgroundRgb)
+        val rule = if (state.synthwaveStyle) SynthwaveTextStyle.rule(argb, backgroundRgb) else null
         val layered = rule != null
         val inverseScale = 1.0 / sysScale
         var keyFont: Font? = null
@@ -205,7 +209,7 @@ class GlowHighlighterRenderer(
                 family = glyphFont.family
             }
             val key = GlyphKey(codes[i], family, glyphFont.style, glyphFont.size2D, argb, sysScale, radius,
-                synthwaveStyle = layered, brightness = if (layered) state.brightness else 1f, textStyleRule = rule)
+                synthwaveStyle = layered, brightness = if (layered) effectiveBrightness else 1f, textStyleRule = rule)
             var mask = atlas.find(key)
             if (mask == null) {
                 if (!workBudget.allowGlyph(state.performanceMode)) continue

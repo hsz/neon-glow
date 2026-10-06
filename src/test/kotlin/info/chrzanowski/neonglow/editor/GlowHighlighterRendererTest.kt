@@ -379,4 +379,26 @@ class GlowHighlighterRendererTest : BasePlatformTestCase() {
             assertEquals(Color(0xcc7832), scheme.defaultForeground)
         }
     }
+
+    fun `test default brightness uses 25 percent on light schemes and 50 percent on dark schemes`() = withEditor("test") { editor, glow ->
+        val scheme = EditorColorsManager.getInstance().globalScheme.clone() as EditorColorsScheme
+        editor.colorsScheme = scheme
+        settings.loadState(GlowSettings.State(regularText = true))
+
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0x36f9f6), Color.WHITE, null, null, 0))
+        val lightDefault = paint(editor, glow)
+
+        settings.state.brightness = 0.25f
+        val lightExplicit25 = paint(editor, glow)
+        assertTrue(lightDefault.getRGB(0, 0, 400, 160, null, 0, 400)
+            .contentEquals(lightExplicit25.getRGB(0, 0, 400, 160, null, 0, 400)))
+
+        settings.loadState(GlowSettings.State(regularText = true))
+        scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(Color(0x36f9f6), Color(0x262335), null, null, 0))
+        val darkDefault = paint(editor, glow)
+        settings.state.brightness = 0.5f
+        val darkExplicit50 = paint(editor, glow)
+        assertTrue(darkDefault.getRGB(0, 0, 400, 160, null, 0, 400)
+            .contentEquals(darkExplicit50.getRGB(0, 0, 400, 160, null, 0, 400)))
+    }
 }
