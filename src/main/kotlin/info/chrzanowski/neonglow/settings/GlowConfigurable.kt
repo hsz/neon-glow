@@ -2,11 +2,15 @@ package info.chrzanowski.neonglow.settings
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindIntText
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindValue
+import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.labelTable
 import com.intellij.ui.dsl.builder.panel
 import info.chrzanowski.neonglow.GlowManager
@@ -14,6 +18,7 @@ import info.chrzanowski.neonglow.NeonGlowBundle
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JSlider
+import javax.swing.event.DocumentEvent
 import kotlin.math.roundToInt
 
 /**
@@ -22,7 +27,7 @@ import kotlin.math.roundToInt
  * All edits go to an independent draft: Apply hands the draft to [GlowManager.applySettings] once, preserving warm
  * masks where possible and repainting every editor. Reset reloads live settings; disposal discards the draft.
  * Reset to Defaults restores glow defaults in the draft without changing the theme or installation state.
- * The radius is edited in whole pixels, brightness, intensity and target strengths in whole percents.
+ * Sliders and numeric inputs edit radius in whole pixels, brightness, intensity and target strengths in whole percents.
  */
 class GlowConfigurable internal constructor(
     private val settings: GlowSettings,
@@ -159,21 +164,49 @@ class GlowConfigurable internal constructor(
         id: String, min: Int, max: Int, minLabel: String, maxLabel: String, read: () -> Int, write: (Int) -> Unit,
         labelKey: String, unit: String = "%",
     ): Cell<JSlider> {
-        val valueLabel = JLabel().apply { name = "${id}Value" }
         val control = slider(min, max, 0, 0)
             .labelTable(mapOf(min to JLabel(minLabel), max to JLabel(maxLabel)))
             .bindValue(read) { if (it != read()) write(it) }
             .applyToComponent {
                 name = id
                 accessibleContext.accessibleName = NeonGlowBundle.message(labelKey)
-                valueLabel.labelFor = this
-                valueLabel.text = "$value$unit"
                 paintTicks = false
-                addChangeListener {
-                    valueLabel.text = "$value$unit"
+            }
+        val input = intTextField(min..max)
+            .columns(4)
+            .bindIntText(read) { if (it != read()) write(it) }
+            .applyToComponent {
+                name = "${id}Value"
+                accessibleContext.accessibleName = "${NeonGlowBundle.message(labelKey)} (${unit.trim()})"
+            }.component
+        var syncing = false
+        input.document.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent) {
+                if (syncing) return
+                val value = input.text.toIntOrNull()?.takeIf { it in min..max } ?: return
+                syncing = true
+                try {
+                    control.component.value = value
+                } finally {
+                    syncing = false
                 }
             }
-        cell(valueLabel)
+        })
+        control.component.addChangeListener {
+            if (!syncing) {
+                syncing = true
+                try {
+                    input.text = control.component.value.toString()
+                } finally {
+                    syncing = false
+                }
+            }
+        }
+        val unitLabel = JLabel(unit.trim()).apply {
+            name = "${id}Unit"
+            labelFor = input
+        }
+        cell(unitLabel)
         return control
     }
 
@@ -181,6 +214,10 @@ class GlowConfigurable internal constructor(
 
     override fun apply() {
         val currentPanel = panel ?: return
+        currentPanel.validationsOnInput.values.asSequence().flatten().firstNotNullOfOrNull { it.validate() }?.let {
+            it.component?.requestFocusInWindow()
+            throw ConfigurationException(it.message)
+        }
         currentPanel.apply()
         applySettings(currentDraft())
         reset()

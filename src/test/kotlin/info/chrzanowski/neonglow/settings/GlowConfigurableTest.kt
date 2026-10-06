@@ -1,5 +1,6 @@
 package info.chrzanowski.neonglow.settings
 
+import com.intellij.openapi.options.ConfigurationException
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import info.chrzanowski.neonglow.NeonGlowBundle
 import java.awt.Component
@@ -10,6 +11,7 @@ import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JSlider
+import javax.swing.JTextField
 import javax.swing.text.JTextComponent
 import kotlin.math.roundToInt
 
@@ -121,22 +123,24 @@ class GlowConfigurableTest : BasePlatformTestCase() {
             "uiGlowStrength" to "settings.strength.ui", "iconGlowStrength" to "settings.strength.icons")
         for ((name, key) in labels) {
             val control = slider(name)
-            val readout = strengthReadout(name)
+            val readout = numericInput(name)
             assertEquals(NeonGlowBundle.message(key), control.accessibleContext.accessibleName)
-            assertSame(control, readout.labelFor)
+            val unitLabel = descendants(component).filterIsInstance<JLabel>().single { it.name == "${name}Unit" }
+            assertSame(readout, unitLabel.labelFor)
+            assertEquals(if (name == "radiusPx") "px" else "%", unitLabel.text)
             control.value = control.minimum
-            assertEquals("${control.value}${if (name == "radiusPx") " px" else "%"}", readout.text)
+            assertEquals(control.value.toString(), readout.text)
         }
         slider("radiusPx").value = 6
         slider("intensity").value = 100
         slider("brightness").value = 45
-        assertEquals("6 px", strengthReadout("radiusPx").text)
-        assertEquals("100%", strengthReadout("intensity").text)
-        assertEquals("45%", strengthReadout("brightness").text)
+        assertEquals("6", numericInput("radiusPx").text)
+        assertEquals("100", numericInput("intensity").text)
+        assertEquals("45", numericInput("brightness").text)
         configurable.reset()
-        assertEquals("6 px", strengthReadout("radiusPx").text)
-        assertEquals("200%", strengthReadout("intensity").text)
-        assertEquals("50%", strengthReadout("brightness").text)
+        assertEquals("6", numericInput("radiusPx").text)
+        assertEquals("200", numericInput("intensity").text)
+        assertEquals("50", numericInput("brightness").text)
         assertFalse(configurable.isModified())
     }
 
@@ -158,7 +162,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
             assertEquals(percent, slider(name).value)
             assertEquals(0, slider(name).minimum)
             assertEquals(100, slider(name).maximum)
-            assertEquals("$percent%", strengthReadout(name).text)
+            assertEquals(percent.toString(), numericInput(name).text)
         }
         assertFalse(checkBox("performanceMode").isSelected)
         assertControlsMatch(GlowSettings.State())
@@ -219,7 +223,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified())
         assertEquals(10, slider("radiusPx").value)
         assertEquals(45, slider("brightness").value)
-        assertTrue(descendants(component).filterIsInstance<JLabel>().any { it.text == "45%" })
+        assertEquals("45", numericInput("brightness").text)
         assertEquals(1, applied.size)
     }
 
@@ -310,9 +314,9 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         val expected = GlowSettings.State(editorGlowStrength = 0f, uiGlowStrength = 0.25f, iconGlowStrength = 0.65f,
             performanceMode = true)
         assertControlsMatch(expected)
-        assertEquals("0%", strengthReadout("editorGlowStrength").text)
-        assertEquals("25%", strengthReadout("uiGlowStrength").text)
-        assertEquals("65%", strengthReadout("iconGlowStrength").text)
+        assertEquals("0", numericInput("editorGlowStrength").text)
+        assertEquals("25", numericInput("uiGlowStrength").text)
+        assertEquals("65", numericInput("iconGlowStrength").text)
         assertTrue(configurable.isModified())
         assertEquals(GlowSettings.State(), settings.state)
         assertTrue(applied.isEmpty())
@@ -327,9 +331,9 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         checkBox("performanceMode").isSelected = false
         configurable.reset()
         assertControlsMatch(expected)
-        assertEquals("0%", strengthReadout("editorGlowStrength").text)
-        assertEquals("25%", strengthReadout("uiGlowStrength").text)
-        assertEquals("65%", strengthReadout("iconGlowStrength").text)
+        assertEquals("0", numericInput("editorGlowStrength").text)
+        assertEquals("25", numericInput("uiGlowStrength").text)
+        assertEquals("65", numericInput("iconGlowStrength").text)
         assertFalse(configurable.isModified())
 
         slider("iconGlowStrength").value = 0
@@ -399,9 +403,9 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         settings.loadState(live)
         configurable.reset()
         assertControlsMatch(live)
-        assertEquals("12%", strengthReadout("editorGlowStrength").text)
-        assertEquals("34%", strengthReadout("uiGlowStrength").text)
-        assertEquals("56%", strengthReadout("iconGlowStrength").text)
+        assertEquals("12", numericInput("editorGlowStrength").text)
+        assertEquals("34", numericInput("uiGlowStrength").text)
+        assertEquals("56", numericInput("iconGlowStrength").text)
         assertFalse(configurable.isModified())
         assertTrue(applied.isEmpty())
     }
@@ -517,12 +521,12 @@ class GlowConfigurableTest : BasePlatformTestCase() {
 
         val defaults = GlowSettings.State(initialThemePreserved = true)
         assertControlsMatch(defaults)
-        assertEquals("50%", strengthReadout("brightness").text)
-        assertEquals("6 px", strengthReadout("radiusPx").text)
-        assertEquals("200%", strengthReadout("intensity").text)
-        assertEquals("75%", strengthReadout("editorGlowStrength").text)
-        assertEquals("50%", strengthReadout("uiGlowStrength").text)
-        assertEquals("50%", strengthReadout("iconGlowStrength").text)
+        assertEquals("50", numericInput("brightness").text)
+        assertEquals("6", numericInput("radiusPx").text)
+        assertEquals("200", numericInput("intensity").text)
+        assertEquals("75", numericInput("editorGlowStrength").text)
+        assertEquals("50", numericInput("uiGlowStrength").text)
+        assertEquals("50", numericInput("iconGlowStrength").text)
         assertEquals(live, settings.state)
         assertTrue(applied.isEmpty())
         assertTrue(configurable.isModified())
@@ -570,6 +574,114 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         }
     }
 
+    fun `test numeric inputs synchronize every slider and apply only on request`() {
+        val values = mapOf("brightness" to 37, "radiusPx" to 9, "intensity" to 123,
+            "editorGlowStrength" to 61, "uiGlowStrength" to 28, "iconGlowStrength" to 84)
+        for ((name, value) in values) {
+            val input = numericInput(name)
+            assertTrue(input.isEditable)
+            assertEquals(slider(name).value.toString(), input.text)
+            assertEquals(visibleWithinPage(slider(name)), visibleWithinPage(input))
+            assertTrue(input.accessibleContext.accessibleName.contains(slider(name).accessibleContext.accessibleName))
+            input.text = value.toString()
+            assertEquals(name, value, slider(name).value)
+        }
+        assertTrue(configurable.isModified())
+        assertEquals(GlowSettings.State(), settings.state)
+        assertTrue(applied.isEmpty())
+
+        configurable.apply()
+        val expected = GlowSettings.State(brightness = 0.37f, radiusPx = 9f, intensity = 1.23f,
+            editorGlowStrength = 0.61f, uiGlowStrength = 0.28f, iconGlowStrength = 0.84f)
+        assertEquals(listOf(expected), applied)
+        assertEquals(expected, settings.state)
+        assertFalse(configurable.isModified())
+
+        for (name in values.keys) {
+            slider(name).value = slider(name).minimum
+            assertEquals(slider(name).minimum.toString(), numericInput(name).text)
+        }
+        configurable.reset()
+        assertControlsMatch(expected)
+        for ((name, value) in values) assertEquals(value.toString(), numericInput(name).text)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test numeric inputs accept endpoints and reject invalid values without applying any settings`() {
+        for (name in listOf("brightness", "radiusPx", "intensity", "editorGlowStrength", "uiGlowStrength", "iconGlowStrength")) {
+            val control = slider(name)
+            val input = numericInput(name)
+            for (value in listOf(control.minimum, control.maximum)) {
+                input.text = value.toString()
+                assertEquals(value, control.value)
+                configurable.apply()
+                assertFalse(configurable.isModified())
+            }
+            val saved = settings.state.copy()
+            val appliedCount = applied.size
+            checkBox("enabled").isSelected = !saved.enabled
+            for (text in listOf("", "abc", "1.5", "999999999999999999999", (control.minimum - 1).toString(), (control.maximum + 1).toString())) {
+                input.text = text
+                assertEquals(text, input.text)
+                assertEquals(control.maximum, control.value)
+                assertTrue(configurable.isModified())
+                try {
+                    configurable.apply()
+                    fail("$name must reject '$text'")
+                } catch (expected: ConfigurationException) {
+                    assertFalse(expected.localizedMessage.isNullOrBlank())
+                }
+                assertEquals(saved, settings.state)
+                assertEquals(appliedCount, applied.size)
+            }
+            configurable.reset()
+            assertEquals(control.maximum.toString(), input.text)
+            assertFalse(configurable.isModified())
+            input.text = "invalid"
+            control.value = control.minimum
+            assertEquals(control.minimum.toString(), input.text)
+            configurable.reset()
+        }
+    }
+
+    fun `test numeric drafts are reset to defaults and discarded when the page closes`() {
+        val live = GlowSettings.State(brightness = 0.8f, radiusPx = 12f, intensity = 3f, initialThemePreserved = true)
+        settings.loadState(live)
+        configurable.reset()
+        numericInput("brightness").text = "42"
+        numericInput("radiusPx").text = ""
+        resetDefaultsButton().doClick()
+        for (name in listOf("brightness", "radiusPx", "intensity", "editorGlowStrength", "uiGlowStrength", "iconGlowStrength")) {
+            assertEquals(slider(name).value.toString(), numericInput(name).text)
+        }
+        assertControlsMatch(GlowSettings.State(initialThemePreserved = true))
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+
+        configurable.reset()
+        assertEquals("80", numericInput("brightness").text)
+        assertEquals("12", numericInput("radiusPx").text)
+        numericInput("brightness").text = "42"
+        configurable.disposeUIResources()
+        component = configurable.createComponent()
+        assertEquals("80", numericInput("brightness").text)
+        assertFalse(configurable.isModified())
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+    }
+
+    fun `test manual edits preserve untouched fractional settings`() {
+        val live = GlowSettings.State(radiusPx = 6.4f, intensity = 1.234f, brightness = 0.456f,
+            editorGlowStrength = 0.789f, uiGlowStrength = 0.234f, iconGlowStrength = 0.567f)
+        settings.loadState(live)
+        configurable.reset()
+        assertFalse(configurable.isModified())
+        numericInput("brightness").text = "37"
+        configurable.apply()
+        assertEquals(live.copy(brightness = 0.37f), settings.state)
+        assertFalse(configurable.isModified())
+    }
+
     private fun resetDefaultsButton(): JButton =
         descendants(component).filterIsInstance<JButton>().single { it.name == "resetToDefaults" }
 
@@ -586,8 +698,8 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         }
     }
 
-    private fun strengthReadout(name: String): JLabel =
-        descendants(component).filterIsInstance<JLabel>().single { it.name == "${name}Value" }
+    private fun numericInput(name: String): JTextField =
+        descendants(component).filterIsInstance<JTextField>().single { it.name == "${name}Value" }
 
     private fun checkBox(name: String = "enabled"): JCheckBox =
         descendants(component).filterIsInstance<JCheckBox>().single { it.name == name }
