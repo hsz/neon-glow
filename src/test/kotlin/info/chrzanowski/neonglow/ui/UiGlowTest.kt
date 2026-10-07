@@ -1,5 +1,6 @@
 package info.chrzanowski.neonglow.ui
 
+import com.intellij.ui.ScreenUtil
 import com.intellij.util.ui.JBSwingUtilities
 import info.chrzanowski.neonglow.render.GlyphGlowAtlas
 import info.chrzanowski.neonglow.settings.GlowSettings
@@ -7,10 +8,50 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.awt.Color
 import java.awt.Font
+import java.awt.event.HierarchyEvent
 import java.awt.image.BufferedImage
 import javax.swing.*
 
 class UiGlowTest {
+
+    @Test
+    fun `temporary dispose marker is set on root during layered pane installation and restoration`() = onEdt {
+        val root = JRootPane()
+        val original = root.layeredPane
+        val observedMarkersDuringRemoval = mutableListOf<Any?>()
+
+        root.addContainerListener(object : java.awt.event.ContainerAdapter() {
+            override fun componentRemoved(e: java.awt.event.ContainerEvent) {
+                observedMarkersDuringRemoval.add(root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
+            }
+        })
+
+        val probe = object : JPanel() {
+            override fun removeNotify() {
+                observedMarkersDuringRemoval.add(root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
+                super.removeNotify()
+            }
+        }
+        original.add(probe, JLayeredPane.DEFAULT_LAYER as Any)
+
+        assertNull("initial marker is null", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
+
+        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
+        try {
+            glow.installRoot(root)
+            assertNull("marker is restored after install", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
+            assertTrue("removal during install witnessed temporary dispose marker",
+                observedMarkersDuringRemoval.isNotEmpty() && observedMarkersDuringRemoval.all { it == true })
+
+            observedMarkersDuringRemoval.clear()
+            glow.dispose()
+            assertNull("marker is restored after dispose", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
+            assertTrue("removal during restore witnessed temporary dispose marker",
+                observedMarkersDuringRemoval.isNotEmpty() && observedMarkersDuringRemoval.all { it == true })
+        } finally {
+            glow.dispose()
+        }
+    }
 
     @Test
     fun `plain Swing labels menus and lightweight popups glow and original hierarchy is restored`() = onEdt {

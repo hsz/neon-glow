@@ -3,6 +3,7 @@ package info.chrzanowski.neonglow.ui
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.ui.ScreenUtil
 import com.intellij.util.ui.JBSwingUtilities
 import info.chrzanowski.neonglow.render.GlowStats
 import info.chrzanowski.neonglow.render.GlyphGlowAtlas
@@ -66,8 +67,10 @@ class UiGlow(
         val original = root.layeredPane
         val wrapper = GlowLayeredPane(original)
         roots[root] = wrapper
-        root.layeredPane = wrapper
-        wrapper.add(original, JLayeredPane.DEFAULT_LAYER)
+        withTemporaryDispose(root) {
+            root.layeredPane = wrapper
+            wrapper.add(original, JLayeredPane.DEFAULT_LAYER)
+        }
         root.revalidate()
         root.repaint()
     }
@@ -107,29 +110,44 @@ class UiGlow(
         val wrapper = roots.remove(root) ?: return
         val parent = wrapper.parent as? JLayeredPane
         if (root.layeredPane !== wrapper && parent == null) return
-        // RootPane may have added lightweight popups or replaced its content while our wrapper was installed.
-        for (child in wrapper.components) {
-            if (child === wrapper.original) continue
-            val layer = wrapper.getLayer(child)
-            val position = wrapper.getPosition(child)
-            wrapper.remove(child)
-            wrapper.original.add(child, Integer.valueOf(layer), position)
-        }
-        if (root.layeredPane === wrapper) {
-            root.layeredPane = wrapper.original
-        } else if (parent != null) {
-            val layer = parent.getLayer(wrapper)
-            val position = parent.getPosition(wrapper)
-            val bounds = wrapper.bounds
-            wrapper.remove(wrapper.original)
-            parent.remove(wrapper)
-            parent.add(wrapper.original, Integer.valueOf(layer), position)
-            wrapper.original.bounds = bounds
-            parent.revalidate()
-            parent.repaint()
+        withTemporaryDispose(root) {
+            // RootPane may have added lightweight popups or replaced its content while our wrapper was installed.
+            for (child in wrapper.components) {
+                if (child === wrapper.original) continue
+                val layer = wrapper.getLayer(child)
+                val position = wrapper.getPosition(child)
+                wrapper.remove(child)
+                wrapper.original.add(child, Integer.valueOf(layer), position)
+            }
+            if (root.layeredPane === wrapper) {
+                root.layeredPane = wrapper.original
+            } else if (parent != null) {
+                val layer = parent.getLayer(wrapper)
+                val position = parent.getPosition(wrapper)
+                val bounds = wrapper.bounds
+                wrapper.remove(wrapper.original)
+                parent.remove(wrapper)
+                parent.add(wrapper.original, Integer.valueOf(layer), position)
+                wrapper.original.bounds = bounds
+                parent.revalidate()
+                parent.repaint()
+            }
         }
         root.revalidate()
         root.repaint()
+    }
+
+    private inline fun <T> withTemporaryDispose(root: JRootPane, block: () -> T): T {
+        val prevScreenUtil = root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY)
+        val prevLiteral = root.getClientProperty("DISPOSE_TEMPORARY")
+        root.putClientProperty(ScreenUtil.DISPOSE_TEMPORARY, true)
+        root.putClientProperty("DISPOSE_TEMPORARY", true)
+        return try {
+            block()
+        } finally {
+            root.putClientProperty(ScreenUtil.DISPOSE_TEMPORARY, prevScreenUtil)
+            root.putClientProperty("DISPOSE_TEMPORARY", prevLiteral)
+        }
     }
 
     override fun dispose() {
