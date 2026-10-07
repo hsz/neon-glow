@@ -98,6 +98,34 @@ class UiEditorGlowTest : BasePlatformTestCase() {
         }
     }
 
+    fun `test GlowRepaintManager inflates small editor dirty regions for caret repaints`() {
+        val settings = GlowSettings.getInstance()
+        val factory = EditorFactory.getInstance()
+        val editor = factory.createEditor(factory.createDocument("line 1\nline 2\nline 3"), project, EditorKind.MAIN_EDITOR) as EditorEx
+        try {
+            val content = editor.contentComponent
+            content.setSize(500, 200)
+            val dirtyRegions = mutableListOf<java.awt.Rectangle>()
+            val dummyDelegate = object : javax.swing.RepaintManager() {
+                override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
+                    dirtyRegions += java.awt.Rectangle(x, y, w, h)
+                }
+            }
+            val rm = GlowRepaintManager(dummyDelegate) { settings.state }
+            val line1Y = editor.visualLineToY(1)
+            val lineHeight = editor.lineHeight
+            rm.addDirtyRegion(content, 50, line1Y, 2, lineHeight)
+            val pad = info.chrzanowski.neonglow.editor.GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx, settings.state.synthwaveStyle)
+            val dirty = dirtyRegions.single()
+            assertEquals("dirty region x should start at 0", 0, dirty.x)
+            assertTrue("dirty region width should cover at least component width", dirty.width >= 500)
+            assertTrue("dirty region y should be inflated with pad", dirty.y <= maxOf(0, line1Y - pad))
+            assertTrue("dirty region height should cover line plus pad", dirty.y + dirty.height >= editor.visualLineToY(2) + pad)
+        } finally {
+            factory.releaseEditor(editor)
+        }
+    }
+
     private fun paint(root: JRootPane): BufferedImage {
         root.setSize(500, 200)
         layout(root)

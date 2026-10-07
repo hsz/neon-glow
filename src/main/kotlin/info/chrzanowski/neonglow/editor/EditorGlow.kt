@@ -3,8 +3,12 @@ package info.chrzanowski.neonglow.editor
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.event.CaretEvent
+import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.editor.event.SelectionEvent
+import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.markup.HighlighterLayer
@@ -60,9 +64,45 @@ class EditorGlow(
         }
     }
 
+    private val caretListener = object : CaretListener {
+        override fun caretPositionChanged(event: CaretEvent) {
+            if (!canRepaintBleed()) return
+            repaintLogicalLine(event.oldPosition.line)
+            repaintLogicalLine(event.newPosition.line)
+        }
+
+        override fun caretAdded(event: CaretEvent) {
+            if (!canRepaintBleed()) return
+            repaintLogicalLine(event.newPosition.line)
+        }
+
+        override fun caretRemoved(event: CaretEvent) {
+            if (!canRepaintBleed()) return
+            repaintLogicalLine(event.oldPosition.line)
+        }
+    }
+
+    private val selectionListener = object : SelectionListener {
+        override fun selectionChanged(event: SelectionEvent) {
+            if (!canRepaintBleed()) return
+            val oldRange = event.oldRange
+            val newRange = event.newRange
+            if (oldRange.length > 0) {
+                val bounds = repaintBounds(oldRange.startOffset, oldRange.length)
+                editor.contentComponent.repaint(bounds.x, bounds.y, bounds.width, bounds.height)
+            }
+            if (newRange.length > 0) {
+                val bounds = repaintBounds(newRange.startOffset, newRange.length)
+                editor.contentComponent.repaint(bounds.x, bounds.y, bounds.width, bounds.height)
+            }
+        }
+    }
+
     init {
         ensureHighlighter()
         editor.document.addDocumentListener(documentListener, this)
+        editor.caretModel.addCaretListener(caretListener, this)
+        editor.selectionModel.addSelectionListener(selectionListener, this)
         manager.register(this)
     }
 
@@ -98,7 +138,16 @@ class EditorGlow(
         bleedRepaints++
     }
 
-    private fun canRepaintBleed(): Boolean = !editor.isDisposed && settings.state.enabled &&
+    private fun repaintLogicalLine(logicalLine: Int) {
+        val document = editor.document
+        if (logicalLine < 0 || logicalLine >= document.lineCount) return
+        val startOffset = document.getLineStartOffset(logicalLine)
+        val endOffset = document.getLineEndOffset(logicalLine)
+        val bounds = repaintBounds(startOffset, endOffset - startOffset)
+        editor.contentComponent.repaint(bounds.x, bounds.y, bounds.width, bounds.height)
+    }
+
+    internal fun canRepaintBleed(): Boolean = !editor.isDisposed && settings.state.enabled &&
         settings.state.editorText && settings.state.brightness > 0f && settings.state.editorGlowStrength > 0f
 
     private fun repaintBounds(offset: Int, length: Int): Rectangle {

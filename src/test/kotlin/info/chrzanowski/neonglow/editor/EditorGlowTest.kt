@@ -108,6 +108,30 @@ class EditorGlowTest : BasePlatformTestCase() {
         }
     }
 
+    fun `test moving the caret repaints visual lines inflated by bleed`() = withMainEditor("line 1\nline 2\nline 3") { editor ->
+        recordRepaints(editor) { requests ->
+            editor.caretModel.moveToOffset(editor.document.getLineStartOffset(1) + 2)
+            val pad = GlowHighlighterRenderer.repaintInflation(6f, false)
+            val line1Y = editor.visualLineToY(1)
+            val repaints = requests.filter { it.x == 0 && it.width >= editor.contentComponent.width }
+            assertTrue("caret move must issue inflated full-width repaint", repaints.isNotEmpty())
+            assertTrue("line 1 repaint must include bleed padding",
+                repaints.any { it.y <= line1Y && it.y + it.height >= editor.visualLineToY(2) + pad })
+        }
+    }
+
+    fun `test changing selection repaints selection range inflated by bleed`() = withMainEditor("line 1\nline 2\nline 3") { editor ->
+        recordRepaints(editor) { requests ->
+            editor.selectionModel.setSelection(editor.document.getLineStartOffset(1), editor.document.getLineEndOffset(1))
+            val pad = GlowHighlighterRenderer.repaintInflation(6f, false)
+            val line1Y = editor.visualLineToY(1)
+            val repaints = requests.filter { it.x == 0 && it.width >= editor.contentComponent.width }
+            assertTrue("selection change must issue inflated full-width repaint", repaints.isNotEmpty())
+            assertTrue("selected line repaint must include bleed padding",
+                repaints.any { it.y <= line1Y && it.y + it.height >= editor.visualLineToY(2) + pad })
+        }
+    }
+
     fun `test editors without a project or of other kinds are ignored`() {
         val standalone = factory.createEditor(factory.createDocument("standalone"))
         try {

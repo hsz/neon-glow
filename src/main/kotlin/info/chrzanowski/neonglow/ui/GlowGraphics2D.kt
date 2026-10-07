@@ -97,8 +97,7 @@ class GlowGraphics2D(
             .createTransformedShape(glyphs.visualBounds)
         val bounds = transform.createTransformedShape(positioned).bounds2D
         return when {
-            fill.area.contains(bounds) -> fill.colour
-            fill.area.intersects(bounds) -> null
+            fill.area.intersects(bounds) -> fill.colour
             else -> currentTextBackground
         }
     }

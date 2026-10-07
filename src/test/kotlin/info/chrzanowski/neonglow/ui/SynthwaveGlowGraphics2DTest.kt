@@ -241,6 +241,22 @@ class SynthwaveGlowGraphics2DTest {
     }
 
     @Test
+    fun `partial background fill intersecting glyph bounds retains dark background style and glow`() {
+        cores.clear()
+        atlas.clear()
+        paint { g ->
+            // Simulate a caret / partial line background repaint that is narrower than the text
+            g.color = Color(0x262335)
+            g.fillRect(55, 45, 10, 30) // narrow 10px slice over a 50px word
+            g.color = Color(0x72f1b8)
+            g.drawString("welcome", 50, 65)
+        }
+        val rule = SynthwaveTextStyle.rule(0x72f1b8, 0x262335)!!
+        assertEquals(listOf(Color(rule.foregroundRgb)), cores)
+        assertTrue("narrow background fill must not prevent mask generation", atlas.size > 0)
+    }
+
+    @Test
     fun `same target background scopes and copied delegates retain their own policy`() {
         cores.clear()
         paint { g ->
