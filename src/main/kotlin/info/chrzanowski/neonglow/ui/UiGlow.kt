@@ -12,6 +12,7 @@ import info.chrzanowski.neonglow.settings.GlowSettings
 import java.awt.*
 import javax.swing.JComponent
 import javax.swing.RepaintManager
+import javax.swing.SwingUtilities
 import kotlin.math.max
 
 /** Owns the global paint hook for Swing components and IDE windows. */
@@ -106,10 +107,17 @@ class GlowRepaintManager(
                 val editor = c.editor
                 if (!editor.isDisposed) {
                     val pad = GlowHighlighterRenderer.repaintInflation(state.radiusPx, state.synthwaveStyle)
-                    val startVisual = editor.xyToVisualPosition(Point(0, max(0, y))).line
-                    val endVisual = editor.xyToVisualPosition(Point(0, max(0, y + h))).line
-                    val top = max(0, editor.visualLineToY(startVisual) - pad)
-                    val bottom = max(top + h, editor.visualLineToY(endVisual + 1) + pad)
+                    val (top, bottom) = if (SwingUtilities.isEventDispatchThread()) {
+                        val startVisual = editor.xyToVisualPosition(Point(0, max(0, y))).line
+                        val endVisual = editor.xyToVisualPosition(Point(0, max(0, y + h))).line
+                        val topY = max(0, editor.visualLineToY(startVisual) - pad)
+                        val bottomY = max(topY + h, editor.visualLineToY(endVisual + 1) + pad)
+                        topY to bottomY
+                    } else {
+                        val topY = max(0, y - pad)
+                        val bottomY = max(topY + h, y + h + pad)
+                        topY to bottomY
+                    }
                     val width = max(c.width, x + w)
                     delegate.addDirtyRegion(c, 0, top, max(1, width), max(1, bottom - top))
                     return

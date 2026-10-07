@@ -6,6 +6,7 @@
 
 ### Fixed
 
+- Prevent `Access is allowed from Event Dispatch Thread (EDT) only` threading exceptions during background caret animations and editor repaints.
 - Fix neon text glow and styles disappearing near the cursor during editor caret movement, selection changes, and partial repaints.
 - Prevent IDE instability and window hierarchy corruption ([IJPL-257899](https://youtrack.jetbrains.com/issue/IJPL-257899)) by replacing invasive root layered-pane interception with platform global graphics transforms.
 - Eliminate spurious component removal and lifecycle notifications during window creation and disposal.

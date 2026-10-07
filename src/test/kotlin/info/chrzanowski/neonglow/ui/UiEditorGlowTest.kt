@@ -126,6 +126,44 @@ class UiEditorGlowTest : BasePlatformTestCase() {
         }
     }
 
+    fun `test GlowRepaintManager inflates dirty regions from background thread without EDT assertion`() {
+        val settings = GlowSettings.getInstance()
+        val factory = EditorFactory.getInstance()
+        val editor = factory.createEditor(factory.createDocument("line 1\nline 2\nline 3"), project, EditorKind.MAIN_EDITOR) as EditorEx
+        try {
+            val content = editor.contentComponent
+            content.setSize(500, 200)
+            val dirtyRegions = java.util.Collections.synchronizedList(mutableListOf<java.awt.Rectangle>())
+            val dummyDelegate = object : javax.swing.RepaintManager() {
+                override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
+                    dirtyRegions += java.awt.Rectangle(x, y, w, h)
+                }
+            }
+            val rm = GlowRepaintManager(dummyDelegate) { settings.state }
+            val caretY = 30
+            val lineHeight = 20
+            var error: Throwable? = null
+            val thread = Thread {
+                try {
+                    rm.addDirtyRegion(content, 50, caretY, 2, lineHeight)
+                } catch (t: Throwable) {
+                    error = t
+                }
+            }
+            thread.start()
+            thread.join()
+            assertNull("addDirtyRegion from background thread must not throw EDT assertion", error)
+            val pad = info.chrzanowski.neonglow.editor.GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx, settings.state.synthwaveStyle)
+            val dirty = dirtyRegions.single()
+            assertEquals("dirty region x should start at 0", 0, dirty.x)
+            assertTrue("dirty region width should cover at least component width", dirty.width >= 500)
+            assertTrue("dirty region y should be inflated with pad", dirty.y <= maxOf(0, caretY - pad))
+            assertTrue("dirty region height should cover caret plus pad", dirty.y + dirty.height >= caretY + lineHeight + pad)
+        } finally {
+            factory.releaseEditor(editor)
+        }
+    }
+
     private fun paint(root: JRootPane): BufferedImage {
         root.setSize(500, 200)
         layout(root)
