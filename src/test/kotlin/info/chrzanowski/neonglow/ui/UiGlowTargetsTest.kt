@@ -18,7 +18,6 @@ import java.awt.Dimension
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
 import javax.swing.JLabel
-import javax.swing.JPanel
 import javax.swing.JRootPane
 
 class UiGlowTargetsTest : BasePlatformTestCase() {
@@ -33,14 +32,13 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
             it.foreground = Color.CYAN
             it.preferredSize = Dimension(800, 60)
         }
-        root.contentPane = JPanel(BorderLayout()).also {
+        root.contentPane = com.intellij.ui.components.JBPanel<com.intellij.ui.components.JBPanel<*>>(BorderLayout()).also {
             it.add(label, BorderLayout.NORTH)
             it.add(editor.component, BorderLayout.CENTER)
         }
         root.setSize(800, 400)
         val glow = UiGlow(GlyphGlowAtlas(), { settings.state }, { false })
         try {
-            glow.installRoot(root)
             val plain = paint(root)
             for (editorText in listOf(false, true)) for (uiText in listOf(false, true)) {
                 settings.loadState(GlowSettings.State(editorText = editorText, uiText = uiText, icons = false,
@@ -81,7 +79,7 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
         scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(source, Color(0x262335), null, null, 0))
         editor.colorsScheme = scheme
         val root = JRootPane()
-        root.contentPane = JPanel(BorderLayout()).also {
+        root.contentPane = com.intellij.ui.components.JBPanel<com.intellij.ui.components.JBPanel<*>>(BorderLayout()).also {
             it.background = Color(0x262335)
             it.add(JLabel("Neon label").also { label ->
                 label.foreground = source
@@ -92,7 +90,6 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
         root.setSize(800, 400)
         val glow = UiGlow(GlyphGlowAtlas(), { settings.state }, { false })
         try {
-            glow.installRoot(root)
             settings.loadState(GlowSettings.State(synthwaveStyle = true, brightness = 0.45f, intensity = 1f, icons = false))
             val image = paint(root)
             val core = Color(0xfdfdfd).rgb
@@ -118,7 +115,7 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
             scheme.setAttributes(HighlighterColors.TEXT, TextAttributes(source, if (editorDark) Color(0x2b2b2b) else Color.WHITE, null, null, 0))
             editor.colorsScheme = scheme
             val root = JRootPane()
-            root.contentPane = JPanel(BorderLayout()).also {
+            root.contentPane = com.intellij.ui.components.JBPanel<com.intellij.ui.components.JBPanel<*>>(BorderLayout()).also {
                 it.background = if (uiDark) Color(0x2b2b2b) else Color.WHITE
                 it.add(JLabel("Adaptive label").also { label ->
                     label.foreground = source
@@ -129,7 +126,6 @@ class UiGlowTargetsTest : BasePlatformTestCase() {
             root.setSize(800, 400)
             val glow = UiGlow(GlyphGlowAtlas(), { settings.state }, { false })
             try {
-                glow.installRoot(root)
                 val image = paint(root)
                 val bright = Color(SynthwaveTextStyle.rule(source.rgb, 0x2b2b2b)!!.foregroundRgb).rgb
                 fun hasCore(core: Int, from: Int, to: Int): Boolean =

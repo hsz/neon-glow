@@ -9,7 +9,6 @@ import info.chrzanowski.neonglow.settings.GlowSettings
 import java.awt.Color
 import java.awt.image.BufferedImage
 import javax.swing.JLabel
-import javax.swing.JPanel
 import javax.swing.JRootPane
 
 class UiIconGlowTest : BasePlatformTestCase() {
@@ -18,7 +17,7 @@ class UiIconGlowTest : BasePlatformTestCase() {
         val state = GlowSettings.State(enabled = false)
         val images = ImageGlowAtlas()
         val root = JRootPane()
-        val panel = JPanel(null)
+        val panel = com.intellij.ui.components.JBPanel<com.intellij.ui.components.JBPanel<*>>(null)
         panel.background = Color.BLACK
         IconLoader.activate()
         val icon = IconLoader.getIcon("/nodes/folder.svg", AllIcons::class.java)
@@ -28,7 +27,6 @@ class UiIconGlowTest : BasePlatformTestCase() {
         root.setSize(100, 100)
         val glow = UiGlow(GlyphGlowAtlas(), { state }, { false }, imageAtlas = images)
         try {
-            glow.installRoot(root)
             for (scale in listOf(1.0, 2.0)) {
                 fun paintRoot(): BufferedImage {
                     fun layout(component: java.awt.Container) {

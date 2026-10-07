@@ -14,12 +14,7 @@ import java.awt.Image
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.awt.image.RescaleOp
-import javax.swing.ImageIcon
-import javax.swing.JLabel
-import javax.swing.JMenuItem
-import javax.swing.JPanel
-import javax.swing.JRootPane
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 class IconGlowGraphics2DTest {
 
@@ -137,7 +132,7 @@ class IconGlowGraphics2DTest {
     @Test
     fun `label and menu icons receive glow through the installed UI hook`() = onEdt {
         val root = JRootPane()
-        val panel = JPanel(null)
+        val panel = com.intellij.ui.components.JBPanel<com.intellij.ui.components.JBPanel<*>>(null)
         panel.background = Color.BLACK
         panel.add(JLabel(ImageIcon(icon())).also { it.setBounds(30, 30, 60, 40) })
         panel.add(JMenuItem(ImageIcon(icon())).also { it.setBounds(30, 90, 60, 40) })
@@ -146,7 +141,6 @@ class IconGlowGraphics2DTest {
         val images = ImageGlowAtlas()
         val glow = UiGlow(GlyphGlowAtlas(), { state }, { false }, imageAtlas = images)
         try {
-            glow.installRoot(root)
             fun render(): BufferedImage {
                 fun layout(component: java.awt.Container) {
                     if (component is javax.swing.JComponent) component.isDoubleBuffered = false

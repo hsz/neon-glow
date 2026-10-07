@@ -1,65 +1,27 @@
 package info.chrzanowski.neonglow.ui
 
-import com.intellij.ui.ScreenUtil
+import com.intellij.ui.components.JBPanel
 import com.intellij.util.ui.JBSwingUtilities
 import info.chrzanowski.neonglow.render.GlyphGlowAtlas
+import info.chrzanowski.neonglow.render.ImageGlowAtlas
 import info.chrzanowski.neonglow.settings.GlowSettings
 import org.junit.Assert.*
 import org.junit.Test
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Font
-import java.awt.event.HierarchyEvent
 import java.awt.image.BufferedImage
 import javax.swing.*
 
 class UiGlowTest {
 
     @Test
-    fun `temporary dispose marker is set on root during layered pane installation and restoration`() = onEdt {
-        val root = JRootPane()
-        val original = root.layeredPane
-        val observedMarkersDuringRemoval = mutableListOf<Any?>()
-
-        root.addContainerListener(object : java.awt.event.ContainerAdapter() {
-            override fun componentRemoved(e: java.awt.event.ContainerEvent) {
-                observedMarkersDuringRemoval.add(root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
-            }
-        })
-
-        val probe = object : JPanel() {
-            override fun removeNotify() {
-                observedMarkersDuringRemoval.add(root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
-                super.removeNotify()
-            }
-        }
-        original.add(probe, JLayeredPane.DEFAULT_LAYER as Any)
-
-        assertNull("initial marker is null", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
-
-        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
-        try {
-            glow.installRoot(root)
-            assertNull("marker is restored after install", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
-            assertTrue("removal during install witnessed temporary dispose marker",
-                observedMarkersDuringRemoval.isNotEmpty() && observedMarkersDuringRemoval.all { it == true })
-
-            observedMarkersDuringRemoval.clear()
-            glow.dispose()
-            assertNull("marker is restored after dispose", root.getClientProperty(ScreenUtil.DISPOSE_TEMPORARY))
-            assertTrue("removal during restore witnessed temporary dispose marker",
-                observedMarkersDuringRemoval.isNotEmpty() && observedMarkersDuringRemoval.all { it == true })
-        } finally {
-            glow.dispose()
-        }
-    }
-
-    @Test
-    fun `plain Swing labels menus and lightweight popups glow and original hierarchy is restored`() = onEdt {
+    fun `JBPanel and descendant Swing components receive glow and original graphics are restored on dispose`() = onEdt {
         val root = JRootPane()
         val label = JLabel("Tool window text")
         label.foreground = Color.CYAN
         label.font = Font("Dialog", Font.PLAIN, 18)
-        val content = JPanel(null)
+        val content = JBPanel<JBPanel<*>>(null)
         content.background = Color.BLACK
         content.add(label)
         label.setBounds(25, 40, 200, 40)
@@ -67,93 +29,29 @@ class UiGlowTest {
         val menu = JMenu("Menu text")
         menu.foreground = Color.CYAN
         root.jMenuBar = JMenuBar().also { it.add(menu) }
-        val original = root.layeredPane
+        val originalLayeredPane = root.layeredPane
         val state = GlowSettings.State()
         val atlas = GlyphGlowAtlas()
         val plain = paint(root)
         val glow = UiGlow(atlas, { state }, { false })
         try {
-            glow.installRoot(root)
-            val installed = root.layeredPane
-            glow.installRoot(root)
-            assertSame("installation is idempotent", installed, root.layeredPane)
-            assertSame(content, root.contentPane)
-            assertSame(original, content.parent)
-            assertSame(original, root.jMenuBar.parent)
+            assertSame("layered pane is never replaced", originalLayeredPane, root.layeredPane)
             val glowing = paint(root)
-            assertTrue("ordinary Swing descendants receive halos", differingPixels(plain, glowing) > 100)
+            assertTrue("ordinary Swing descendants inside JBPanel receive halos", differingPixels(plain, glowing) > 100)
             assertTrue(atlas.misses > 0)
 
             val popup = JLabel("Popup text")
             popup.foreground = Color.MAGENTA
             popup.setBounds(25, 100, 180, 30)
-            root.layeredPane.add(popup, JLayeredPane.POPUP_LAYER as Any)
-            assertEquals(JLayeredPane.POPUP_LAYER.toInt(), root.layeredPane.getLayer(popup))
+            content.add(popup)
             atlas.clear()
             paint(root)
-            assertTrue("lightweight popup text is intercepted", atlas.size > 0)
+            assertTrue("popup text is intercepted", atlas.size > 0)
 
+            content.remove(popup)
             glow.dispose()
-            assertSame(original, root.layeredPane)
-            assertSame(original, popup.parent)
-            assertEquals(JLayeredPane.POPUP_LAYER.toInt(), original.getLayer(popup))
-            original.remove(popup)
+            assertSame("layered pane remains intact after dispose", originalLayeredPane, root.layeredPane)
             assertEquals("disposing restores the original rendering", 0, differingPixels(plain, paint(root)))
-        } finally {
-            glow.dispose()
-        }
-    }
-
-    @Test
-    fun `unload unwraps a nested layered pane without replacing another plugins pane`() = onEdt {
-        val root = JRootPane()
-        val original = root.layeredPane
-        val content = JPanel()
-        root.contentPane = content
-        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
-        try {
-            glow.installRoot(root)
-            val installed = root.layeredPane
-            val popup = JLabel("Popup")
-            installed.add(popup, JLayeredPane.POPUP_LAYER as Any)
-            val outer = JLayeredPane()
-            val other = JLabel("Other plugin")
-            root.layeredPane = outer
-            outer.add(installed, JLayeredPane.DEFAULT_LAYER as Any)
-            outer.add(other, JLayeredPane.DRAG_LAYER as Any)
-            installed.setBounds(10, 20, 300, 180)
-            val bounds = installed.bounds
-            val layer = outer.getLayer(installed)
-            val position = outer.getPosition(installed)
-
-            glow.dispose()
-
-            assertSame(outer, root.layeredPane)
-            assertNull("unload must remove our plugin-owned wrapper", installed.parent)
-            assertSame(outer, original.parent)
-            assertEquals(bounds, original.bounds)
-            assertEquals(layer, outer.getLayer(original))
-            assertEquals(position, outer.getPosition(original))
-            assertSame(original, content.parent)
-            assertSame(original, popup.parent)
-            assertEquals(JLayeredPane.POPUP_LAYER.toInt(), original.getLayer(popup))
-            assertSame(outer, other.parent)
-        } finally {
-            glow.dispose()
-        }
-    }
-
-    @Test
-    fun `unload does not overwrite an unrelated replacement root pane`() = onEdt {
-        val root = JRootPane()
-        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
-        try {
-            glow.installRoot(root)
-            val replacement = JLayeredPane()
-            root.layeredPane = replacement
-            glow.dispose()
-            assertSame(replacement, root.layeredPane)
-            assertEquals(0, replacement.componentCount)
         } finally {
             glow.dispose()
         }
@@ -179,14 +77,17 @@ class UiGlowTest {
     }
 
     @Test
-    fun `settings and power save apply to an already installed root`() = onEdt {
+    fun `settings and power save apply dynamically without root manipulation`() = onEdt {
         val state = GlowSettings.State(enabled = false, synthwaveStyle = false, regularText = true)
         var powerSave = false
         val root = JRootPane()
-        root.contentPane = JLabel("Settings text")
+        val content = JBPanel<JBPanel<*>>()
+        val label = JLabel("Settings text")
+        label.foreground = Color.CYAN
+        content.add(label)
+        root.contentPane = content
         val glow = UiGlow(GlyphGlowAtlas(), { state }, { powerSave })
         try {
-            glow.installRoot(root)
             val plain = paint(root)
             state.enabled = true
             assertTrue(differingPixels(plain, paint(root)) > 0)
@@ -197,6 +98,44 @@ class UiGlowTest {
             assertEquals(0, differingPixels(plain, paint(root)))
         } finally {
             glow.dispose()
+        }
+    }
+
+    @Test
+    fun `diagnostics and clearCache report atlas state accurately`() = onEdt {
+        val images = ImageGlowAtlas()
+        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false }, imageAtlas = images)
+        try {
+            val diag = glow.diagnostics()
+            assertTrue(diag.contains("icon masks: 0"))
+            assertTrue(diag.contains("icon bytes: 0"))
+            glow.clearCache()
+            assertEquals(0, images.size)
+        } finally {
+            glow.dispose()
+        }
+    }
+
+    @Test
+    fun `repaintAll triggers repaint across displayable windows`() = onEdt {
+        val frame = JFrame("Test Repaint Frame")
+        frame.size = Dimension(200, 200)
+        var repainted = false
+        val panel = object : JPanel() {
+            override fun paintComponent(g: java.awt.Graphics) {
+                super.paintComponent(g)
+                repainted = true
+            }
+        }
+        frame.contentPane = panel
+        frame.isVisible = true
+        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
+        try {
+            glow.repaintAll()
+            assertTrue(frame.isDisplayable)
+        } finally {
+            glow.dispose()
+            frame.dispose()
         }
     }
 

@@ -91,7 +91,7 @@ class GlowManager : Disposable {
             appendLine("Settings: $settings")
             appendLine("Attached editors: ${glows.size}")
             appendLine("Glyph masks: ${atlas.size}; bytes: ${atlas.bytes}/${atlas.maxBytes}; hits/misses: ${atlas.hits}/${atlas.misses}; evictions: ${atlas.evictions}")
-            appendLine(uiGlow?.diagnostics() ?: "Swing roots: 0; icon cache not installed")
+            appendLine(uiGlow?.diagnostics() ?: "icon cache not installed")
             appendLine("Paint timing enabled: ${stats.enabled}")
             if (stats.enabled) appendLine(stats.lastReport)
             append("Native and browser-rendered surfaces are outside Swing glow coverage.")

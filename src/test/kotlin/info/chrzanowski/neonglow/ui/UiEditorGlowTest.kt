@@ -25,7 +25,6 @@ class UiEditorGlowTest : BasePlatformTestCase() {
         root.contentPane = editor.component
         val glow = UiGlow(manager.atlas, { settings.state }, { false })
         try {
-            glow.installRoot(root)
             val plain = paint(root)
             settings.state.enabled = true
             manager.atlas.clear()
@@ -57,7 +56,6 @@ class UiEditorGlowTest : BasePlatformTestCase() {
         val glow = UiGlow(manager.atlas, { settings.state }, { false })
         try {
             assertNull(EditorGlow.of(editor))
-            glow.installRoot(root)
             manager.atlas.clear()
             paint(root)
             assertTrue("console text is no longer excluded", manager.atlas.size > 0)
@@ -80,7 +78,6 @@ class UiEditorGlowTest : BasePlatformTestCase() {
                 try {
                     val root = JRootPane()
                     root.contentPane = editor.component
-                    glow.installRoot(root)
                     settings.loadState(GlowSettings.State(enabled = false))
                     val plain = paint(root)
                     settings.loadState(GlowSettings.State(editorText = false, icons = false,

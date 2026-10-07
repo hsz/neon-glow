@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Prevent IDE instability and window hierarchy corruption ([IJPL-257899](https://youtrack.jetbrains.com/issue/IJPL-257899)) by replacing invasive root layered-pane interception with platform global graphics transforms.
+- Eliminate spurious component removal and lifecycle notifications during window creation and disposal.
+
 ## [0.3.1] - 2026-10-07
 
 ### Fixed

@@ -90,7 +90,6 @@ class GlowEditorPreviewTest : BasePlatformTestCase() {
                 live.enabled = false
                 val draftOff = paint(root)
                 live.enabled = true
-                glow.installRoot(root)
                 assertTrue("Enabled live glow cannot override disabled draft", draftOff.contentEquals(paint(root)))
                 preview.update(preview.previewState.copy(enabled = true))
                 val draftOn = paint(root)
