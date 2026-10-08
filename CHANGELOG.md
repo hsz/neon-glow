@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add error handler integration for JetBrains Marketplace error reporting
+
 ## [0.3.4] - 2026-10-08
 
 ### Fixed

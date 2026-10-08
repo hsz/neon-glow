@@ -50,6 +50,7 @@
         <themeProvider id="info.chrzanowski.neonglow.theme.midnight" path="/themes/neon-glow-midnight.theme.json"/>
         <themeProvider id="info.chrzanowski.neonglow.theme.accessible" path="/themes/neon-glow-accessible.theme.json"/>
         <editorFactoryListener implementation="info.chrzanowski.neonglow.editor.GlowEditorFactoryListener"/>
+        <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
         <postStartupActivity implementation="info.chrzanowski.neonglow.ui.GlowStartupActivity"/>
 
         <applicationConfigurable
