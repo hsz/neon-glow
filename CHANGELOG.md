@@ -7,9 +7,24 @@
 ### Fixed
 
 - Prevent `Access is allowed from Event Dispatch Thread (EDT) only` threading exceptions during background caret animations and editor repaints.
+
+## [0.3.2] - 2026-10-08
+
+### Fixed
+
 - Fix neon text glow and styles disappearing near the cursor during editor caret movement, selection changes, and partial repaints.
 - Prevent IDE instability and window hierarchy corruption ([IJPL-257899](https://youtrack.jetbrains.com/issue/IJPL-257899)) by replacing invasive root layered-pane interception with platform global graphics transforms.
 - Eliminate spurious component removal and lifecycle notifications during window creation and disposal.
+
+### Added
+
+- Add "Reset to Defaults" button in settings to restore default glow settings without changing theme.
+- Add numeric input fields for slider controls with bidirectional synchronization and input validation.
+- Visual screenshots and demo file showcasing Neon Glow themes in README.
+
+### Changed
+
+- Preserve user active theme and color scheme on dynamic install and startup.
 
 ## [0.3.1] - 2026-10-07
 
@@ -62,8 +77,9 @@
 - Glow follows theme and colour scheme changes, pauses in Power Save mode, and applies without a restart.
 - Compatible with IntelliJ Platform 2025.3 and newer.
 
-[Unreleased]: https://github.com/hsz/neon-glow/compare/0.3.1...HEAD
-[0.3.1]: https://github.com/hsz/neon-glow/compare/0.3.0...0.3.1
-[0.3.0]: https://github.com/hsz/neon-glow/compare/0.2.0...0.3.0
-[0.2.0]: https://github.com/hsz/neon-glow/compare/0.1.0...0.2.0
-[0.1.0]: https://github.com/hsz/neon-glow/commits/0.1.0
+[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/hsz/neon-glow/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/hsz/neon-glow/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/hsz/neon-glow/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/hsz/neon-glow/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/hsz/neon-glow/commits/v0.1.0
