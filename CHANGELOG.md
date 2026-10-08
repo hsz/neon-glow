@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix editor, headers and other components flashing (content disappearing for a frame) by no longer replacing Swing's `RepaintManager`; neighbouring-line halos during partial editor repaints are now supplied by the editor highlighter instead.
+
 ## [0.3.3] - 2026-10-08
 
 ### Fixed

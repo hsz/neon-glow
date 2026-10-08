@@ -87,9 +87,20 @@ A halo spills `3σ` beyond its glyph, into the neighbouring lines. Two repaint p
 1. **Into the clip**: the renderer inflates the clip by `GlowHighlighterRenderer.repaintInflation(radius)`
    (`ceil(1.5 · radius) + 1` user px, scale-independent) before mapping it to lines, so halos of lines just outside
    the clip are redrawn where they overlap it. Painting outside the real clip is discarded by the graphics clip.
+   When the IDE-wide hook (§10) glows the editor's graphics, the glyphs the editor draws in that pass are already
+   haloed there, and the renderer restricts itself to the visual lines *outside* the clip, which the editor does
+   not draw — through the unwrapped graphics, so nothing is glowed twice. Caret blinks and single-line
+   re-highlights therefore keep the bleed of their neighbours.
 2. **Out of the edited line**: the editor repaints exactly the changed lines; `EditorGlow`'s bulk-aware
-   `DocumentListener` additionally repaints the changed visual-line range inflated by the same padding, full width,
-   so stale halo fragments never survive on adjacent lines. Bulk updates repaint the whole component once at the end.
+   `DocumentListener` (and its caret/selection listeners) additionally repaints the changed visual-line range
+   inflated by the same padding, full width, so stale halo fragments never survive on adjacent lines. Bulk updates
+   repaint the whole component once at the end.
+
+Swing's `RepaintManager` is **not** replaced to inflate dirty regions. A delegating wrapper is constructed through
+the public `RepaintManager()` constructor, which disables the per-window `BufferStrategy` path the IDE paints
+with; `JComponent.paint`/`paintImmediately` then route through the wrapper's plain double buffer while the
+original manager still schedules the dirty regions. The two disagree about buffers and painting state, partial
+repaints reach the screen unsynchronised, and the editor, tool-window headers and tabs blank out for a frame.
 
 ## 6. Measured cost
 

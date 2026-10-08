@@ -26,6 +26,7 @@ import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.font.FontRenderContext
 import java.awt.geom.AffineTransform
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -38,6 +39,12 @@ import kotlin.math.roundToInt
  * Each non-blank, unfolded token is split into single-line, tab-free segments, laid out by [TokenLayout] and
  * blitted glyph by glyph from the [GlyphGlowAtlas] at integer device-pixel positions. Everything outside the
  * real clip is discarded by the graphics clip, so over-iteration is harmless.
+ *
+ * When the IDE-wide hook ([GlowGraphics2D]) already glows the editor's graphics, every glyph the editor draws in
+ * this pass gets its halo there. The editor only draws the visual lines intersecting the clip, though, so a partial
+ * repaint (caret blink, a re-highlighted line) would lose the halos spilling in from the neighbouring lines. In that
+ * mode the renderer paints exactly those: glyphs on visual lines outside the clip, through the unwrapped graphics so
+ * nothing is glowed twice. This keeps partial repaints consistent without touching Swing's `RepaintManager`.
  *
  * HiDPI: masks are device-pixel images. On a Retina surface `Graphics2D.getTransform()` hides the device scale
  * (it lives in the surface), on an offscreen image it is an explicit `scale(2)`; [JBUIScale.sysScale] covers both.
@@ -58,6 +65,10 @@ class GlowHighlighterRenderer(
     private var editorContext: FontRenderContext? = null
     private var workBudget = GlowWorkBudget()
 
+    /** User-space y range `[skipTop, skipBottom)` of the visual lines the editor draws itself in this pass. */
+    private var skipTop = 0
+    private var skipBottom = 0
+
     /** Glyphs blitted by the last [paint] (tests, statistics). */
     var lastGlyphCount: Int = 0
         private set
@@ -75,32 +86,46 @@ class GlowHighlighterRenderer(
         val state = settings.state
         if (!state.enabled || !state.editorText || state.editorGlowStrength <= 0f || state.brightness <= 0f || PowerSaveMode.isEnabled()) return
         if (!state.regularText && !state.synthwaveStyle) return
-        if (g is Graphics2D && GlowGraphics2D.isGlowing(g)) return
         val source = g as? Graphics2D ?: return
         val alpha = source.composite as? AlphaComposite ?: return
         if (alpha.rule != AlphaComposite.SRC_OVER || alpha.alpha == 0f) return
-        val halo = source.create() as Graphics2D
+        val hooked = GlowGraphics2D.isGlowing(source)
+        // Masks are plain images; never let the hook treat them as icons and halo the halo.
+        val halo = GlowGraphics2D.withoutGlow(source).create() as Graphics2D
         try {
             halo.composite = alpha.derive(alpha.alpha * state.editorGlowStrength)
             if (!stats.enabled) {
-                paintGlow(editor, state, halo)
+                paintGlow(editor, state, halo, hooked)
                 return
             }
             val start = System.nanoTime()
-            paintGlow(editor, state, halo)
+            paintGlow(editor, state, halo, hooked)
             stats.recordPaint((System.nanoTime() - start) / 1_000, lastGlyphCount, lastFallbackSegments, atlas)
         } finally {
             halo.dispose()
         }
     }
 
-    private fun paintGlow(editor: Editor, state: GlowSettings.State, g: Graphics) {
+    /**
+     * [onlyOutsideClip] restricts painting to glyphs on visual lines the editor does not draw in this pass (see the
+     * class comment); otherwise every glyph of the inflated clip range is painted.
+     */
+    private fun paintGlow(editor: Editor, state: GlowSettings.State, g: Graphics, onlyOutsideClip: Boolean) {
         val editorEx = editor as? EditorEx ?: return
         val document = editor.document
         if (document.textLength == 0) return
         val g2 = g as Graphics2D
         g2.getClipBounds(clip)
         if (clip.isEmpty) return
+
+        if (onlyOutsideClip) {
+            // Same visual-line range as EditorPainter: yToVisualLine(clip.y) .. yToVisualLine(clip.maxY - 1).
+            skipTop = editor.visualLineToY(editor.yToVisualLine(clip.y))
+            skipBottom = editor.visualLineToY(editor.yToVisualLine(clip.y + clip.height - 1) + 1)
+        } else {
+            skipTop = 0
+            skipBottom = 0
+        }
 
         val radius = state.radiusPx
         val sysScale = JBUIScale.sysScale(g2).takeIf { it > 0f } ?: 1f
@@ -113,6 +138,30 @@ class GlowHighlighterRenderer(
         if (startLine >= lineCount) return
         point.setLocation(0, clip.y + clip.height)
         val endLine = min(editor.xyToLogicalPosition(point).line, lineCount - 1)
+
+        if (!onlyOutsideClip) {
+            paintLines(editorEx, state, g2, sysScale, radius, startLine, endLine)
+            return
+        }
+        // Walk only the logical lines above and below the drawn visual lines; the boundary lines stay included
+        // because a soft-wrapped line may be drawn only partially, and the per-glyph check drops the drawn part.
+        point.setLocation(0, skipTop)
+        val drawnStart = editor.xyToLogicalPosition(point).line
+        point.setLocation(0, skipBottom - 1)
+        val drawnEnd = editor.xyToLogicalPosition(point).line
+        if (drawnEnd <= drawnStart) {
+            paintLines(editorEx, state, g2, sysScale, radius, startLine, endLine)
+            return
+        }
+        if (drawnStart >= startLine) paintLines(editorEx, state, g2, sysScale, radius, startLine, min(drawnStart, endLine))
+        if (drawnEnd <= endLine) paintLines(editorEx, state, g2, sysScale, radius, max(drawnEnd, startLine), endLine)
+    }
+
+    private fun paintLines(
+        editor: EditorEx, state: GlowSettings.State, g2: Graphics2D, sysScale: Float, radius: Float,
+        startLine: Int, endLine: Int,
+    ) {
+        val document = editor.document
         val startOffset = document.getLineStartOffset(startLine)
         val endOffset = document.getLineEndOffset(endLine)
         if (endOffset <= startOffset) return
@@ -130,7 +179,7 @@ class GlowHighlighterRenderer(
         val alpha = g2.composite as AlphaComposite
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
         try {
-            val iterator = editorEx.highlighter.createIterator(startOffset)
+            val iterator = editor.highlighter.createIterator(startOffset)
             while (!iterator.atEnd() && iterator.start < endOffset) {
                 val tokenStart = maxOf(iterator.start, startOffset)
                 val tokenEnd = min(iterator.end, endOffset)
@@ -203,6 +252,7 @@ class GlowHighlighterRenderer(
         var family = ""
         for (i in 0 until count) {
             if (blank[i]) continue
+            if (ys[i] >= skipTop && ys[i] < skipBottom) continue
             val glyphFont = fonts[i]!!
             if (glyphFont !== keyFont) {
                 keyFont = glyphFont

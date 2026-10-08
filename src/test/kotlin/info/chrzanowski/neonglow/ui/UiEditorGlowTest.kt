@@ -8,9 +8,12 @@ import info.chrzanowski.neonglow.GlowManager
 import info.chrzanowski.neonglow.editor.EditorGlow
 import info.chrzanowski.neonglow.settings.GlowSettings
 import java.awt.Container
+import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
 import javax.swing.JRootPane
+import javax.swing.RepaintManager
+import javax.swing.SwingUtilities
 
 class UiEditorGlowTest : BasePlatformTestCase() {
 
@@ -98,78 +101,62 @@ class UiEditorGlowTest : BasePlatformTestCase() {
         }
     }
 
-    fun `test GlowRepaintManager inflates small editor dirty regions for caret repaints`() {
+    fun `test the UI hook leaves the Swing RepaintManager untouched`() {
         val settings = GlowSettings.getInstance()
-        val factory = EditorFactory.getInstance()
-        val editor = factory.createEditor(factory.createDocument("line 1\nline 2\nline 3"), project, EditorKind.MAIN_EDITOR) as EditorEx
+        val manager = GlowManager.getInstance()
+        val before = RepaintManager.currentManager(null)
+        val glow = UiGlow(manager.atlas, { settings.state }, { false })
         try {
-            val content = editor.contentComponent
-            content.setSize(500, 200)
-            val dirtyRegions = mutableListOf<java.awt.Rectangle>()
-            val dummyDelegate = object : javax.swing.RepaintManager() {
-                override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
-                    dirtyRegions += java.awt.Rectangle(x, y, w, h)
-                }
-            }
-            val rm = GlowRepaintManager(dummyDelegate) { settings.state }
-            val line1Y = editor.visualLineToY(1)
-            val lineHeight = editor.lineHeight
-            rm.addDirtyRegion(content, 50, line1Y, 2, lineHeight)
-            val pad = info.chrzanowski.neonglow.editor.GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx, settings.state.synthwaveStyle)
-            val dirty = dirtyRegions.single()
-            assertEquals("dirty region x should start at 0", 0, dirty.x)
-            assertTrue("dirty region width should cover at least component width", dirty.width >= 500)
-            assertTrue("dirty region y should be inflated with pad", dirty.y <= maxOf(0, line1Y - pad))
-            assertTrue("dirty region height should cover line plus pad", dirty.y + dirty.height >= editor.visualLineToY(2) + pad)
+            assertSame("replacing the RepaintManager desynchronises window buffers and makes components flash",
+                before, RepaintManager.currentManager(null))
         } finally {
+            glow.dispose()
+        }
+        assertSame(before, RepaintManager.currentManager(null))
+    }
+
+    fun `test partial editor repaints get the neighbouring halos from the highlighter under the UI hook`() {
+        val settings = GlowSettings.getInstance()
+        val manager = GlowManager.getInstance()
+        settings.loadState(GlowSettings.State(synthwaveStyle = false, regularText = true, radiusPx = 6f))
+        val factory = EditorFactory.getInstance()
+        val editor = factory.createEditor(factory.createDocument("line one\nline two\nline three"), project,
+            EditorKind.MAIN_EDITOR) as EditorEx
+        val root = JRootPane()
+        root.contentPane = editor.component
+        val glow = UiGlow(manager.atlas, { settings.state }, { false })
+        try {
+            val renderer = EditorGlow.of(editor)!!.renderer
+            root.setSize(500, 200)
+            layout(root)
+            val content = editor.contentComponent
+            val caretColumn = SwingUtilities.convertRectangle(
+                content, Rectangle(content.width / 2, editor.visualLineToY(1), 4, editor.lineHeight), root)
+
+            paint(root, caretColumn)
+            assertTrue("the hook keeps glowing the drawn line itself", manager.atlas.size > 0)
+            assertEquals("the highlighter adds the halos of the two lines the editor did not draw",
+                "line one".count { !it.isWhitespace() } + "line three".count { !it.isWhitespace() },
+                renderer.lastGlyphCount)
+
+            paint(root)
+            assertEquals("a full repaint is glowed by the hook alone", 0, renderer.lastGlyphCount)
+        } finally {
+            glow.dispose()
             factory.releaseEditor(editor)
+            settings.loadState(GlowSettings.State())
+            manager.atlas.clear()
         }
     }
 
-    fun `test GlowRepaintManager inflates dirty regions from background thread without EDT assertion`() {
-        val settings = GlowSettings.getInstance()
-        val factory = EditorFactory.getInstance()
-        val editor = factory.createEditor(factory.createDocument("line 1\nline 2\nline 3"), project, EditorKind.MAIN_EDITOR) as EditorEx
-        try {
-            val content = editor.contentComponent
-            content.setSize(500, 200)
-            val dirtyRegions = java.util.Collections.synchronizedList(mutableListOf<java.awt.Rectangle>())
-            val dummyDelegate = object : javax.swing.RepaintManager() {
-                override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
-                    dirtyRegions += java.awt.Rectangle(x, y, w, h)
-                }
-            }
-            val rm = GlowRepaintManager(dummyDelegate) { settings.state }
-            val caretY = 30
-            val lineHeight = 20
-            var error: Throwable? = null
-            val thread = Thread {
-                try {
-                    rm.addDirtyRegion(content, 50, caretY, 2, lineHeight)
-                } catch (t: Throwable) {
-                    error = t
-                }
-            }
-            thread.start()
-            thread.join()
-            assertNull("addDirtyRegion from background thread must not throw EDT assertion", error)
-            val pad = info.chrzanowski.neonglow.editor.GlowHighlighterRenderer.repaintInflation(settings.state.radiusPx, settings.state.synthwaveStyle)
-            val dirty = dirtyRegions.single()
-            assertEquals("dirty region x should start at 0", 0, dirty.x)
-            assertTrue("dirty region width should cover at least component width", dirty.width >= 500)
-            assertTrue("dirty region y should be inflated with pad", dirty.y <= maxOf(0, caretY - pad))
-            assertTrue("dirty region height should cover caret plus pad", dirty.y + dirty.height >= caretY + lineHeight + pad)
-        } finally {
-            factory.releaseEditor(editor)
-        }
-    }
-
-    private fun paint(root: JRootPane): BufferedImage {
+    /** Paints [root] at 500×200 into a fresh image, optionally clipped to [clip] (root coordinates). */
+    private fun paint(root: JRootPane, clip: Rectangle? = null): BufferedImage {
         root.setSize(500, 200)
         layout(root)
         val image = BufferedImage(500, 200, BufferedImage.TYPE_INT_ARGB)
         val g = image.createGraphics()
         try {
+            if (clip != null) g.clip = clip
             root.paint(g)
         } finally {
             g.dispose()
