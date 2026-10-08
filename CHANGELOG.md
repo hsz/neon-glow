@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-10-08
+
 ### Fixed
 
 - Fix editor, headers and other components flashing (content disappearing for a frame) by no longer replacing Swing's `RepaintManager`; neighbouring-line halos during partial editor repaints are now supplied by the editor highlighter instead.
@@ -83,7 +85,8 @@
 - Glow follows theme and colour scheme changes, pauses in Power Save mode, and applies without a restart.
 - Compatible with IntelliJ Platform 2025.3 and newer.
 
-[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/hsz/neon-glow/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/hsz/neon-glow/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/hsz/neon-glow/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/hsz/neon-glow/compare/v0.3.0...v0.3.1
