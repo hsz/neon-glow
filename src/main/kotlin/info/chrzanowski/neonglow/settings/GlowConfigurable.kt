@@ -9,6 +9,7 @@ import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindIntText
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindValue
@@ -61,7 +62,7 @@ class GlowConfigurable internal constructor(
                 browserLink(NeonGlowBundle.message("settings.support.github"), SPONSOR_GITHUB_URL)
                 browserLink(NeonGlowBundle.message("settings.support.kofi"), SPONSOR_KOFI_URL)
                 browserLink(NeonGlowBundle.message("settings.support.paypal"), SPONSOR_PAYPAL_URL)
-            }.bottomGap(BottomGap.SMALL)
+            }.layout(RowLayout.INDEPENDENT).bottomGap(BottomGap.SMALL)
             row {
                 checkBox(NeonGlowBundle.message("settings.enabled"))
                     .bindSelected({ currentDraft().enabled }, { currentDraft().enabled = it })
@@ -70,7 +71,7 @@ class GlowConfigurable internal constructor(
                         addItemListener { editDraft { enabled = isSelected } }
                     }
                     .comment(NeonGlowBundle.message("settings.enabled.comment"))
-            }
+            }.layout(RowLayout.INDEPENDENT)
             group(NeonGlowBundle.message("settings.targets")) {
                 row {
                     checkBox(NeonGlowBundle.message("settings.editorText"))
@@ -148,7 +149,7 @@ class GlowConfigurable internal constructor(
                             addItemListener { editDraft { synthwaveStyle = isSelected } }
                         }
                         .comment(NeonGlowBundle.message("settings.synthwaveStyle.comment"))
-                }
+                }.layout(RowLayout.INDEPENDENT)
                 row(NeonGlowBundle.message("settings.radius")) {
                     labelledSlider(
                         "radiusPx", MIN_RADIUS, MAX_RADIUS,
@@ -176,15 +177,15 @@ class GlowConfigurable internal constructor(
                         addItemListener { editDraft { performanceMode = isSelected } }
                     }
                     .comment(NeonGlowBundle.message("settings.performanceMode.comment"))
-            }
+            }.layout(RowLayout.INDEPENDENT)
             row {
                 comment(NeonGlowBundle.message("settings.powerSave.comment"))
-            }
+            }.layout(RowLayout.INDEPENDENT)
             row {
                 button(NeonGlowBundle.message("settings.resetToDefaults")) { resetToDefaults() }
                     .applyToComponent { name = "resetToDefaults" }
                     .comment(NeonGlowBundle.message("settings.resetToDefaults.comment"))
-            }
+            }.layout(RowLayout.INDEPENDENT)
         }
         return panel!!
     }
