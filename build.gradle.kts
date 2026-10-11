@@ -1,3 +1,4 @@
+import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -46,5 +47,16 @@ tasks {
     runIde {
         // Periodic paint-cost / atlas statistics in the sandbox idea.log (see GlowStats).
         jvmArgs("-Dide.neon.glow.debug=true")
+    }
+
+    patchPluginXml {
+        // The IntelliJ Platform Gradle Plugin already renders the current version section of CHANGELOG.md into the change notes
+        // (and wires `pluginRepositoryUrl` into the changelog). The Marketplace "What's New" is read at update time, when the
+        // plugin has just delivered something new, so only a one-line sponsorship nudge is prepended to that default.
+        val nudge = markdownToHTML(
+            "_Neon Glow is free and sponsor-supported. If it brightens your day, consider " +
+                "[♥ sponsoring it on GitHub](https://github.com/sponsors/hsz)._"
+        )
+        changeNotes = intellijPlatform.pluginConfiguration.changeNotes.map { nudge + it }
     }
 }

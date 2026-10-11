@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- A one-time notification inviting to sponsor the plugin, shown only after a couple of weeks of actual use with glow enabled, with `Remind me later` and `Don't show again` options; the plugin stays free
+- The sponsorship links in the settings replaced the support group with a compact row of links at the top of the page
+- `♥ Sponsor Neon Glow` action at the bottom of the `View | Appearance | Neon Glow Tools` menu, opening the GitHub Sponsors page
+- The Marketplace `What's New` notes open with a one-line reminder that the plugin is free and sponsor-supported
+
 ## [0.3.5] - 2026-10-08
 
 ### Added

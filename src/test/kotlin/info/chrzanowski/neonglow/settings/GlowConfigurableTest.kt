@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.ui.components.ActionLink
 import info.chrzanowski.neonglow.NeonGlowBundle
 import info.chrzanowski.neonglow.editor.EditorGlow
 import java.awt.Component
@@ -486,27 +487,20 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         assertFalse(configurable.isModified())
     }
 
-    fun `test support comment is displayed on the settings page`() {
+    fun `test support links are displayed on top of the settings page`() {
         val labels = descendants(component).filterIsInstance<JLabel>().map { it.text }.toList()
-        assertTrue("Support title must be present in settings page", NeonGlowBundle.message("settings.support.title") in labels)
+        assertTrue("Support label must be present in settings page", NeonGlowBundle.message("settings.support") in labels)
 
-        val descriptions = descendants(component).mapNotNull {
-            when (it) {
-                is JLabel -> it.text
-                is JTextComponent -> it.document.getText(0, it.document.length)
-                else -> null
-            }
-        }.map { it.replace(Regex("\\s+"), " ").trim() }.toList()
-        val supportComment = NeonGlowBundle.message("settings.support.comment")
-        assertTrue("Support comment must be present in settings page", descriptions.any { supportComment in it || it.contains("GitHub Sponsors") || it.contains("Ko-fi") })
+        val links = descendants(component).filterIsInstance<ActionLink>().map { it.text }.toList()
+        assertEquals(
+            listOf("settings.support.github", "settings.support.kofi", "settings.support.paypal").map { NeonGlowBundle.message(it) },
+            links,
+        )
 
         val allComponents = descendants(component).toList()
-        val supportIndex = allComponents.indexOfFirst {
-            (it is JLabel && it.text == NeonGlowBundle.message("settings.support.title")) ||
-            (it is JTextComponent && (it.document.getText(0, it.document.length).contains("GitHub Sponsors") || it.document.getText(0, it.document.length).contains("Ko-fi")))
-        }
+        val supportIndex = allComponents.indexOfFirst { it is JLabel && it.text == NeonGlowBundle.message("settings.support") }
         val enabledIndex = allComponents.indexOfFirst { it is JCheckBox && it.name == "enabled" }
-        assertTrue("Support section must appear before enabled checkbox", supportIndex != -1 && enabledIndex != -1 && supportIndex < enabledIndex)
+        assertTrue("Support row must appear before enabled checkbox", supportIndex != -1 && enabledIndex != -1 && supportIndex < enabledIndex)
     }
 
     fun `test reset to defaults updates all controls and applies only when requested`() {

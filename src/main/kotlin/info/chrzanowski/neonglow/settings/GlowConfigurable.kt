@@ -1,12 +1,12 @@
 package info.chrzanowski.neonglow.settings
 
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindIntText
@@ -17,6 +17,9 @@ import com.intellij.ui.dsl.builder.labelTable
 import com.intellij.ui.dsl.builder.panel
 import info.chrzanowski.neonglow.GlowManager
 import info.chrzanowski.neonglow.NeonGlowBundle
+import info.chrzanowski.neonglow.NeonGlowConstants.SPONSOR_GITHUB_URL
+import info.chrzanowski.neonglow.NeonGlowConstants.SPONSOR_KOFI_URL
+import info.chrzanowski.neonglow.NeonGlowConstants.SPONSOR_PAYPAL_URL
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JSlider
@@ -53,12 +56,12 @@ class GlowConfigurable internal constructor(
         draft = settings.state.normalized()
         preview = GlowEditorPreview(currentDraft())
         panel = panel {
-            group(NeonGlowBundle.message("settings.support.title")) {
-                row {
-                    icon(AllIcons.General.Information)
-                    text(NeonGlowBundle.message("settings.support.comment"))
-                }
-            }
+            // A single line of sponsorship links, seen while the glow is actually being configured; GitHub Sponsors first.
+            row(NeonGlowBundle.message("settings.support")) {
+                browserLink(NeonGlowBundle.message("settings.support.github"), SPONSOR_GITHUB_URL)
+                browserLink(NeonGlowBundle.message("settings.support.kofi"), SPONSOR_KOFI_URL)
+                browserLink(NeonGlowBundle.message("settings.support.paypal"), SPONSOR_PAYPAL_URL)
+            }.bottomGap(BottomGap.SMALL)
             row {
                 checkBox(NeonGlowBundle.message("settings.enabled"))
                     .bindSelected({ currentDraft().enabled }, { currentDraft().enabled = it })

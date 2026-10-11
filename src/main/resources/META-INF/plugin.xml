@@ -34,7 +34,11 @@
         The glow is drawn with Java2D and covers Swing text and standard icons. Native menu bars, embedded browsers,
         terminal panes that bypass Swing text drawing and icons painted from vector shapes are not covered.<br><br>
         Inspired by Robb Owen's <a href="https://github.com/robb0wen/synthwave-vscode">SynthWave '84</a> for VS Code,
-        with no affiliation to its author. A personal project, not an official JetBrains product.
+        with no affiliation to its author. A personal project, not an official JetBrains product.<br><br>
+        <b>Free and sponsor-supported.</b>
+        If Neon Glow brightens your day, consider <a href="https://github.com/sponsors/hsz">sponsoring it on GitHub</a>
+        (one-time tips via <a href="https://ko-fi.com/hszanowski">Ko-fi</a> or <a href="https://paypal.me/hsz">PayPal</a> are welcome too).<br>
+        <a href="https://github.com/sponsors/hsz"><img src="https://img.shields.io/github/sponsors/hsz?style=for-the-badge&logo=githubsponsors&label=Sponsor" alt="Sponsor hsz on GitHub" /></a>
         ]]></description>
 
     <!-- Product and plugin compatibility requirements.
@@ -52,6 +56,8 @@
         <editorFactoryListener implementation="info.chrzanowski.neonglow.editor.GlowEditorFactoryListener"/>
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
         <postStartupActivity implementation="info.chrzanowski.neonglow.ui.GlowStartupActivity"/>
+        <postStartupActivity implementation="info.chrzanowski.neonglow.sponsor.SponsorNotificationActivity"/>
+        <notificationGroup id="Neon Glow" displayType="STICKY_BALLOON" key="notification.group.neonGlow"/>
 
         <applicationConfigurable
                 groupId="appearance"
@@ -86,6 +92,9 @@
                     class="info.chrzanowski.neonglow.actions.ClearGlowCachesAction"/>
             <action id="info.chrzanowski.neonglow.CopyGlowDiagnosticsAction"
                     class="info.chrzanowski.neonglow.actions.CopyGlowDiagnosticsAction"/>
+            <separator/>
+            <action id="info.chrzanowski.neonglow.SponsorAction"
+                    class="info.chrzanowski.neonglow.actions.SponsorAction"/>
         </group>
     </actions>
 
