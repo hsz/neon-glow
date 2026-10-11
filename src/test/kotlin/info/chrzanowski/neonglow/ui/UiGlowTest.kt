@@ -6,10 +6,12 @@ import info.chrzanowski.neonglow.render.GlyphGlowAtlas
 import info.chrzanowski.neonglow.render.ImageGlowAtlas
 import info.chrzanowski.neonglow.settings.GlowSettings
 import org.junit.Assert.*
+import org.junit.Assume.assumeFalse
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.GraphicsEnvironment
 import java.awt.image.BufferedImage
 import javax.swing.*
 
@@ -117,25 +119,29 @@ class UiGlowTest {
     }
 
     @Test
-    fun `repaintAll triggers repaint across displayable windows`() = onEdt {
-        val frame = JFrame("Test Repaint Frame")
-        frame.size = Dimension(200, 200)
-        var repainted = false
-        val panel = object : JPanel() {
-            override fun paintComponent(g: java.awt.Graphics) {
-                super.paintComponent(g)
-                repainted = true
+    fun `repaintAll triggers repaint across displayable windows`() {
+        // Windows need a display; on headless CI there is nothing for repaintAll to iterate over.
+        assumeFalse(GraphicsEnvironment.isHeadless())
+        onEdt {
+            val frame = JFrame("Test Repaint Frame")
+            frame.size = Dimension(200, 200)
+            var repainted = false
+            val panel = object : JPanel() {
+                override fun paintComponent(g: java.awt.Graphics) {
+                    super.paintComponent(g)
+                    repainted = true
+                }
             }
-        }
-        frame.contentPane = panel
-        frame.isVisible = true
-        val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
-        try {
-            glow.repaintAll()
-            assertTrue(frame.isDisplayable)
-        } finally {
-            glow.dispose()
-            frame.dispose()
+            frame.contentPane = panel
+            frame.isVisible = true
+            val glow = UiGlow(GlyphGlowAtlas(), { GlowSettings.State() }, { false })
+            try {
+                glow.repaintAll()
+                assertTrue(frame.isDisplayable)
+            } finally {
+                glow.dispose()
+                frame.dispose()
+            }
         }
     }
 

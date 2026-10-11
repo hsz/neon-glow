@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.markup.CustomHighlighterOrder
 import com.intellij.openapi.editor.markup.CustomHighlighterRenderer
 import com.intellij.openapi.editor.markup.RangeHighlighter
-import com.intellij.ui.scale.JBUIScale
+import info.chrzanowski.neonglow.render.DeviceScale
 import info.chrzanowski.neonglow.render.GaussianBlur
 import info.chrzanowski.neonglow.render.GlowMaskRenderer
 import info.chrzanowski.neonglow.render.GlowStats
@@ -47,7 +47,7 @@ import kotlin.math.roundToInt
  * nothing is glowed twice. This keeps partial repaints consistent without touching Swing's `RepaintManager`.
  *
  * HiDPI: masks are device-pixel images. On a Retina surface `Graphics2D.getTransform()` hides the device scale
- * (it lives in the surface), on an offscreen image it is an explicit `scale(2)`; [JBUIScale.sysScale] covers both.
+ * (it lives in the surface), on an offscreen image it is an explicit `scale(2)`; [DeviceScale] covers both.
  * Each mask is drawn through a `1 / sysScale` transform positioned at `devicePixel / sysScale`, so the composite
  * transform is a pure integer device translation and the blit is 1:1 — no resampling, no mushy halo.
  */
@@ -128,7 +128,7 @@ class GlowHighlighterRenderer(
         }
 
         val radius = state.radiusPx
-        val sysScale = JBUIScale.sysScale(g2).takeIf { it > 0f } ?: 1f
+        val sysScale = DeviceScale.of(g2)
         val padUser = repaintInflation(radius, state.synthwaveStyle)
         clip.grow(padUser, padUser)
 

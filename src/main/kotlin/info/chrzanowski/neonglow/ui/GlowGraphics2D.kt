@@ -2,7 +2,6 @@ package info.chrzanowski.neonglow.ui
 
 import com.intellij.ui.Graphics2DDelegate
 import com.intellij.ui.JBColor
-import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.ImageUtil
 import info.chrzanowski.neonglow.render.*
 import info.chrzanowski.neonglow.settings.GlowSettings
@@ -26,7 +25,7 @@ class GlowGraphics2D(
     private val powerSave: () -> Boolean,
     private val stats: GlowStats = GlowStats.DISABLED,
     private val imageAtlas: ImageGlowAtlas = ImageGlowAtlas(),
-    private val imageScale: Float = JBUIScale.sysScale(graphics).takeIf { it > 0f } ?: 1f,
+    private val imageScale: Float = DeviceScale.of(graphics),
     private val surfaceScale: Double = (imageScale / (hypot(graphics.transform.scaleX, graphics.transform.shearY)
         .takeIf { it.isFinite() && it > 0.0 } ?: imageScale.toDouble())).coerceAtLeast(1.0),
     private val editorText: Boolean = false,
@@ -302,7 +301,7 @@ class GlowGraphics2D(
         if (!layered && !state.regularText) return 0
         val effectiveBrightness = state.effectiveBrightness(glyphBackground(glyphs, x, y)?.rgb, JBColor.isBright())
         atlas.intensity = state.intensity
-        val scale = JBUIScale.sysScale(myDelegate).takeIf { it > 0f } ?: 1f
+        val scale = DeviceScale.of(myDelegate)
         val glyphFont = glyphs.font
         val halo = myDelegate.create() as Graphics2D
         var count = 0
