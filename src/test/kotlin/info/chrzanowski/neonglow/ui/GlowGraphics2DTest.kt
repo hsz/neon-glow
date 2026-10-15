@@ -7,6 +7,7 @@ import org.junit.Test
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
+import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.font.TextAttribute
 import java.awt.image.BufferedImage
@@ -34,6 +35,7 @@ class GlowGraphics2DTest {
     fun `child graphics retain glow without changing the parent state`() {
         val image = paint { g ->
             val transform = g.transform
+            val clip = g.clip.bounds
             val hints = g.renderingHints
             val composite = g.composite
             val child = g.create(10, 10, 150, 90) as Graphics2D
@@ -43,12 +45,59 @@ class GlowGraphics2DTest {
                 child.dispose()
             }
             assertEquals(transform, g.transform)
+            assertEquals(clip, g.clip.bounds)
             assertEquals(hints, g.renderingHints)
             assertEquals(composite, g.composite)
             assertEquals(Color.CYAN, g.color)
         }
         val plain = paint(glow = false) { it.drawString("Child", 30f, 50f) }
         assertHalo(plain, image)
+    }
+
+    @Test
+    fun `text target child copies retain smooth halos while shapes remain layout clipped`() {
+        for (scale in listOf(1.0, 2.0)) for (editor in listOf(false, true)) {
+            val reference = paint(scale) { GlowGraphics2D.withTextTarget(it, editor).drawString("A", 40, 54) }
+            val image = paint(scale) { g ->
+                val child = GlowGraphics2D.withTextTarget(g, editor).create(40, 40, 20, 18) as Graphics2D
+                try {
+                    val copy = child.create() as Graphics2D
+                    try { copy.drawString("A", 0, 14) } finally { copy.dispose() }
+                } finally { child.dispose() }
+            }
+            assertPixelsEqual(reference, image)
+            val shapes: (Graphics2D) -> Unit = { g ->
+                val child = g.create(40, 40, 20, 18) as Graphics2D
+                try { child.fillRect(-10, -10, 40, 38) } finally { child.dispose() }
+            }
+            assertPixelsEqual(paint(scale, glow = false, draw = shapes), paint(scale, draw = shapes))
+        }
+    }
+
+    @Test
+    fun `explicit clips on copied child graphics remain strict for text and icons`() {
+        val icon = BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB).also {
+            val g = it.createGraphics()
+            try { g.color = Color.MAGENTA; g.fillRect(0, 0, 16, 16) } finally { g.dispose() }
+        }
+        for (scale in listOf(1.0, 2.0)) for (editor in listOf(false, true)) {
+            val image = paint(scale) { g ->
+                val child = GlowGraphics2D.withTextTarget(g, editor).create(30, 30, 40, 40) as Graphics2D
+                try {
+                    val copy = child.create() as Graphics2D
+                    try {
+                        copy.clipRect(0, 8, 10, 10)
+                        copy.drawString("A", 0, 18)
+                        copy.drawImage(icon, 0, 0, null)
+                    } finally { copy.dispose() }
+                } finally { child.dispose() }
+            }
+            assertTrue(image.getRGB(0, 0, image.width, image.height, null, 0, image.width).any { it ushr 24 != 0 })
+            for (y in 0 until image.height) for (x in 0 until image.width) {
+                if (Rectangle(30, 38, 10, 10).contains(x / scale, y / scale)) continue
+                assertEquals("explicit child clip at ($x, $y), scale $scale, editor $editor", 0, image.getRGB(x, y))
+            }
+        }
     }
 
     @Test

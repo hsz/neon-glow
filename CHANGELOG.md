@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix clipped text and icon glow around tightly fitted UI labels, including Air screen messages, while preserving parent and repaint boundaries.
+
 ## [0.4.0] - 2026-10-15
 
 ### Added

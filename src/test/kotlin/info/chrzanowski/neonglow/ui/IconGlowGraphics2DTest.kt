@@ -1,6 +1,6 @@
 package info.chrzanowski.neonglow.ui
 
-import com.intellij.util.JBHiDPIScaledImage
+import com.intellij.util.RetinaImage
 import com.intellij.util.ui.UIUtil
 import info.chrzanowski.neonglow.render.GlyphGlowAtlas
 import info.chrzanowski.neonglow.render.ImageGlowAtlas
@@ -28,7 +28,7 @@ class IconGlowGraphics2DTest {
         val high = BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB)
         val g = high.createGraphics()
         try { g.drawImage(low, 0, 0, 32, 32, null) } finally { g.dispose() }
-        val retina = JBHiDPIScaledImage(high, 2.0)
+        val retina = RetinaImage.createFrom(high, 2.0, null)
         val regular: (Graphics2D) -> Unit = { it.drawImage(low, 30, 30, null) }
         val platform: (Graphics2D) -> Unit = { UIUtil.drawImage(it, retina, 30, 30, null) }
         assertPixelsEqual(paint(2.0, false, regular), paint(2.0, false, platform))
@@ -54,6 +54,19 @@ class IconGlowGraphics2DTest {
             assertEquals(plain.getRGB((35 * scale).toInt(), (37 * scale).toInt()),
                 glowing.getRGB((35 * scale).toInt(), (37 * scale).toInt()))
             assertEquals("far from the icon stays transparent", 0, glowing.getRGB(5, 5))
+        }
+    }
+
+    @Test
+    fun `toolkit image rasterization matches buffered icons at both display scales`() {
+        val icon = icon()
+        val toolkitIcon = ImageIcon(icon.getScaledInstance(16, 16, Image.SCALE_SMOOTH)).image
+        assertFalse(toolkitIcon is BufferedImage)
+        for (scale in listOf(1.0, 2.0)) {
+            val buffered = paint(scale) { it.drawImage(icon, 30, 30, null) }
+            val toolkit = paint(scale) { it.drawImage(toolkitIcon, 30, 30, null) }
+            assertHalo(paint(scale, false) { it.drawImage(toolkitIcon, 30, 30, null) }, toolkit)
+            assertPixelsEqual(buffered, toolkit)
         }
     }
 
@@ -143,7 +156,7 @@ class IconGlowGraphics2DTest {
         try {
             fun render(): BufferedImage {
                 fun layout(component: java.awt.Container) {
-                    if (component is javax.swing.JComponent) component.isDoubleBuffered = false
+                    if (component is JComponent) component.isDoubleBuffered = false
                     component.doLayout()
                     for (child in component.components) if (child is java.awt.Container) layout(child)
                 }

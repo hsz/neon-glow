@@ -2,6 +2,8 @@ package info.chrzanowski.neonglow.ui
 
 import com.intellij.ui.Graphics2DDelegate
 import com.intellij.ui.JBColor
+import com.intellij.ui.paint.PaintUtil
+import com.intellij.ui.scale.ScaleContext
 import com.intellij.util.ui.ImageUtil
 import info.chrzanowski.neonglow.render.*
 import info.chrzanowski.neonglow.settings.GlowSettings
@@ -9,6 +11,8 @@ import java.awt.*
 import java.awt.font.GlyphVector
 import java.awt.font.TextLayout
 import java.awt.geom.AffineTransform
+import java.awt.geom.Area
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImageOp
 import java.awt.image.ImageObserver
@@ -39,6 +43,8 @@ class GlowGraphics2D(
     private var paintedTextBackground: Color? = null
     private var hasPaintedTextBackground = false
     private var lastTextBackgroundFill: BackgroundFill? = null
+    private var haloClip: Shape? = deviceClip(graphics)
+    private var componentClip: Shape? = haloClip
     private val currentTextBackground: Color? get() = if (hasPaintedTextBackground) paintedTextBackground
         else activeTextBackground ?: textBackground
     private val textEnabled: Boolean get() = isTextEnabled(activeTextTarget ?: editorText)
@@ -56,7 +62,38 @@ class GlowGraphics2D(
         GlowGraphics2D(myDelegate.create() as Graphics2D, atlas, settings, powerSave, stats, imageAtlas, imageScale,
             surfaceScale, activeTextTarget ?: editorText, budget, currentTextBackground).also {
             it.lastTextBackgroundFill = lastTextBackgroundFill
+            it.haloClip = haloClip
+            it.componentClip = componentClip
         }
+
+    override fun create(x: Int, y: Int, width: Int, height: Int): Graphics {
+        val g = create() as GlowGraphics2D
+        g.haloClip = deviceClip(myDelegate)
+        g.translate(x, y)
+        g.clipRect(0, 0, width, height)
+        g.componentClip = deviceClip(g)
+        return g
+    }
+
+    private fun relaxHaloClip(halo: Graphics2D, radius: Float) {
+        if (haloClip === componentClip) return
+        val current = deviceClip(halo) ?: return
+        val layout = componentClip ?: return
+        // Only child layout clipping may bleed; a painter's own clipping remains strict.
+        val unchanged = if (current is Rectangle2D && layout is Rectangle2D) current == layout
+            else Area(current).also { it.exclusiveOr(Area(layout)) }.isEmpty
+        if (!unchanged) return
+        val inflated = halo.clip.bounds
+        if (inflated.isEmpty) return
+        val pad = kotlin.math.ceil(radius * 1.5).toInt() + 1
+        inflated.grow(pad, pad)
+        val transform = halo.transform
+        val allowed = Area(transform.createTransformedShape(inflated))
+        haloClip?.let { allowed.intersect(Area(it)) }
+        halo.transform = AffineTransform()
+        halo.clip = allowed
+        halo.transform = transform
+    }
 
     override fun fillRect(x: Int, y: Int, width: Int, height: Int) {
         if (settings().synthwaveStyle) recordBackground(Rectangle(x, y, width, height), paint as? Color)
@@ -80,8 +117,8 @@ class GlowGraphics2D(
             it.alpha == 255 && (clearing || alpha?.alpha == 1f &&
                 (alpha.rule == AlphaComposite.SRC_OVER || alpha.rule == AlphaComposite.SRC))
         }
-        val visible = java.awt.geom.Area(area)
-        clip?.let { visible.intersect(java.awt.geom.Area(it)) }
+        val visible = Area(area)
+        clip?.let { visible.intersect(Area(it)) }
         if (visible.isEmpty) return
         lastTextBackgroundFill = BackgroundFill(transform.createTransformedShape(visible), solid)
         val bounds = clip?.bounds ?: return
@@ -212,6 +249,7 @@ class GlowGraphics2D(
             state.radiusPx, imageScale, state.intensity) { budget.allowImage(state.performanceMode) } ?: return
         val halo = myDelegate.create() as Graphics2D
         try {
+            relaxHaloClip(halo, state.radiusPx)
             // Clip is already in device space; keep it while undoing any image-specific HiDPI unscaling.
             halo.transform = AffineTransform.getScaleInstance(1.0 / surfaceScale, 1.0 / surfaceScale)
             halo.composite = alpha.derive(alpha.alpha * effectiveBrightness * state.iconGlowStrength)
@@ -231,7 +269,10 @@ class GlowGraphics2D(
         val width = image.getWidth(null)
         val height = image.getHeight(null)
         if (width !in 1..MAX_ICON_DEVICE_SIZE || height !in 1..MAX_ICON_DEVICE_SIZE) return null
-        val raster = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        // Source dimensions
+        // are pixels, so rasterization must not apply display scaling.
+        val raster = ImageUtil.createImage(ScaleContext.createIdentity(), width.toDouble(), height.toDouble(),
+            BufferedImage.TYPE_INT_ARGB, PaintUtil.RoundingMode.ROUND)
         val g = raster.createGraphics()
         return try {
             // Never block the EDT waiting for an asynchronously loaded image.
@@ -283,7 +324,8 @@ class GlowGraphics2D(
             if (rule != null) {
                 val core = myDelegate.create() as Graphics2D
                 try {
-                    core.color = Color((foreground!!.alpha shl 24) or rule.foregroundRgb, true)
+                    val coreRgb = (foreground!!.alpha shl 24) or rule.foregroundRgb
+                    core.color = JBColor(Color(coreRgb, true), Color(coreRgb, true))
                     core.drawGlyphVector(glyphs, x, y)
                 } finally { core.dispose() }
                 return
@@ -306,6 +348,7 @@ class GlowGraphics2D(
         val halo = myDelegate.create() as Graphics2D
         var count = 0
         try {
+            relaxHaloClip(halo, if (layered) SynthwaveTextStyle.maxRadius(state.radiusPx) else state.radiusPx)
             halo.composite = alpha.derive(alpha.alpha * foreground.alpha / 255f *
                 textStrength * if (layered) 1f else effectiveBrightness)
             halo.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
@@ -366,6 +409,10 @@ class GlowGraphics2D(
         private val glow = checkNotNull(find(graphics))
 
         override fun create(): Graphics = withTextTarget(myDelegate.create() as Graphics2D, editor, textBackground)
+
+        override fun create(x: Int, y: Int, width: Int, height: Int): Graphics =
+            withTextTarget(myDelegate.create(x, y, width, height) as Graphics2D, editor, textBackground)
+
         override fun drawString(text: String, x: Int, y: Int) = glow.withTextTarget(editor, textBackground) { myDelegate.drawString(text, x, y) }
         override fun drawString(text: String, x: Float, y: Float) = glow.withTextTarget(editor, textBackground) { myDelegate.drawString(text, x, y) }
         override fun drawString(text: AttributedCharacterIterator, x: Int, y: Int) =
@@ -383,6 +430,13 @@ class GlowGraphics2D(
     companion object {
         private const val MAX_ICON_SIZE = 128
         private const val MAX_ICON_DEVICE_SIZE = 512
+
+        private fun deviceClip(graphics: Graphics2D): Shape? {
+            val clip = graphics.clip ?: return null
+            val transform = graphics.transform
+            val shape = transform.createTransformedShape(clip)
+            return if (clip is Rectangle2D && transform.shearX == 0.0 && transform.shearY == 0.0) shape.bounds2D else shape
+        }
 
         /** Nested IDE transforms must not add another halo to an already wrapped graphics. */
         fun isWrapped(graphics: Graphics2D): Boolean = find(graphics) != null
