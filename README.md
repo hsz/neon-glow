@@ -43,6 +43,7 @@ Three dark themes come bundled, but you don't need them. The glow works with wha
 | Intensity | 200 % | Boosts coverage before brightness. Thin fonts need more. |
 | Neon text styling | on | Layered neon for coloured text. Picks text by colour and contrast, so a colourful comment glows and a grey one doesn't. On dark backgrounds letters get a pale tint; on light backgrounds they keep their colour. |
 | Regular text glow | off | Same-colour halos for everything Neon text styling leaves alone. Turn on to glow all text. |
+| Text selection | on | Halos behind selection highlights in editors and input fields, independent of text glow. Uses the matching Editor / UI strength and shared Brightness, Radius and Intensity. |
 | Performance mode | off | Caps new glow masks per repaint. Some halos may show up one repaint late. |
 
 Each slider has a numeric input beside it for entering an exact value in percent or pixels.
@@ -87,6 +88,15 @@ but haven't been checked visually.
 ./gradlew verifyPlugin                  # the four versions above
 ./gradlew test -PplatformVersion=2026.2.3   # needs a Java 25 toolchain
 ```
+
+Test a local IDE without changing the compilation target:
+
+```shell
+./gradlew testCurrentIde -PtestIdePath="/path/to/IntelliJ IDEA.app" --tests '*UiSelectionGlowTest' --tests '*SelectionGlow*Test'
+```
+
+For early EAPs without a published test framework, add `-PtestFrameworkVersion=<available-version>`.
+The selection tests pass on 2027.1 EAP `271.658` with test framework `262.10968.176`, covering both legacy and Islands selections.
 
 Settings live in `neon-glow.xml`. With the debug flag the plugin writes a `[NeonGlow] paints=… paint avg=…µs`
 line to `idea.log` every 10 seconds.

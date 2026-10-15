@@ -31,6 +31,7 @@ class GlowSettingsTest : BasePlatformTestCase() {
         assertTrue(state.uiText)
         assertTrue(state.icons)
         assertFalse(state.regularText)
+        assertTrue(state.selectionGlow)
         assertTrue(state.synthwaveStyle)
         assertEquals(6f, state.radiusPx)
         assertEquals(2f, state.intensity)
@@ -75,7 +76,7 @@ class GlowSettingsTest : BasePlatformTestCase() {
         val original = GlowSettings.State(enabled = false, radiusPx = 9f, intensity = 1.5f,
             editorText = false, uiText = false, icons = false, brightness = 0.45f, synthwaveStyle = false,
             editorGlowStrength = 0f, uiGlowStrength = 0.25f, iconGlowStrength = 0.65f, performanceMode = true,
-            regularText = true)
+            regularText = true, selectionGlow = false)
         val restored = XmlSerializer.deserialize(XmlSerializer.serialize(original), GlowSettings.State::class.java)
         val settings = GlowSettings()
         settings.loadState(restored)
@@ -87,10 +88,11 @@ class GlowSettingsTest : BasePlatformTestCase() {
     fun `test missing XML options use the current defaults`() {
         val settings = GlowSettings()
         settings.loadState(GlowSettings.State(enabled = false, brightness = 1f, intensity = 3f, synthwaveStyle = false,
-            editorGlowStrength = 1f, uiGlowStrength = 1f, iconGlowStrength = 1f, regularText = true))
+            editorGlowStrength = 1f, uiGlowStrength = 1f, iconGlowStrength = 1f, regularText = true, selectionGlow = false))
         settings.loadState(XmlSerializer.deserialize(Element("state"), GlowSettings.State::class.java))
         assertEquals(GlowSettings.State(), settings.state)
         assertFalse(settings.state.regularText)
+        assertTrue(settings.state.selectionGlow)
         assertTrue(settings.state.synthwaveStyle)
     }
 
@@ -195,6 +197,20 @@ class GlowSettingsTest : BasePlatformTestCase() {
             val settings = GlowSettings()
             settings.loadState(state)
             assertEquals(GlowSettings.State(intensity = 4f, brightness = 0f, synthwaveStyle = style), settings.state)
+        }
+    }
+
+    fun `test normalization preserves selection glow independently of text targets`() {
+        for (selected in listOf(false, true)) {
+            val state = GlowSettings.State(radiusPx = Float.NaN, intensity = 100f, brightness = -1f,
+                editorText = false, uiText = false, synthwaveStyle = false, selectionGlow = selected)
+            val expected = state.copy(radiusPx = GlowSettings.DEFAULT_RADIUS, intensity = 4f, brightness = 0f)
+            assertEquals(expected, state.normalized())
+            val settings = GlowSettings()
+            settings.loadState(state)
+            assertEquals(expected, settings.state)
+            assertNotSame(state, settings.state)
+            assertEquals(selected, settings.state.selectionGlow)
         }
     }
 

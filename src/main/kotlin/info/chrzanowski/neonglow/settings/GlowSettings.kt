@@ -34,6 +34,8 @@ class GlowSettings : PersistentStateComponent<GlowSettings.State> {
         var performanceMode: Boolean = false,
         /** Same-colour glow for text without an eligible SynthWave-style rule, in either text target. */
         var regularText: Boolean = false,
+        /** Halos behind selection highlights, independent of editor/UI text glow. */
+        var selectionGlow: Boolean = true,
         /** Tracks whether the initial theme preservation check has completed on first run or install. */
         var initialThemePreserved: Boolean = false,
     ) {

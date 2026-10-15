@@ -101,6 +101,15 @@ class GlowConfigurable internal constructor(
                         .comment(NeonGlowBundle.message("settings.regularText.comment"))
                 }
                 row {
+                    checkBox(NeonGlowBundle.message("settings.selectionGlow"))
+                        .bindSelected({ currentDraft().selectionGlow }, { currentDraft().selectionGlow = it })
+                        .applyToComponent {
+                            name = "selectionGlow"
+                            addItemListener { editDraft { selectionGlow = isSelected } }
+                        }
+                        .comment(NeonGlowBundle.message("settings.selectionGlow.comment"))
+                }
+                row {
                     checkBox(NeonGlowBundle.message("settings.icons"))
                         .bindSelected({ currentDraft().icons }, { currentDraft().icons = it })
                         .applyToComponent {

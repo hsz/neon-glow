@@ -25,7 +25,7 @@ class GlowEditorPreviewTest : BasePlatformTestCase() {
 
     override fun setUp() {
         super.setUp()
-        preview = GlowEditorPreview(GlowSettings.State(enabled = false, icons = false, regularText = true))
+        preview = GlowEditorPreview(GlowSettings.State(enabled = false, icons = false, regularText = true, selectionGlow = false))
     }
 
     override fun tearDown() {
@@ -66,7 +66,7 @@ class GlowEditorPreviewTest : BasePlatformTestCase() {
         scheme.setAttributes(DefaultLanguageHighlighterColors.KEYWORD, TextAttributes(Color(0x36f9f6), null, null, null, 0))
         preview.editor.colorsScheme = scheme
         val plain = paint(preview)
-        preview.update(GlowSettings.State(icons = false, regularText = false))
+        preview.update(GlowSettings.State(icons = false, regularText = false, selectionGlow = false))
         val styled = paint(preview)
         assertFalse("Coloured syntax receives neon styling", plain.contentEquals(styled))
         preview.update(preview.previewState.copy(synthwaveStyle = false))
@@ -121,6 +121,67 @@ class GlowEditorPreviewTest : BasePlatformTestCase() {
                 JBSwingUtilities.runGlobalCGTransform(child, graphics))
         } finally {
             graphics.dispose()
+        }
+    }
+
+    fun `test selection preview uses only draft settings regardless of live hook order`() {
+        for (previewFirst in listOf(true, false)) {
+            val live = GlowSettings.State(selectionGlow = true, editorText = false, uiText = false, icons = false)
+            val glow = UiGlow(GlyphGlowAtlas(), { live }, { false })
+            try {
+                if (!previewFirst) {
+                    Disposer.dispose(preview)
+                    preview = GlowEditorPreview(GlowSettings.State())
+                }
+                preview.editor.selectionModel.setSelection(3, 20)
+                preview.update(GlowSettings.State(editorText = false, uiText = false, icons = false, selectionGlow = false))
+                val plain = paint(preview)
+                live.selectionGlow = false
+                assertTrue("live selection settings cannot affect the draft", plain.contentEquals(paint(preview)))
+                preview.update(preview.previewState.copy(selectionGlow = true))
+                val glowing = paint(preview)
+                assertFalse("draft selection receives glow", plain.contentEquals(glowing))
+                live.selectionGlow = true
+                assertTrue("no second live selection halo", glowing.contentEquals(paint(preview)))
+            } finally { glow.dispose() }
+        }
+    }
+
+    fun `test selection glow toggle is visible in the preview without manually selecting text`() {
+        val selection = preview.editor.selectionModel
+        assertTrue("The preview must start with a native sample selection", selection.hasSelection())
+        assertEquals("Hello, neon!", selection.selectedText)
+        val selectionStart = selection.selectionStart
+        val selectionEnd = selection.selectionEnd
+        assertEquals(2, preview.editor.document.getLineNumber(selectionStart))
+        preview.update(GlowSettings.State(selectionGlow = false, editorText = false, uiText = false, icons = false))
+        val plain = paint(preview)
+        for (enabled in listOf(false, true, false)) {
+            preview.update(preview.previewState.copy(selectionGlow = enabled))
+            assertEquals("Toggling glow must not move the selection start", selectionStart, selection.selectionStart)
+            assertEquals("Toggling glow must not move the selection end", selectionEnd, selection.selectionEnd)
+            assertEquals("Hello, neon!", selection.selectedText)
+            val rendered = paint(preview)
+            if (enabled) {
+                assertFalse("Text selection must demonstrate its effect immediately", plain.contentEquals(rendered))
+            } else {
+                assertTrue("Disabling selection glow must restore exact rendering", plain.contentEquals(rendered))
+            }
+        }
+    }
+
+    fun `test draft updates preserve changed or cleared sample selection`() {
+        val selection = preview.editor.selectionModel
+        selection.setSelection(3, 20)
+        for (enabled in listOf(true, false)) {
+            preview.update(preview.previewState.copy(selectionGlow = enabled))
+            assertEquals(3, selection.selectionStart)
+            assertEquals(20, selection.selectionEnd)
+        }
+        selection.removeSelection()
+        for (enabled in listOf(true, false)) {
+            preview.update(preview.previewState.copy(selectionGlow = enabled))
+            assertFalse("Draft updates must not restore a cleared sample selection", selection.hasSelection())
         }
     }
 

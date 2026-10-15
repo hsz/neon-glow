@@ -444,7 +444,7 @@ class GlowGraphics2D(
         /** A local preview replaces inherited live glow rather than painting both policies. */
         internal fun withoutGlow(graphics: Graphics2D): Graphics2D {
             var current = graphics
-            while (current is GlowGraphics2D || current is TextTargetGraphics) {
+            while (current is GlowGraphics2D || current is TextTargetGraphics || current is SelectionGlowGraphics2D) {
                 current = current.delegate
             }
             return current

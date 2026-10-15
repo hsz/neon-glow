@@ -9,6 +9,8 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.event.SelectionEvent
+import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.LexerEditorHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
@@ -18,7 +20,9 @@ import com.intellij.util.ui.JBSwingUtilities
 import info.chrzanowski.neonglow.NeonGlowBundle
 import info.chrzanowski.neonglow.render.GlyphGlowAtlas
 import info.chrzanowski.neonglow.render.ImageGlowAtlas
+import info.chrzanowski.neonglow.render.SelectionGlowPainter
 import info.chrzanowski.neonglow.ui.GlowGraphics2D
+import info.chrzanowski.neonglow.ui.SelectionGlowGraphics2D
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -32,6 +36,7 @@ internal class GlowEditorPreview(state: GlowSettings.State) : JPanel(BorderLayou
         private set
     private val atlas = GlyphGlowAtlas(capacity = 256, maxBytes = 4L * 1024 * 1024)
     private val imageAtlas = ImageGlowAtlas()
+    private val selectionPainter = SelectionGlowPainter()
     private var disposed = false
     internal val editor: EditorEx
     private val transform: Disposable
@@ -53,6 +58,12 @@ internal class GlowEditorPreview(state: GlowSettings.State) : JPanel(BorderLayou
             additionalColumnsCount = 0
         }
         editor.setBorder(JBUI.Borders.empty(8))
+        val selectionText = "Hello, neon!"
+        val selectionStart = SAMPLE.indexOf(selectionText)
+        editor.selectionModel.setSelection(selectionStart, selectionStart + selectionText.length)
+        editor.selectionModel.addSelectionListener(object : SelectionListener {
+            override fun selectionChanged(event: SelectionEvent) = repaint()
+        }, this)
         add(editor.component, BorderLayout.CENTER)
         preferredSize = JBUI.size(520, 200)
         // Child-only repaints (selection, scrolling, etc.) must also use the draft, not inherited live glow.
@@ -68,10 +79,17 @@ internal class GlowEditorPreview(state: GlowSettings.State) : JPanel(BorderLayou
         repaint()
     }
 
-    private fun wrap(graphics: Graphics2D): Graphics2D = GlowGraphics2D(
-        GlowGraphics2D.withoutGlow(graphics), atlas, { previewState }, { disposed || PowerSaveMode.isEnabled() },
-        imageAtlas = imageAtlas, editorText = true, textBackground = editor.colorsScheme.defaultBackground,
-    )
+    private fun wrap(graphics: Graphics2D): Graphics2D {
+        val background = editor.colorsScheme.defaultBackground
+        val textGraphics = GlowGraphics2D(
+            GlowGraphics2D.withoutGlow(graphics), atlas, { previewState }, { disposed || PowerSaveMode.isEnabled() },
+            imageAtlas = imageAtlas, editorText = true, textBackground = background,
+        )
+        val selection = editor.selectionModel.textAttributes.backgroundColor
+        return if (!editor.selectionModel.hasSelection(true) || selection == null) textGraphics
+        else SelectionGlowGraphics2D(textGraphics, selectionPainter, { previewState },
+            { disposed || PowerSaveMode.isEnabled() }, selection, background, true, localPolicy = true)
+    }
 
     override fun getComponentGraphics(graphics: Graphics): Graphics =
         if (disposed || graphics !is Graphics2D) super.getComponentGraphics(graphics)
@@ -84,6 +102,7 @@ internal class GlowEditorPreview(state: GlowSettings.State) : JPanel(BorderLayou
         EditorFactory.getInstance().releaseEditor(editor)
         atlas.clear()
         imageAtlas.clear()
+        selectionPainter.clear()
         removeAll()
     }
 

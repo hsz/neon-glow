@@ -4,8 +4,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Optional glow behind editor and input-field selections, controlled by the on-by-default `Text selection` setting.
+
 ### Fixed
 
+- Support rounded editor selection glow in IntelliJ IDEA 2027.1's Islands UI, including multiline selections.
+- Show a selected sample in the settings preview so toggling text selection glow immediately demonstrates its effect.
 - Fix clipped text and icon glow around tightly fitted UI labels, including Air screen messages, while preserving parent and repaint boundaries.
 
 ## [0.4.0] - 2026-10-15

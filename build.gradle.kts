@@ -60,3 +60,15 @@ tasks {
         changeNotes = intellijPlatform.pluginConfiguration.changeNotes.map { nudge + it }
     }
 }
+
+providers.gradleProperty("testIdePath").orNull?.let { path ->
+    intellijPlatformTesting.testIde.register("testCurrentIde") {
+        localPath = file(path)
+        val frameworkVersion = providers.gradleProperty("testFrameworkVersion").orNull
+        if (frameworkVersion == null) testFramework(TestFrameworkType.Platform)
+        else testFramework(TestFrameworkType.Platform, frameworkVersion)
+        plugins {
+            bundledPlugin("JUnit")
+        }
+    }
+}

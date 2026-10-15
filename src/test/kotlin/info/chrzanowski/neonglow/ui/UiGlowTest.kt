@@ -61,7 +61,7 @@ class UiGlowTest {
 
     @Test
     fun `nested component hooks do not double glow even after an enabled toggle`() = onEdt {
-        val state = GlowSettings.State(enabled = false)
+        val state = GlowSettings.State(enabled = false, selectionGlow = false)
         val glow = UiGlow(GlyphGlowAtlas(), { state }, { false })
         val image = BufferedImage(200, 100, BufferedImage.TYPE_INT_ARGB)
         val raw = image.createGraphics()

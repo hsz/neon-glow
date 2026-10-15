@@ -61,9 +61,10 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         }
         assertEquals(NeonGlowBundle.message("settings.enabled"), checkBox().text)
         assertEquals(NeonGlowBundle.message("settings.regularText"), checkBox("regularText").text)
+        assertEquals(NeonGlowBundle.message("settings.selectionGlow"), checkBox("selectionGlow").text)
         assertEquals(NeonGlowBundle.message("settings.synthwaveStyle"), checkBox("synthwaveStyle").text)
         assertEquals(NeonGlowBundle.message("settings.performanceMode"), checkBox("performanceMode").text)
-        assertEquals(listOf("enabled", "editorText", "uiText", "regularText", "icons", "brightness",
+        assertEquals(listOf("enabled", "editorText", "uiText", "regularText", "selectionGlow", "icons", "brightness",
             "editorGlowStrength", "uiGlowStrength", "iconGlowStrength", "synthwaveStyle",
             "radiusPx", "intensity", "performanceMode"), descendants(component).filter {
             it is JCheckBox || it is JSlider || it is JComboBox<*>
@@ -78,13 +79,14 @@ class GlowConfigurableTest : BasePlatformTestCase() {
                 else -> null
             }
         }.map { it.replace(Regex("\\s+"), " ").trim() }.toList()
-        for (target in listOf("editorText", "uiText", "regularText", "icons")) {
+        for (target in listOf("editorText", "uiText", "regularText", "selectionGlow", "icons")) {
             assertEquals(NeonGlowBundle.message("settings.$target"), checkBox(target).text)
             val description = NeonGlowBundle.message("settings.$target.comment")
             assertTrue("$target must have a separate description", descriptions.any { description in it })
         }
         assertEquals("Editor text", checkBox("editorText").text)
         assertEquals("UI text", checkBox("uiText").text)
+        assertEquals("Text selection", checkBox("selectionGlow").text)
         assertFalse(configurable.isModified())
     }
 
@@ -111,7 +113,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
     }
 
     fun `test everyday controls are visible and fine tuning is initially collapsed`() {
-        for (name in listOf("enabled", "editorText", "uiText", "regularText", "icons", "performanceMode")) {
+        for (name in listOf("enabled", "editorText", "uiText", "regularText", "selectionGlow", "icons", "performanceMode")) {
             assertTrue("$name must be visible", visibleWithinPage(checkBox(name)))
         }
         assertTrue(visibleWithinPage(slider("brightness")))
@@ -154,6 +156,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         for (target in listOf("editorText", "uiText", "icons")) assertTrue(checkBox(target).isSelected)
         assertTrue(checkBox("synthwaveStyle").isSelected)
         assertFalse(checkBox("regularText").isSelected)
+        assertTrue(checkBox("selectionGlow").isSelected)
         assertEquals(GlowSettings.DEFAULT_RADIUS.toInt(), slider("radiusPx").value)
         assertEquals((GlowSettings.DEFAULT_INTENSITY * 100).toInt(), slider("intensity").value)
         assertEquals(GlowSettings.RADIUS_RANGE.start.toInt(), slider("radiusPx").minimum)
@@ -371,6 +374,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         checkBox("editorText").isSelected = false
         checkBox("uiText").isSelected = false
         checkBox("icons").isSelected = false
+        checkBox("selectionGlow").isSelected = true
         checkBox("synthwaveStyle").isSelected = true
         checkBox("performanceMode").isSelected = true
         slider("brightness").value = 45
@@ -381,7 +385,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         slider("iconGlowStrength").value = 10
         val expected = GlowSettings.State(enabled = false, editorText = false, uiText = false, icons = false,
             synthwaveStyle = true, performanceMode = true, brightness = 0.45f, radiusPx = 9f, intensity = 1.5f,
-            editorGlowStrength = 0.3f, uiGlowStrength = 0.2f, iconGlowStrength = 0.1f)
+            editorGlowStrength = 0.3f, uiGlowStrength = 0.2f, iconGlowStrength = 0.1f, selectionGlow = true)
         repeat(3) {
             assertControlsMatch(expected)
             assertTrue(configurable.isModified())
@@ -440,6 +444,47 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         component = configurable.createComponent()
         assertTrue(checkBox("regularText").isSelected)
         assertControlsMatch(expected)
+        assertFalse(configurable.isModified())
+    }
+
+    fun `test selection glow applies resets and discards drafts independently of text glow`() {
+        val live = GlowSettings.State(editorText = false, uiText = false, synthwaveStyle = false, selectionGlow = false)
+        settings.loadState(live)
+        configurable.reset()
+        checkBox("selectionGlow").isSelected = true
+        assertTrue(configurable.isModified())
+        assertControlsMatch(live.copy(selectionGlow = true))
+        assertEquals(live, settings.state)
+        assertTrue(applied.isEmpty())
+        configurable.reset()
+        assertControlsMatch(live)
+        assertFalse(configurable.isModified())
+
+        checkBox("selectionGlow").isSelected = true
+        configurable.apply()
+        val expected = live.copy(selectionGlow = true)
+        assertEquals(listOf(expected), applied)
+        assertEquals(expected, settings.state)
+        assertControlsMatch(expected)
+        assertFalse(configurable.isModified())
+
+        checkBox("selectionGlow").isSelected = false
+        configurable.reset()
+        assertControlsMatch(expected)
+        assertFalse(configurable.isModified())
+        checkBox("selectionGlow").isSelected = false
+        configurable.disposeUIResources()
+        component = configurable.createComponent()
+        assertControlsMatch(expected)
+        assertEquals(expected, settings.state)
+        assertEquals(listOf(expected), applied)
+        assertFalse(configurable.isModified())
+
+        checkBox("selectionGlow").isSelected = false
+        configurable.apply()
+        assertEquals(listOf(expected, live), applied)
+        assertEquals(live, settings.state)
+        assertControlsMatch(live)
         assertFalse(configurable.isModified())
     }
 
@@ -507,7 +552,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         val live = GlowSettings.State(
             enabled = false, radiusPx = 12f, intensity = 3f, editorText = false, uiText = false, icons = false,
             brightness = 0.9f, synthwaveStyle = false, editorGlowStrength = 0.2f, uiGlowStrength = 0.3f,
-            iconGlowStrength = 0.4f, performanceMode = true, regularText = true, initialThemePreserved = true,
+            iconGlowStrength = 0.4f, performanceMode = true, regularText = true, selectionGlow = false, initialThemePreserved = true,
         )
         settings.loadState(live)
         configurable.reset()
@@ -538,7 +583,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
     }
 
     fun `test reset to defaults can be discarded by reset or disposal`() {
-        val live = GlowSettings.State(enabled = false, brightness = 0.8f, initialThemePreserved = true)
+        val live = GlowSettings.State(enabled = false, brightness = 0.8f, selectionGlow = true, initialThemePreserved = true)
         settings.loadState(live)
         configurable.reset()
 
@@ -566,6 +611,7 @@ class GlowConfigurableTest : BasePlatformTestCase() {
 
             slider("brightness").value = 90
             checkBox("icons").isSelected = false
+            checkBox("selectionGlow").isSelected = true
             resetDefaultsButton().doClick()
             assertControlsMatch(defaults)
             assertFalse(configurable.isModified())
@@ -689,12 +735,12 @@ class GlowConfigurableTest : BasePlatformTestCase() {
         val values = mapOf("brightness" to 37, "radiusPx" to 9, "intensity" to 123,
             "editorGlowStrength" to 61, "uiGlowStrength" to 28, "iconGlowStrength" to 84)
         for ((name, value) in values) slider(name).value = value
-        for (name in listOf("enabled", "editorText", "uiText", "regularText", "icons", "synthwaveStyle", "performanceMode")) {
+        for (name in listOf("enabled", "editorText", "uiText", "regularText", "selectionGlow", "icons", "synthwaveStyle", "performanceMode")) {
             checkBox(name).isSelected = !checkBox(name).isSelected
         }
         val expected = saved.copy(enabled = false, editorText = false, uiText = false, regularText = true,
             icons = false, synthwaveStyle = false, performanceMode = true, brightness = 0.37f, radiusPx = 9f,
-            intensity = 1.23f, editorGlowStrength = 0.61f, uiGlowStrength = 0.28f, iconGlowStrength = 0.84f)
+            intensity = 1.23f, editorGlowStrength = 0.61f, uiGlowStrength = 0.28f, iconGlowStrength = 0.84f, selectionGlow = false)
         assertEquals(expected, preview.previewState)
         assertEquals(saved, settings.state)
         assertTrue(applied.isEmpty())
@@ -772,7 +818,8 @@ class GlowConfigurableTest : BasePlatformTestCase() {
 
     private fun assertControlsMatch(expected: GlowSettings.State) {
         for ((name, selected) in mapOf("enabled" to expected.enabled, "editorText" to expected.editorText,
-            "uiText" to expected.uiText, "regularText" to expected.regularText, "icons" to expected.icons,
+            "uiText" to expected.uiText, "regularText" to expected.regularText, "selectionGlow" to expected.selectionGlow,
+            "icons" to expected.icons,
             "synthwaveStyle" to expected.synthwaveStyle, "performanceMode" to expected.performanceMode)) {
             assertEquals(name, selected, checkBox(name).isSelected)
         }
