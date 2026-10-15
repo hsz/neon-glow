@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-15
+
 ### Added
 
 - Optional glow behind editor and input-field selections, controlled by the on-by-default `Text selection` setting.
@@ -110,7 +112,8 @@
 - Glow follows theme and colour scheme changes, pauses in Power Save mode, and applies without a restart.
 - Compatible with IntelliJ Platform 2025.3 and newer.
 
-[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/hsz/neon-glow/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/hsz/neon-glow/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/hsz/neon-glow/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/hsz/neon-glow/compare/v0.3.3...v0.3.4
