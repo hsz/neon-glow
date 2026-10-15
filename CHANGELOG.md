@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-15
+
 ### Added
 
 - A one-time notification inviting to sponsor the plugin, shown only after a couple of weeks of actual use with glow enabled, with `Remind me later` and `Don't show again` options; the plugin stays free
@@ -98,7 +100,8 @@
 - Glow follows theme and colour scheme changes, pauses in Power Save mode, and applies without a restart.
 - Compatible with IntelliJ Platform 2025.3 and newer.
 
-[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/hsz/neon-glow/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/hsz/neon-glow/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/hsz/neon-glow/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/hsz/neon-glow/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/hsz/neon-glow/compare/v0.3.2...v0.3.3
