@@ -10,13 +10,25 @@ import java.awt.Font
 import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.Shape
+import java.awt.font.TextLayout
 import java.awt.geom.Area
 import java.awt.image.BufferedImage
 import javax.swing.BorderFactory
 import javax.swing.JLabel
 import javax.swing.SwingUtilities
+import kotlin.math.ceil
 
 class UiGlowClippingTest {
+
+    @Test
+    fun `plain label glyphs fit preferred bounds at both scales`() = onEdt {
+        val labels = listOf("Couldn't load session settings" to Font("Dialog", Font.PLAIN, 14),
+            "f" to Font("Serif", Font.ITALIC, 14))
+        for (scale in listOf(1.0, 2.0)) for ((text, font) in labels) {
+            assertPixelsEqual(paintLabel(scale, padded = true, text = text, font = font),
+                paintLabel(scale, text = text, font = font), "plain label '$text' at scale $scale")
+        }
+    }
 
     @Test
     fun `tightly fitted labels have the same smooth halo as padded labels at both scales`() = onEdt {
@@ -26,14 +38,14 @@ class UiGlowClippingTest {
             try {
                 state.enabled = false
                 val plain = paintLabel(scale)
-                assertPixelsEqual(plain, paintLabel(scale, padded = true))
+                assertPixelsEqual(plain, paintLabel(scale, padded = true), "disabled glow at scale $scale, styled $styled")
                 state.enabled = true
                 val tight = paintLabel(scale)
                 val padded = paintLabel(scale, padded = true)
                 assertTrue("the reference halo extends above the label", (60 * scale).toInt().until((70 * scale).toInt()).any { y ->
                     (80 * scale).toInt().until((350 * scale).toInt()).any { x -> padded.getRGB(x, y) != plain.getRGB(x, y) }
                 })
-                assertPixelsEqual(padded, tight)
+                assertPixelsEqual(padded, tight, "halo at scale $scale, styled $styled")
             } finally { glow.dispose() }
         }
     }
@@ -79,42 +91,48 @@ class UiGlowClippingTest {
         }
     }
 
-    private fun paintLabel(scale: Double, padded: Boolean = false, clip: Shape? = null, nested: Boolean = false): BufferedImage {
-        val label = JLabel("Couldn't load session settings").also {
-            it.foreground = Color(0xcc7832)
-            it.font = Font("Dialog", Font.PLAIN, 14)
-        }
-        val size = label.preferredSize
-        val padding = if (padded) 60 else 0
-        label.border = BorderFactory.createEmptyBorder(padding, padding, padding, padding)
-        label.setBounds(90 - padding, 70 - padding, size.width + padding * 2, size.height + padding * 2)
-        val panel = JBPanel<JBPanel<*>>(null).also {
-            it.background = Color(0x252525)
-            it.isDoubleBuffered = false
-            it.setSize(500, 180)
-            if (nested) {
-                it.add(JBPanel<JBPanel<*>>(null).also { parent ->
-                    parent.background = it.background
-                    parent.isDoubleBuffered = false
-                    parent.setBounds(80, 70, 350, 90)
-                    label.setLocation(label.x - parent.x, label.y - parent.y)
-                    parent.add(label)
-                })
-            } else it.add(label)
-        }
+    private fun paintLabel(scale: Double, padded: Boolean = false, clip: Shape? = null, nested: Boolean = false,
+        text: String = "Couldn't load session settings", font: Font = Font("Dialog", Font.PLAIN, 14)): BufferedImage {
         val image = BufferedImage((500 * scale).toInt(), (180 * scale).toInt(), BufferedImage.TYPE_INT_ARGB)
         val g = image.createGraphics()
         try {
             g.scale(scale, scale)
             g.clip = clip ?: Rectangle(0, 0, 500, 180)
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+            val label = JLabel(text).also {
+                it.foreground = Color(0xcc7832)
+                it.font = font
+            }
+            val size = label.preferredSize
+            // Preferred width uses advances; some platform fonts paint beyond them even without glow.
+            val pixels = TextLayout(text, font, g.fontRenderContext).getPixelBounds(null, 0f, 0f)
+            val left = ceil(-pixels.x / scale).toInt().coerceAtLeast(0)
+            val right = (ceil((pixels.x + pixels.width) / scale).toInt() - size.width).coerceAtLeast(0)
+            val padding = if (padded) 60 else 0
+            label.border = BorderFactory.createEmptyBorder(padding, padding + left, padding, padding + right)
+            label.setBounds(90 - padding - left, 70 - padding,
+                size.width + padding * 2 + left + right, size.height + padding * 2)
+            val panel = JBPanel<JBPanel<*>>(null).also {
+                it.background = Color(0x252525)
+                it.isDoubleBuffered = false
+                it.setSize(500, 180)
+                if (nested) {
+                    it.add(JBPanel<JBPanel<*>>(null).also { parent ->
+                        parent.background = it.background
+                        parent.isDoubleBuffered = false
+                        parent.setBounds(80, 70, 350, 90)
+                        label.setLocation(label.x - parent.x, label.y - parent.y)
+                        parent.add(label)
+                    })
+                } else it.add(label)
+            }
             panel.paint(g)
         } finally { g.dispose() }
         return image
     }
 
-    private fun assertPixelsEqual(expected: BufferedImage, actual: BufferedImage) {
-        assertArrayEquals(expected.getRGB(0, 0, expected.width, expected.height, null, 0, expected.width),
+    private fun assertPixelsEqual(expected: BufferedImage, actual: BufferedImage, message: String) {
+        assertArrayEquals(message, expected.getRGB(0, 0, expected.width, expected.height, null, 0, expected.width),
             actual.getRGB(0, 0, actual.width, actual.height, null, 0, actual.width))
     }
 
